@@ -1,0 +1,40 @@
+services:
+  app:
+    container_name: back_end_pladonf
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 8000:8000
+    depends_on:
+      mysqldb:
+        condition: service_healthy
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysqldb:${MYSQL_PORT}/${DATABASE_NAME}
+      - SPRING_DATASOURCE_USERNAME=${MYSQL_ROOT_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${MYSQL_ROOT_PASSWORD}
+    networks:
+      - pladonf_network
+  mysqldb:
+    image: mysql:8.2.0
+    container_name: mysqldb_pladonf
+    environment:
+      - MYSQL_DATABASE=${DATABASE_NAME}
+      - MYSQL_ROOT_USERNAME=${MYSQL_ROOT_USERNAME-root}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD-root}
+    ports:
+      - 3306:${MYSQL_PORT-3306}
+    volumes:
+      - ./mysql-data:/var/lib/mysql
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      retries: 10
+      interval: 3s
+      timeout: 30s
+    networks:
+      - pladonf_network
+volumes:
+  mysql-data:
+networks:
+  pladonf_network:
+    driver: bridge
