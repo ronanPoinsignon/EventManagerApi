@@ -55,7 +55,7 @@ public class StringToLocalDateTimeConverter implements StringConverter<LocalDate
             return parse(date);
         }
 
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Aucun format de date correspondant.");
+        throw new BadRequestException("Aucun format de date correspondant.");
     }
 
     private TemporalAccessor checkIfPatternMatches(String value, DateTimeFormatter pattern) {
@@ -84,7 +84,7 @@ public class StringToLocalDateTimeConverter implements StringConverter<LocalDate
         try {
             return LocalDateTime.of(year, month, day, hour, minute, second, milli);
         } catch(DateTimeException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La date n'est pas valide.");
+            throw new BadRequestException("La date n'est pas valide.");
         }
     }
 
@@ -92,7 +92,7 @@ public class StringToLocalDateTimeConverter implements StringConverter<LocalDate
         try {
             return temporalAccessor.isSupported(chronoField) ? temporalAccessor.get(chronoField) : 0;
         } catch(DateTimeException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La date n'est pas valide.");
+            throw new BadRequestException("La date n'est pas valide.");
         }
     }
 
