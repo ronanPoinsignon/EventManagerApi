@@ -9,6 +9,6 @@ import java.util.Optional;
 public interface DiscordMemberRepository extends AbstractEntityRepository<DiscordMember> {
 
     Optional<DiscordMember> findByNickname(String nickname);
-    Optional<DiscordMember> findByDiscordId(long discorId);
+    Optional<DiscordMember> findByDiscordId(long discordId);
 
 }
