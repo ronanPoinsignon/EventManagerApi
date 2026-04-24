@@ -1,15 +1,15 @@
 package app.web.pojo;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
 public class PojoEvent extends PojoEntity {
 
     private String eventName;
-    private Date creationDate;
-    private Date startDate;
-    private Date endDate;
+    private LocalDateTime creationDate;
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
     private String location;
     private List<PojoEvent> subEvents;
     private PojoEvent parentEvent;
@@ -25,27 +25,27 @@ public class PojoEvent extends PojoEntity {
         this.eventName = eventName;
     }
 
-    public Date getCreationDate() {
+    public LocalDateTime getCreationDate() {
         return creationDate;
     }
 
-    public void setCreationDate(Date creationDate) {
+    public void setCreationDate(LocalDateTime creationDate) {
         this.creationDate = creationDate;
     }
 
-    public Date getStartDate() {
+    public LocalDateTime getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(Date startDate) {
+    public void setStartDate(LocalDateTime startDate) {
         this.startDate = startDate;
     }
 
-    public Date getEndDate() {
+    public LocalDateTime getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(Date endDate) {
+    public void setEndDate(LocalDateTime endDate) {
         this.endDate = endDate;
     }
 
