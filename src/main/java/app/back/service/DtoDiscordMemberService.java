@@ -31,6 +31,10 @@ public class DtoDiscordMemberService extends DtoAbstractEntityService<DiscordMem
         return repository.findByDiscordId(id);
     }
 
+    public Optional<DiscordMember> findByDiscordId(long id) {
+        return repository.findByDiscordId(id);
+    }
+
     public Optional<DiscordMember> findByNickname(String nickname) {
         return repository.findByNickname(nickname);
     }
