@@ -2,6 +2,8 @@ package app.web.handler;
 
 import app.web.exception.WebException;
 import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -17,8 +19,12 @@ import java.util.Objects;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
     @ExceptionHandler(Exception.class)
     public ProblemDetail handleException(Exception ex, ServletWebRequest request) {
+        logger.error(ex.getMessage(), ex);
+
         ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.INTERNAL_SERVER_ERROR);
 
         problem.setTitle(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
