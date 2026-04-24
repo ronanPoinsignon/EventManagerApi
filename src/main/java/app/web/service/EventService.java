@@ -31,7 +31,8 @@ public class EventService extends AbstractService<Event, PojoEvent, @NonNull Eve
 
     @Override
     public PojoEvent findByEventName(String name) {
-        var result =  getService().findByEventName(name).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Aucun événement trouvé pour le nom " + name + "."));
+        var result =  getService().findByEventName(name)
+                .orElseThrow(() -> new NotFoundException("Aucun événement trouvé pour le nom " + name + "."));
         return getTransform().toPojo(result);
     }
 
@@ -41,7 +42,7 @@ public class EventService extends AbstractService<Event, PojoEvent, @NonNull Eve
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Aucun événement donné.");
         }
 
-        var parentEvent = getService().findById(parentEventId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Aucun parent trouvé."));
+        var parentEvent = getService().findById(parentEventId).orElseThrow(() -> new NotFoundException("Aucun parent trouvé."));
         var dtoEvent = getTransform().toDto(event);
         dtoEvent.setParentEvent(parentEvent);
         dtoEvent = getService().save(dtoEvent);
