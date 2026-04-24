@@ -5,7 +5,8 @@ import app.back.repository.EventRepository;
 import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Service
 public class DtoEventService extends DtoAbstractEntityService<Event, @NonNull EventRepository> {
@@ -14,7 +15,23 @@ public class DtoEventService extends DtoAbstractEntityService<Event, @NonNull Ev
         super(repository);
     }
 
+    @Override
+    public Event save(Event entity) {
+        return super.save(entity);
+    }
+
     public Optional<Event> findByEventName(String name) {
         return repository.findByEventName(name);
+    }
+
+    public List<Event> findAllBeforeEnd(LocalDateTime date) {
+        if(date == null) {
+            date = LocalDateTime.now();
+        }
+        return repository.findAllBeforeEnd(date);
+    }
+
+    public Event getLast() {
+        return repository.getLast();
     }
 }
