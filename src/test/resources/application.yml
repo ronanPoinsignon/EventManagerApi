@@ -1,0 +1,25 @@
+app:
+  name: back_end_pladonf
+  description: ${app.name} is a Spring Boot application
+server:
+  port: 8000
+
+spring:
+  datasource:
+    platform: mysql
+    url: jdbc:mysql://localhost:${MYSQL_PORT}/test?createDatabaseIfNotExist=true
+    username: ${MYSQL_ROOT_USERNAME}
+    password: ${MYSQL_ROOT_PASSWORD}
+    initialization-mode: always
+    dialect: org.hibernate.dialect.MySQLDialect
+  db:
+  driver: com.mysql.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+      naming:
+        strategy: org.hibernate.cfg.ImprovedNamingStrategy
