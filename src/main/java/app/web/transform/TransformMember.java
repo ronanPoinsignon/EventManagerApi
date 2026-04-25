@@ -10,8 +10,8 @@ public class TransformMember extends AbstractTransform<DiscordMember, PojoDiscor
 
     @Override
     protected DiscordMember from(@Nonnull PojoDiscordMember pojo) {
-        var member = new DiscordMember();
-        member.setDiscordId(pojo.getId());
+        var member = super.from(pojo);
+        member.setDiscordId(pojo.getDiscordId());
         member.setNickname(pojo.getNickname());
         member.setFirstname(pojo.getFirstname());
 
@@ -20,10 +20,10 @@ public class TransformMember extends AbstractTransform<DiscordMember, PojoDiscor
 
     @Override
     protected PojoDiscordMember from(@Nonnull DiscordMember dto) {
-        var member = new PojoDiscordMember();
+        var member = super.from(dto);
         member.setNickname(dto.getNickname());
         member.setFirstname(dto.getFirstname());
-        member.setId(dto.getDiscordId());
+        member.setDiscordId(dto.getDiscordId());
 
         return member;
     }
