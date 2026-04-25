@@ -30,4 +30,18 @@ public abstract class DtoAbstractEntityService<T extends AbstractEntity<T>, U ex
         return repository.findById(id);
     }
 
+    public void delete(Long id) {
+        repository.deleteById(id);
+    }
+
+    public void delete(T id) {
+        repository.delete(id);
+    }
+
+    public Optional<T> findAndDelete(Long id) {
+        var resultOptional = repository.findById(id);
+        resultOptional.ifPresent(this::delete);
+        return resultOptional;
+    }
+
 }
