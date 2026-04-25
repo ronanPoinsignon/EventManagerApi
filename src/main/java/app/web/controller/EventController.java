@@ -1,7 +1,6 @@
 package app.web.controller;
 
 import app.web.api.EventServiceApi;
-import app.web.exception.BadRequestException;
 import app.web.pojo.PojoEvent;
 import org.springframework.web.bind.annotation.*;
 
@@ -49,12 +48,13 @@ public class EventController {
     }
 
     @PostMapping("/addTo")
-    public PojoEvent addTo(@RequestParam(value = "eventId", required = false) String eventId, @RequestParam(value = "discordMemberIds", required = false) List<String> discordMemberIds) {
-        if(eventId == null) {
-            throw new BadRequestException("Le champ eventId ne peut être null.");
-        }
+    public PojoEvent addTo(@RequestParam(value = "eventId") Long eventId, @RequestParam(value = "discordMemberIds", required = false) List<Long> discordMemberIds) {
+        return eventService.addTo(eventId, discordMemberIds);
+    }
 
-        return eventService.addTo(Long.parseLong(eventId), discordMemberIds);
+    @PostMapping("/addTodo")
+    public PojoEvent addTodo(@RequestParam(value = "eventId") Long eventId, @RequestParam("todo") String todo, @RequestParam(value = "discordMemberIds", required = false) List<Long> discordMemberIds) {
+        return eventService.addTodo(eventId, todo, discordMemberIds);
     }
 
 }
