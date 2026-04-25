@@ -15,11 +15,6 @@ public class DtoEventService extends DtoAbstractEntityService<Event, @NonNull Ev
         super(repository);
     }
 
-    @Override
-    public Event save(Event entity) {
-        return super.save(entity);
-    }
-
     public Optional<Event> findByEventName(String name) {
         return repository.findByEventName(name);
     }
