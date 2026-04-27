@@ -3,41 +3,44 @@ package app.web.transform;
 import app.back.dto.Event;
 import app.web.pojo.PojoEvent;
 import jakarta.annotation.Nonnull;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 public class TransformEvent extends AbstractTransform<Event, PojoEvent> {
 
-    private final TransformMember transformMember;
+    @Autowired
+    @Lazy
+    private TransformMember transformMember;
 
-    public TransformEvent(TransformMember transformMember) {
-        this.transformMember = transformMember;
-    }
+    @Autowired
+    @Lazy
+    private TransformTodoEntry transformTodoEntry;
 
     @Override
     protected Event from(@Nonnull PojoEvent pojo) {
         return from(pojo, new HashMap<>());
     }
 
-    private Event from(PojoEvent pojo, Map<Long, Event> eventMap) {
+    private Event from(PojoEvent pojo, Map<PojoEvent, Event> eventMap) {
         if(pojo == null) {
             return null;
         }
 
         var event = super.from(pojo);
-        eventMap.put(event.getId(), event);
+        eventMap.put(pojo, event);
 
         event.setEventName(pojo.getEventName());
         event.setStartDate(pojo.getStartDate());
         event.setEndDate(pojo.getEndDate());
         event.setLocation(pojo.getLocation());
         if(pojo.getParentEvent() != null) {
-            if(eventMap.containsKey(pojo.getParentEvent().getId())) {
-                event.setParentEvent(eventMap.get(pojo.getParentEvent().getId()));
+            if(eventMap.containsKey(pojo.getParentEvent())) {
+                event.setParentEvent(eventMap.get(pojo.getParentEvent()));
             } else {
                 var parentEvent = from(pojo.getParentEvent(), eventMap);
                 event.setParentEvent(parentEvent);
@@ -45,8 +48,8 @@ public class TransformEvent extends AbstractTransform<Event, PojoEvent> {
         }
         if(pojo.getSubEvents() != null) {
             event.setSubEvents(pojo.getSubEvents().stream().map(subEvent -> {
-                if(eventMap.containsKey(subEvent.getId())) {
-                    return eventMap.get(subEvent.getId());
+                if(eventMap.containsKey(subEvent)) {
+                    return eventMap.get(subEvent);
                 } else {
                     return from(subEvent, eventMap);
                 }
@@ -55,12 +58,16 @@ public class TransformEvent extends AbstractTransform<Event, PojoEvent> {
         if(pojo.getParticipants() != null) {
             event.setParticipants(pojo.getParticipants().stream().map(transformMember::toDto).toList());
         }
-        if(pojo.getTodoListMap() != null) {
-            event.setTodoListFromMap(pojo.getTodoListMap().entrySet()
-                    .stream().collect(Collectors.toMap(
-                            Map.Entry::getKey,
-                            entry -> transformMember.toDto(entry.getValue())
-                    )));
+        if(pojo.getTodoList() != null) {
+            pojo.getTodoList().stream().map(pojoTodo -> {
+                var pojoTodoEvent = pojoTodo.getEvent();
+                pojoTodo.setEvent(null);
+                var todo = transformTodoEntry.toDto(pojoTodo);
+                pojoTodo.setEvent(pojoTodoEvent);
+                todo.setEvent(event);
+
+                return todo;
+            }).forEach(todo -> event.addTodo(todo.getTodoName(), todo.getTodoValue(), todo.getDiscordMembers()));
         }
         event.setTricountUrl(pojo.getTricountUrl());
 
@@ -72,43 +79,47 @@ public class TransformEvent extends AbstractTransform<Event, PojoEvent> {
         return from(dto, new HashMap<>());
     }
 
-    private PojoEvent from(Event dto, Map<Long, PojoEvent> pojoEventMap) {
+    private PojoEvent from(Event dto, Map<Event, PojoEvent> pojoEventMap) {
         if(dto == null) {
             return null;
         }
 
-        var event = super.from(dto);
-        pojoEventMap.put(event.getId(), event);
+        var pojoEvent = super.from(dto);
+        pojoEventMap.put(dto, pojoEvent);
 
-        event.setEventName(dto.getEventName());
-        event.setCreationDate(dto.getCreationDate());
-        event.setStartDate(dto.getStartDate());
-        event.setEndDate(dto.getEndDate());
-        event.setLocation(dto.getLocation());
+        pojoEvent.setEventName(dto.getEventName());
+        pojoEvent.setCreationDate(dto.getCreationDate());
+        pojoEvent.setStartDate(dto.getStartDate());
+        pojoEvent.setEndDate(dto.getEndDate());
+        pojoEvent.setLocation(dto.getLocation());
         if(dto.getParentEvent() != null) {
-            if(pojoEventMap.containsKey(dto.getParentEvent().getId())) {
-                event.setParentEvent(pojoEventMap.get(dto.getParentEvent().getId()));
+            if(pojoEventMap.containsKey(dto.getParentEvent())) {
+                pojoEvent.setParentEvent(pojoEventMap.get(dto.getParentEvent()));
             } else {
                 var parentEvent = from(dto.getParentEvent(), pojoEventMap);
-                event.setParentEvent(parentEvent);
+                pojoEvent.setParentEvent(parentEvent);
             }
         }
-        event.setSubEvents(dto.getSubEvents().stream().map(subEvent -> {
-            if(pojoEventMap.containsKey(subEvent.getId())) {
-                return pojoEventMap.get(subEvent.getId());
+        pojoEvent.setSubEvents(dto.getSubEvents().stream().map(subEvent -> {
+            if(pojoEventMap.containsKey(subEvent)) {
+                return pojoEventMap.get(subEvent);
             } else {
                 return from(subEvent, pojoEventMap);
             }
         }).toList());
-        event.setParticipants(dto.getParticipants().stream().map(transformMember::toPojo).toList());
-        event.setTodoListMap(dto.getTodoListMap().entrySet()
-                .stream().collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        entry -> transformMember.toPojo(entry.getValue())
-                )));
-        event.setTricountUrl(dto.getTricountUrl());
+        pojoEvent.setParticipants(dto.getParticipants().stream().map(transformMember::toPojo).toList());
+        pojoEvent.setTodoList(dto.getTodoList().stream().map(todo -> {
+            var todoEvent = todo.getEvent();
+            todo.setEvent(null);
+            var pojo = transformTodoEntry.toPojo(todo);
+            todo.setEvent(todoEvent);
+            pojo.setEvent(pojoEvent);
 
-        return event;
+            return pojo;
+        }).toList());
+        pojoEvent.setTricountUrl(dto.getTricountUrl());
+
+        return pojoEvent;
     }
 
     @Override

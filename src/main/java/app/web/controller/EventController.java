@@ -1,6 +1,7 @@
 package app.web.controller;
 
 import app.web.api.EventServiceApi;
+import app.web.pojo.LightPojoTodoEntry;
 import app.web.pojo.PojoEvent;
 import org.springframework.web.bind.annotation.*;
 
@@ -58,8 +59,8 @@ public class EventController {
     }
 
     @PostMapping("/addTodo")
-    public PojoEvent addTodo(@RequestParam(value = "eventId") long eventId, @RequestParam("todo") String todo, @RequestParam(value = "discordMemberIds", required = false) List<Long> discordMemberIds) {
-        return eventService.addTodo(eventId, todo, discordMemberIds);
+    public PojoEvent addTodo(@RequestParam(value = "eventId") long eventId, @RequestBody LightPojoTodoEntry todoEntry) {
+        return eventService.addTodo(eventId, todoEntry);
     }
 
 }

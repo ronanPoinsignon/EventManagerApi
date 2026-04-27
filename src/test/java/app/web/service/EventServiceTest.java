@@ -2,6 +2,7 @@ package app.web.service;
 
 import app.back.dto.Event;
 import app.back.exception.BackBadRequestException;
+import app.utils.EventUtils;
 import app.web.exception.BadRequestException;
 import app.web.exception.NotFoundException;
 import app.web.pojo.PojoEvent;
@@ -10,32 +11,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestClassOrder(ClassOrderer.OrderAnnotation.class)
 @Transactional
 public class EventServiceTest extends BasicTestService<Event, PojoEvent, EventService> {
 
-    private final PojoEvent BASIC_EVENT = new PojoEvent();
-    private final AtomicInteger counter = new AtomicInteger();
+    private final EventUtils eventUtils;
 
-    public EventServiceTest(@Autowired EventService eventService) {
+    public EventServiceTest(@Autowired EventService eventService, @Autowired EventUtils eventUtils) {
         super(eventService);
-
-        BASIC_EVENT.setEventName("eventName");
-        BASIC_EVENT.setLocation("location");
-        BASIC_EVENT.setTricountUrl("tricount");
+        this.eventUtils = eventUtils;
     }
 
     @Override
     protected PojoEvent createBasicPojo() {
-        var event = new PojoEvent();
-        event.setEventName(BASIC_EVENT.getEventName() + "_" + counter.getAndIncrement());
-        event.setLocation(BASIC_EVENT.getLocation());
-        event.setTricountUrl(BASIC_EVENT.getTricountUrl());
-
-        return event;
+        return eventUtils.createBasicPojo();
     }
 
     @Test

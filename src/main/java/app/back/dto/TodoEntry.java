@@ -2,24 +2,54 @@ package app.back.dto;
 
 import jakarta.persistence.*;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Entity
-@Table(name = "todos")
+@Table(name = "todos", uniqueConstraints = @UniqueConstraint(columnNames = {"name", "event_id"}))
 public class TodoEntry extends AbstractEntity {
 
-    @Column(name = "todo")
+    @Column(name = "name", nullable = false)
+    private String todoName;
+
+    @Column(name = "todo", nullable = false)
     private String todoValue;
 
     @ManyToOne
-    @JoinColumn(name = "discord_member_id")
-    private Set<DiscordMember> discordMemberSet = new HashSet<>();
-    
-    public TodoEntry(String todoValue, Collection<DiscordMember> discordMemberSet) {
+    @JoinColumn(name = "event_id", nullable = false)
+    private Event event;
+
+    @ManyToMany
+    @JoinTable(
+            name = "todo_participants",
+            joinColumns = @JoinColumn(name = "todo_id"),
+            inverseJoinColumns = @JoinColumn(name = "discord_member_id")
+    )
+    private final Set<DiscordMember> discordMemberSet = new HashSet<>();
+
+    public TodoEntry() {
+
+    }
+
+    public TodoEntry(String todoName, String todoValue, Collection<DiscordMember> discordMemberSet) {
+        this.todoName = todoName;
         this.todoValue = todoValue;
         this.discordMemberSet.addAll(discordMemberSet);
+    }
+
+    public TodoEntry(String todoName, String todoValue, DiscordMember discordMember) {
+        this(todoName, todoValue, Set.of(discordMember));
+    }
+
+    public TodoEntry(String todoName, String todoValue) {
+        this(todoName, todoValue, Set.of());
+    }
+
+    public String getTodoName() {
+        return todoName;
+    }
+
+    public void setTodoName(String todoName) {
+        this.todoName = todoName;
     }
 
     public String getTodoValue() {
@@ -31,11 +61,31 @@ public class TodoEntry extends AbstractEntity {
     }
 
     public Set<DiscordMember> getDiscordMembers() {
-        return discordMemberSet;
+        return Collections.unmodifiableSet(discordMemberSet);
+    }
+
+    public boolean addDiscordMember(DiscordMember member) {
+        return this.discordMemberSet.add(member);
+    }
+
+    public boolean addDiscordMembers(Collection<DiscordMember> discordMemberCollection) {
+        return this.discordMemberSet.addAll(discordMemberCollection);
+    }
+
+    public boolean remove(DiscordMember discordMember) {
+        return this.discordMemberSet.remove(discordMember);
     }
 
     public void setDiscordMemberSet(Collection<DiscordMember> discordMemberSet) {
         this.discordMemberSet.clear();
         this.discordMemberSet.addAll(discordMemberSet);
+    }
+
+    public Event getEvent() {
+        return event;
+    }
+
+    public void setEvent(Event event) {
+        this.event = event;
     }
 }

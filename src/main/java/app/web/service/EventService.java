@@ -7,6 +7,7 @@ import app.back.service.DtoEventService;
 import app.web.api.EventServiceApi;
 import app.web.exception.BadRequestException;
 import app.web.exception.NotFoundException;
+import app.web.pojo.LightPojoTodoEntry;
 import app.web.pojo.PojoEvent;
 import app.web.transform.TransformEvent;
 import org.springframework.stereotype.Service;
@@ -14,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 @Service
@@ -96,10 +96,13 @@ public class EventService extends AbstractService<Event, PojoEvent, DtoEventServ
 
     @Transactional
     @Override
-    public PojoEvent addTodo(long eventId, String todo, List<Long> discordMemberIdList) {
+    public PojoEvent addTodo(long eventId, LightPojoTodoEntry lightPojoTodoEntry) {
+        if(lightPojoTodoEntry == null) {
+            throw new BadRequestException("Document d'information manquant.");
+        }
         var event = getService().findById(eventId).orElseThrow(() -> new NotFoundException("Aucun événement trouvé."));
-        var discordMemberList = findMembers(discordMemberIdList);
-        event.getTodoListMap().getOrDefault(todo, new HashSet<>()).addAll(discordMemberList);
+        var discordMemberList = findMembers(lightPojoTodoEntry.getParticipants());
+        event.addTodo(lightPojoTodoEntry.getName(), lightPojoTodoEntry.getTodo(), discordMemberList);
 
         return getTransform().toPojo(getService().save(event));
     }

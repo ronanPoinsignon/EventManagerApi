@@ -1,5 +1,6 @@
 package app.back.dto;
 
+import app.web.exception.BadRequestException;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -52,12 +53,7 @@ public class Event extends AbstractEntity {
 
     private transient boolean shouldUpdateTodos;
 
-    @ManyToMany
-    @JoinTable(
-            name = "todo_list_entries",
-            joinColumns = @JoinColumn(name = "todo_entry_id"),
-            inverseJoinColumns = @JoinColumn(name = "event_id")
-    )
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TodoEntry> todoListEntries = new ArrayList<>();
 
     @Column(name = "tricount")
@@ -79,23 +75,81 @@ public class Event extends AbstractEntity {
         return Collections.unmodifiableList(todoListEntries);
     }
 
-    public boolean addTodo(TodoEntry todo) {
-        var result = todoListEntries.add(todo);
-        shouldUpdateTodos |= result;
-        return result;
+    private Optional<TodoEntry> findByTodo(String todoName) {
+        return todoListEntries.stream()
+                .filter(t -> t.getTodoName().equals(todoName))
+                .findFirst();
     }
 
-    public boolean addTodos(Collection<TodoEntry> todoCollection) {
-        if(todoCollection == null) {
-            todoCollection = new ArrayList<>();
+    public TodoEntry addTodo(String name, String todo, Collection<DiscordMember> discordMemberCollection) {
+        if(name == null || name.isBlank()) {
+            throw new BadRequestException("Le champ name ne peut être null ou vide.");
         }
-        var result = todoListEntries.addAll(todoCollection);
-        shouldUpdateTodos |= result;
-        return result;
+        if(todo == null || todo.isBlank()) {
+            throw new BadRequestException("Le champ todo ne peut être null ou vide.");
+        }
+        if(discordMemberCollection == null) {
+            discordMemberCollection = new ArrayList<>();
+        }
+
+        var todoEntry = findByTodo(name).orElseGet(() -> {
+            var entry = new TodoEntry(name, todo);
+            entry.setEvent(this);
+            shouldUpdateTodos = true;
+            this.todoListEntries.add(entry);
+            return entry;
+        });
+
+        todoEntry.addDiscordMembers(discordMemberCollection);
+        return todoEntry;
     }
 
-    public boolean removeTodo(TodoEntry todo) {
-        var result = todoListEntries.remove(todo);
+    public TodoEntry addTodo(String name, String todo, DiscordMember discordMember) {
+        if(name == null || name.isBlank()) {
+            throw new BadRequestException("Le champ name ne peut être null ou vide.");
+        }
+        if(todo == null || todo.isBlank()) {
+            throw new BadRequestException("Le champ todo ne peut être null ou vide.");
+        }
+        if(discordMember == null) {
+            throw new BadRequestException("Le champ discordMember ne peut être null");
+        }
+
+        var todoEntry = findByTodo(name).orElseGet(() -> {
+            var entry = new TodoEntry(name, todo);
+            entry.setEvent(this);
+            return entry;
+        });
+
+        var result = todoEntry.addDiscordMember(discordMember);
+        shouldUpdateTodos |= result;
+        return todoEntry;
+    }
+
+    public TodoEntry addTodo(String name, String todo) {
+        if(name == null || name.isBlank()) {
+            throw new BadRequestException("Le champ name ne peut être null ou vide.");
+        }
+        if(todo == null || todo.isBlank()) {
+            throw new BadRequestException("Le champ todo ne peut être null ou vide.");
+        }
+
+        return findByTodo(name).orElseGet(() -> {
+            var entry = new TodoEntry(name, todo);
+            entry.setEvent(this);
+            this.todoListEntries.add(entry);
+            shouldUpdateTodos = true;
+            return entry;
+        });
+    }
+
+    public boolean removeTodo(String name) {
+        var todoEntryOptional = findByTodo(name);
+        if(todoEntryOptional.isEmpty()) {
+            return false;
+        }
+        
+        var result = this.todoListEntries.remove(todoEntryOptional.get());
         shouldUpdateTodos |= result;
         return result;
     }
@@ -104,10 +158,8 @@ public class Event extends AbstractEntity {
         if(todoListEntries == null) {
             todoListEntries = new ArrayList<>();
         }
-        var temp = new ArrayList<>(todoListEntries);
         this.todoListEntries.clear();
-        this.todoListEntries.addAll(temp);
-        shouldUpdateTodos = true;
+        todoListEntries.forEach(todo -> addTodo(todo.getTodoName(), todo.getTodoValue(), todo.getDiscordMembers()));
     }
 
     public boolean shouldUpdateParticipants() {
@@ -257,22 +309,5 @@ public class Event extends AbstractEntity {
             result.put(entry.getTodoValue(), entry.getDiscordMembers());
         }
         return result;
-    }
-
-    public List<TodoEntry> setTodoListFromMap(Map<String, List<DiscordMember>> todoListMap) {
-        if(todoListMap == null) {
-            return new ArrayList<>();
-        }
-
-        var temp = new HashMap<>(todoListMap);
-        this.todoListEntries.clear();
-        this.todoListEntries.addAll(temp.entrySet().stream().map(entry -> {
-            var todo = entry.getKey();
-            var discordMembers = entry.getValue();
-
-            return new TodoEntry(todo, discordMembers);
-        }).toList());
-
-        return this.todoListEntries;
     }
 }

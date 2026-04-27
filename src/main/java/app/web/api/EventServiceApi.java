@@ -1,5 +1,6 @@
 package app.web.api;
 
+import app.web.pojo.LightPojoTodoEntry;
 import app.web.pojo.PojoEvent;
 
 import java.time.LocalDateTime;
@@ -17,7 +18,7 @@ public interface EventServiceApi extends AbstractServiceApi<PojoEvent> {
 
     PojoEvent addTo(long parentEventId, List<Long> discordMemberIds);
 
-    PojoEvent addTodo(long eventId, String todo, List<Long> discordMemberIdList);
+    PojoEvent addTodo(long eventId, LightPojoTodoEntry lightPojoTodoEntry);
 
     PojoEvent removeSubEvent(long parentEventId, String subEventName);
 }

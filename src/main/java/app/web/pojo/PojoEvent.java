@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 
 public class PojoEvent extends PojoEntity {
 
@@ -17,7 +16,7 @@ public class PojoEvent extends PojoEntity {
     @JsonIgnore
     private PojoEvent parentEvent;
     private List<PojoDiscordMember> participants;
-    private Map<String, List<PojoDiscordMember>> todoListMap;
+    private List<PojoTodoEntry> todoList;
     private String tricountUrl;
 
     public String getEventName() {
@@ -84,12 +83,12 @@ public class PojoEvent extends PojoEntity {
         this.participants = participants;
     }
 
-    public Map<String, List<PojoDiscordMember>> getTodoListMap() {
-        return todoListMap;
+    public List<PojoTodoEntry> getTodoList() {
+        return todoList;
     }
 
-    public void setTodoListMap(Map<String, List<PojoDiscordMember>> todoListMap) {
-        this.todoListMap = todoListMap;
+    public void setTodoList(List<PojoTodoEntry> todoList) {
+        this.todoList = todoList;
     }
 
     public String getTricountUrl() {

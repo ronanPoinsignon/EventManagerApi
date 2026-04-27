@@ -2,6 +2,7 @@ package app.back.service;
 
 import app.back.dto.DiscordMember;
 import app.back.exception.BackBadRequestException;
+import app.utils.DiscordMemberUtils;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,25 +15,13 @@ import java.util.List;
 @Transactional
 public class DtoDiscordMemberServiceTest extends BasicDtoTestService<DiscordMember, DtoDiscordMemberService> {
 
-    private final DiscordMember BASE_DISCORD_MEMBER;
-
     public DtoDiscordMemberServiceTest(@Autowired DtoDiscordMemberService discordMemberService) {
         super(discordMemberService);
-
-        BASE_DISCORD_MEMBER = new DiscordMember();
-        BASE_DISCORD_MEMBER.setDiscordId(1L);
-        BASE_DISCORD_MEMBER.setFirstname("firstname");
-        BASE_DISCORD_MEMBER.setNickname("nickname");
     }
 
     @Override
     protected DiscordMember createBasicObject() {
-        var discordMember = new DiscordMember();
-        discordMember.setDiscordId(BASE_DISCORD_MEMBER.getDiscordId());
-        discordMember.setNickname(BASE_DISCORD_MEMBER.getNickname());
-        discordMember.setFirstname(BASE_DISCORD_MEMBER.getFirstname());
-
-        return discordMember;
+        return DiscordMemberUtils.createBasicEntity();
     }
 
     @Test
