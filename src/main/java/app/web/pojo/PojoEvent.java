@@ -17,7 +17,7 @@ public class PojoEvent extends PojoEntity {
     @JsonIgnore
     private PojoEvent parentEvent;
     private List<PojoDiscordMember> participants;
-    private Map<String, List<PojoDiscordMember>> todoList;
+    private Map<String, List<PojoDiscordMember>> todoListMap;
     private String tricountUrl;
 
     public String getEventName() {
@@ -84,12 +84,12 @@ public class PojoEvent extends PojoEntity {
         this.participants = participants;
     }
 
-    public Map<String, List<PojoDiscordMember>> getTodoList() {
-        return todoList;
+    public Map<String, List<PojoDiscordMember>> getTodoListMap() {
+        return todoListMap;
     }
 
-    public void setTodoList(Map<String, List<PojoDiscordMember>> todoList) {
-        this.todoList = todoList;
+    public void setTodoListMap(Map<String, List<PojoDiscordMember>> todoListMap) {
+        this.todoListMap = todoListMap;
     }
 
     public String getTricountUrl() {
