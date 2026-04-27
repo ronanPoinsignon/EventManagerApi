@@ -86,6 +86,9 @@ public class Event extends AbstractEntity {
     }
 
     public boolean addTodos(Collection<TodoEntry> todoCollection) {
+        if(todoCollection == null) {
+            todoCollection = new ArrayList<>();
+        }
         var result = todoListEntries.addAll(todoCollection);
         shouldUpdateTodos |= result;
         return result;
@@ -98,6 +101,9 @@ public class Event extends AbstractEntity {
     }
 
     public void setTodoList(List<TodoEntry> todoListEntries) {
+        if(todoListEntries == null) {
+            todoListEntries = new ArrayList<>();
+        }
         var temp = new ArrayList<>(todoListEntries);
         this.todoListEntries.clear();
         this.todoListEntries.addAll(temp);
@@ -119,6 +125,9 @@ public class Event extends AbstractEntity {
     }
 
     public boolean addParticipants(Collection<DiscordMember> discordMemberCollection) {
+        if(discordMemberCollection == null) {
+            discordMemberCollection = new ArrayList<>();
+        }
         var result = this.participants.addAll(discordMemberCollection);
         shouldUpdateParticipants |= result;
         return result;
@@ -131,6 +140,9 @@ public class Event extends AbstractEntity {
     }
 
     public void setParticipants(Collection<DiscordMember> participants) {
+        if(participants == null) {
+            participants = new ArrayList<>();
+        }
         var temp = new ArrayList<>(participants);
         this.participants.clear();
         this.participants.addAll(temp);
@@ -152,6 +164,9 @@ public class Event extends AbstractEntity {
     }
 
     public boolean addSubEvents(Collection<Event> subEventCollection) {
+        if(subEventCollection == null) {
+            subEventCollection = new ArrayList<>();
+        }
         var result = this.subEvents.addAll(subEventCollection);
         shouldUpdateSubEvents |= result;
         return result;
@@ -164,6 +179,9 @@ public class Event extends AbstractEntity {
     }
 
     public void setSubEvents(List<Event> subEvents) {
+        if(subEvents == null) {
+            subEvents = new ArrayList<>();
+        }
         var temp = new ArrayList<>(subEvents);
         this.subEvents.clear();
         this.subEvents.addAll(temp);
