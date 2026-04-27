@@ -6,6 +6,7 @@ import app.back.repository.EventRepository;
 import app.back.service.DtoDiscordMemberService;
 import app.back.service.DtoEventService;
 import app.web.api.EventServiceApi;
+import app.web.exception.BadRequestException;
 import app.web.exception.NotFoundException;
 import app.web.pojo.PojoEvent;
 import app.web.transform.TransformEvent;
@@ -41,7 +42,7 @@ public class EventService extends AbstractService<Event, PojoEvent, DtoEventServ
     @Transactional
     public PojoEvent addSubEvent(long parentEventId, PojoEvent event) {
         if(event == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Aucun événement donné.");
+            throw new BadRequestException("Aucun événement donné.");
         }
 
         var parentEvent = getService().findById(parentEventId).orElseThrow(() -> new NotFoundException("Aucun parent trouvé."));
