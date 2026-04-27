@@ -2,8 +2,6 @@ package app.back.dto;
 
 import jakarta.persistence.*;
 
-import java.util.Objects;
-
 @MappedSuperclass
 public abstract class AbstractEntity implements Identifiable {
 
@@ -20,16 +18,5 @@ public abstract class AbstractEntity implements Identifiable {
         this.id = id;
     }
 
-    @Override
-    public boolean equals(Object object) {
-        if(object == null || getClass() != object.getClass()) return false;
-        AbstractEntity that = (AbstractEntity) object;
-        return Objects.equals(id, that.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(id);
-    }
 }
 
