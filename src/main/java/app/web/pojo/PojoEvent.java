@@ -1,5 +1,7 @@
 package app.web.pojo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +14,7 @@ public class PojoEvent extends PojoEntity {
     private LocalDateTime endDate;
     private String location;
     private List<PojoEvent> subEvents;
+    @JsonIgnore
     private PojoEvent parentEvent;
     private List<PojoDiscordMember> participants;
     private Map<String, List<PojoDiscordMember>> todoList;
