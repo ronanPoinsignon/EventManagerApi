@@ -99,19 +99,4 @@ public class PojoEvent extends PojoEntity {
     public void setTricountUrl(String tricountUrl) {
         this.tricountUrl = tricountUrl;
     }
-
-    @Override
-    public String toString() {
-        return "PojoEvent{" +
-                "eventName='" + eventName + '\'' +
-                ", creationDate=" + creationDate +
-                ", startDate=" + startDate +
-                ", endDate=" + endDate +
-                ", location='" + location + '\'' +
-                ", subEvents=" + subEvents +
-                ", participants=" + participants +
-                ", todoList=" + todoList +
-                ", tricountUrl='" + tricountUrl + '\'' +
-                '}';
-    }
 }
