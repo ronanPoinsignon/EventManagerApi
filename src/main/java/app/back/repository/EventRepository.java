@@ -17,6 +17,6 @@ public interface EventRepository extends AbstractEntityRepository<Event> {
     List<Event> findAllBeforeEnd(LocalDateTime date);
 
     @NativeQuery("select * from events order by start_date desc limit 1")
-    Event getLast();
+    Optional<Event> getLast();
 
 }

@@ -45,7 +45,7 @@ public class DtoEventService extends DtoAbstractEntityService<Event, @NonNull Ev
         return repository.findAllBeforeEnd(date);
     }
 
-    public Event getLast() {
+    public Optional<Event> getLast() {
         return repository.getLast();
     }
 }

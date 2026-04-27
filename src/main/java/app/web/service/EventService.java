@@ -58,7 +58,8 @@ public class EventService extends AbstractService<Event, PojoEvent, @NonNull Eve
 
     @Override
     public PojoEvent getLast() {
-        return getTransform().toPojo(getService().getLast());
+        var result = getService().getLast().orElseThrow(() -> new NotFoundException("Aucun événement de renseigné."));
+        return getTransform().toPojo(result);
     }
 
     @Override
