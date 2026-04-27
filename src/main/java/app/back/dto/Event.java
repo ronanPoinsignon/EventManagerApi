@@ -1,7 +1,6 @@
 package app.back.dto;
 
 import jakarta.persistence.*;
-import org.springframework.data.annotation.Transient;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -30,20 +29,17 @@ public class Event extends AbstractEntity {
     @Column(name = "location")
     private String location;
 
-    @Transient
-    private boolean shouldUpdateSubEvents;
+    private transient boolean shouldUpdateSubEvents;
 
     @OneToMany(mappedBy = "parentEvent", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Event> subEvents = new ArrayList<>();
 
-    @Transient
-    private boolean shouldUpdateParentEvent;
+    private transient boolean shouldUpdateParentEvent;
 
     @ManyToOne
     private Event parentEvent;
 
-    @Transient
-    private boolean shouldUpdateParticipants;
+    private transient boolean shouldUpdateParticipants;
 
     @ManyToMany
     @JoinTable(
@@ -54,8 +50,7 @@ public class Event extends AbstractEntity {
     )
     private Set<DiscordMember> participants = new HashSet<>();
 
-    @Transient
-    private boolean shouldUpdateTodos;
+    private transient boolean shouldUpdateTodos;
 
     @ManyToMany
     @JoinTable(
