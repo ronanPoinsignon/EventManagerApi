@@ -1,6 +1,7 @@
 package app.back.service;
 
 import app.back.dto.DiscordMember;
+import app.back.exception.BackBadRequestException;
 import app.back.repository.DiscordMemberRepository;
 import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,15 @@ public class DtoDiscordMemberService extends DtoAbstractEntityService<DiscordMem
 
     protected DtoDiscordMemberService(DiscordMemberRepository repository) {
         super(repository);
+    }
+
+    @Override
+    public DiscordMember save(DiscordMember entity) {
+        if(entity.getDiscordId() == null) {
+            throw new BackBadRequestException("Il est obligatoire d'avoir un discordId.");
+        }
+
+        return super.save(entity);
     }
 
     @Override
