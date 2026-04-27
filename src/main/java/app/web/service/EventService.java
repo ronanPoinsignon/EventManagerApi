@@ -20,7 +20,7 @@ import java.util.HashSet;
 import java.util.List;
 
 @Service
-public class EventService extends AbstractService<Event, PojoEvent, @NonNull EventRepository, DtoEventService> implements EventServiceApi {
+public class EventService extends AbstractService<Event, PojoEvent, DtoEventService> implements EventServiceApi {
 
     private final DtoDiscordMemberService discordMemberService;
 

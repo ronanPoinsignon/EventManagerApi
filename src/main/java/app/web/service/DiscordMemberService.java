@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class DiscordMemberService extends AbstractService<DiscordMember, PojoDiscordMember, @NonNull DiscordMemberRepository, DtoDiscordMemberService> implements DiscordMemberServiceApi {
+public class DiscordMemberService extends AbstractService<DiscordMember, PojoDiscordMember, DtoDiscordMemberService> implements DiscordMemberServiceApi {
 
     public DiscordMemberService(DtoDiscordMemberService service, TransformMember transformMember) {
         super(service, transformMember);
