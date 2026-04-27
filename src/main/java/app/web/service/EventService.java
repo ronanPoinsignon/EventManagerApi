@@ -29,6 +29,7 @@ public class EventService extends AbstractService<Event, PojoEvent, @NonNull Eve
         this.discordMemberService = discordMemberService;
     }
 
+    @Transactional
     @Override
     public PojoEvent findByEventName(String name) {
         var result =  getService().findByEventName(name)
@@ -51,17 +52,20 @@ public class EventService extends AbstractService<Event, PojoEvent, @NonNull Eve
         return getTransform().toPojo(getService().save(parentEvent));
     }
 
+    @Transactional
     @Override
     public List<PojoEvent> findAllBeforeEnd(LocalDateTime date) {
         return getService().findAllBeforeEnd(date).stream().map(getTransform()::toPojo).toList();
     }
 
+    @Transactional
     @Override
     public PojoEvent getLast() {
         var result = getService().getLast().orElseThrow(() -> new NotFoundException("Aucun événement de renseigné."));
         return getTransform().toPojo(result);
     }
 
+    @Transactional
     @Override
     public PojoEvent addTo(long parentEventId, List<Long> discordMemberIdList) {
         var event = getService().findById(parentEventId).orElseThrow(() -> new NotFoundException("Aucun événement trouvé."));
@@ -75,6 +79,7 @@ public class EventService extends AbstractService<Event, PojoEvent, @NonNull Eve
         return getTransform().toPojo(getService().save(event));
     }
 
+    @Transactional
     @Override
     public PojoEvent addTodo(long eventId, String todo, List<Long> discordMemberIdList) {
         var event = getService().findById(eventId).orElseThrow(() -> new NotFoundException("Aucun événement trouvé."));

@@ -16,6 +16,7 @@ public class DiscordMemberService extends AbstractService<DiscordMember, PojoDis
         super(service, transformMember);
     }
 
+    @Transactional
     public PojoDiscordMember findByNickname(String nickname) {
         return getService().findByNickname(nickname)
                 .map(getTransform()::toPojo)
