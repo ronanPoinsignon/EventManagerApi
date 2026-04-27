@@ -2,7 +2,6 @@ package app.web.service;
 
 import app.back.dto.DiscordMember;
 import app.back.dto.Event;
-import app.back.repository.EventRepository;
 import app.back.service.DtoDiscordMemberService;
 import app.back.service.DtoEventService;
 import app.web.api.EventServiceApi;
@@ -10,8 +9,6 @@ import app.web.exception.BadRequestException;
 import app.web.exception.NotFoundException;
 import app.web.pojo.PojoEvent;
 import app.web.transform.TransformEvent;
-import org.jspecify.annotations.NonNull;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,8 +46,25 @@ public class EventService extends AbstractService<Event, PojoEvent, DtoEventServ
         var dtoEvent = getTransform().toDto(event);
         dtoEvent.setParentEvent(parentEvent);
         dtoEvent = getService().save(dtoEvent);
-        parentEvent.getSubEvents().add(dtoEvent);
-        return getTransform().toPojo(getService().save(parentEvent));
+
+        parentEvent.addSubEvent(dtoEvent);
+        parentEvent = getService().save(parentEvent);
+        return getTransform().toPojo(parentEvent);
+    }
+
+    @Override
+    @Transactional
+    public PojoEvent removeSubEvent(long parentEventId, String subEventName) {
+        if(subEventName == null || subEventName.isBlank()) {
+            throw new BadRequestException("le nom du sous événement ne peut être null.");
+        }
+
+        var event = getService().findById(parentEventId).orElseThrow(() -> new NotFoundException("Aucun événement trouvé."));
+        var subEvent = event.getSubEvents().stream().filter(subevent -> subevent.getEventName().equals(subEventName)).findFirst().orElseThrow(() -> new NotFoundException("Aucun sous événement trouvé pour ce nom"));
+        event.removeSubEvent(subEvent);
+        getService().delete(subEvent.getId());
+
+        return getTransform().toPojo(getService().save(event));
     }
 
     @Transactional

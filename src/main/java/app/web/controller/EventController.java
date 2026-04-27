@@ -37,6 +37,11 @@ public class EventController {
         return eventService.addSubEvent(parentEventId, event);
     }
 
+    @PostMapping("/removeSubEvent")
+    public PojoEvent removeSubEvent(@RequestParam("parentEventId") long parentEventId, @RequestParam("subEventName") String subEventName) {
+        return eventService.removeSubEvent(parentEventId, subEventName);
+    }
+
     @GetMapping("/findActive")
     public List<PojoEvent> findAllBeforeEnd(@RequestParam(required = false) LocalDateTime date) {
         return eventService.findAllBeforeEnd(date);
@@ -48,12 +53,12 @@ public class EventController {
     }
 
     @PostMapping("/addTo")
-    public PojoEvent addTo(@RequestParam(value = "eventId") Long eventId, @RequestParam(value = "discordMemberIds", required = false) List<Long> discordMemberIds) {
+    public PojoEvent addTo(@RequestParam(value = "eventId") long eventId, @RequestParam(value = "discordMemberIds", required = false) List<Long> discordMemberIds) {
         return eventService.addTo(eventId, discordMemberIds);
     }
 
     @PostMapping("/addTodo")
-    public PojoEvent addTodo(@RequestParam(value = "eventId") Long eventId, @RequestParam("todo") String todo, @RequestParam(value = "discordMemberIds", required = false) List<Long> discordMemberIds) {
+    public PojoEvent addTodo(@RequestParam(value = "eventId") long eventId, @RequestParam("todo") String todo, @RequestParam(value = "discordMemberIds", required = false) List<Long> discordMemberIds) {
         return eventService.addTodo(eventId, todo, discordMemberIds);
     }
 
