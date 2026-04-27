@@ -16,6 +16,13 @@ public class DtoDiscordMemberService extends DtoAbstractEntityService<DiscordMem
         super(repository);
     }
 
+    @Override
+    protected void update(DiscordMember entityToSave, DiscordMember dbEntity) {
+        dbEntity.setDiscordId(entityToSave.getDiscordId());
+        dbEntity.setFirstname(entityToSave.getFirstname());
+        dbEntity.setNickname(entityToSave.getNickname());
+    }
+
     public Optional<DiscordMember> findByDiscordId(long id) {
         return repository.findByDiscordId(id);
     }

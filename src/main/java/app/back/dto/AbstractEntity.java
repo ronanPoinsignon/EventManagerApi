@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import java.util.Objects;
 
 @MappedSuperclass
-public abstract class AbstractEntity<T extends AbstractEntity<T>> implements Identifiable, Mixin<T> {
+public abstract class AbstractEntity implements Identifiable {
 
     @Id
     @Column(name = "id")
@@ -21,16 +21,9 @@ public abstract class AbstractEntity<T extends AbstractEntity<T>> implements Ide
     }
 
     @Override
-    public void write(T dbEntity) {
-        if(this.id != null) {
-            dbEntity.setId(id);
-        }
-    }
-
-    @Override
     public boolean equals(Object object) {
         if(object == null || getClass() != object.getClass()) return false;
-        AbstractEntity<?> that = (AbstractEntity<?>) object;
+        AbstractEntity that = (AbstractEntity) object;
         return Objects.equals(id, that.id);
     }
 

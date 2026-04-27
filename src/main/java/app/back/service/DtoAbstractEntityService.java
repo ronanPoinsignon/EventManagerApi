@@ -1,11 +1,17 @@
 package app.back.service;
 
 import app.back.dto.AbstractEntity;
+import app.back.exception.BackNotFoundException;
 import app.back.repository.AbstractEntityRepository;
+import jakarta.persistence.EntityManager;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Optional;
 
-public abstract class DtoAbstractEntityService<T extends AbstractEntity<T>, U extends AbstractEntityRepository<T>> {
+public abstract class DtoAbstractEntityService<T extends AbstractEntity, U extends AbstractEntityRepository<T>> {
+
+    @Autowired
+    private EntityManager em;
 
     protected final U repository;
 
@@ -14,17 +20,17 @@ public abstract class DtoAbstractEntityService<T extends AbstractEntity<T>, U ex
     }
 
     public T save(T entity) {
-        T dbEntity;
-        if(entity.getId() == null) {
-            dbEntity = entity;
-        } else {
-            dbEntity = repository.findById(entity.getId()).orElse(entity);
+        // si l'objet est rattaché à spring, pas besoin de le find
+        if(entity.getId() == null || em.contains(entity)) {
+            return repository.save(entity);
         }
 
-        entity.write(dbEntity);
-
-        return repository.save(dbEntity);
+        var dbEntity = this.findById(entity.getId()).orElseThrow(() -> new BackNotFoundException("Aucun élément trouvé."));
+        update(entity, dbEntity);
+        return  repository.save(dbEntity);
     }
+
+    protected abstract void update(T entityToSave, T dbEntity);
 
     public Optional<T> findById(long id) {
         return repository.findById(id);

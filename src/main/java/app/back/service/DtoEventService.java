@@ -15,6 +15,25 @@ public class DtoEventService extends DtoAbstractEntityService<Event, @NonNull Ev
         super(repository);
     }
 
+    @Override
+    protected void update(Event entityToSave, Event dbEntity) {
+        dbEntity.setEventName(entityToSave.getEventName());
+        dbEntity.setLocation(entityToSave.getLocation());
+        dbEntity.setTricountUrl(entityToSave.getTricountUrl());
+        dbEntity.setStartDate(entityToSave.getStartDate());
+        dbEntity.setEndDate(entityToSave.getEndDate());
+        dbEntity.setParentEvent(entityToSave.getParentEvent());
+        if(entityToSave.shouldUpdateSubEvents()) {
+            dbEntity.setSubEvents(entityToSave.getSubEvents());
+        }
+        if(entityToSave.shouldUpdateParticipants()) {
+            dbEntity.setParticipants(entityToSave.getParticipants());
+        }
+        if(entityToSave.isShouldUpdateTodos()) {
+            dbEntity.setTodoList(entityToSave.getTodoList());
+        }
+    }
+
     public Optional<Event> findByEventName(String name) {
         return repository.findByEventName(name);
     }

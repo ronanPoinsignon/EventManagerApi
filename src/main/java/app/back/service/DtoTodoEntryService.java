@@ -8,4 +8,10 @@ public class DtoTodoEntryService extends DtoAbstractEntityService<TodoEntry, @No
     protected DtoTodoEntryService(@NonNull TodoEntryRepository repository) {
         super(repository);
     }
+
+    @Override
+    protected void update(TodoEntry entityToSave, TodoEntry dbEntity) {
+        dbEntity.setTodoValue(entityToSave.getTodoValue());
+        dbEntity.setDiscordMemberSet(entityToSave.getDiscordMembers());
+    }
 }
