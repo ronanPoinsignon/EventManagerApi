@@ -24,14 +24,18 @@ public abstract class AbstractTransform<T extends Identifiable, U extends PojoEn
 
     protected T from(@Nonnull U pojo) {
         var dto = createDto();
-        dto.setId(pojo.getId());
+        if(pojo.getId() != null) {
+            dto.setId(pojo.getId());
+        }
 
         return dto;
     }
 
     protected U from(@Nonnull T dto) {
         var pojo = createPojo();
-        pojo.setId(dto.getId());
+        if(dto.getId() != null) {
+            pojo.setId(dto.getId());
+        }
 
         return pojo;
     }
