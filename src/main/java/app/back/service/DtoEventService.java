@@ -74,6 +74,10 @@ public class DtoEventService extends DtoAbstractEntityService<Event, @NonNull Ev
         return repository.findByEventName(name);
     }
 
+    public Optional<Event> findByEventName(long parentId, String name) {
+        return repository.findByEventName(parentId, name);
+    }
+
     public List<Event> findAllBeforeEnd(LocalDateTime date) {
         if(date == null) {
             date = LocalDateTime.now();

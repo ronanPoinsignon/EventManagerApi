@@ -11,9 +11,12 @@ import java.util.Optional;
 @Repository
 public interface EventRepository extends AbstractEntityRepository<Event> {
 
+    @NativeQuery("select * from events where event_name = ?1 and parent_event_id is null")
     Optional<Event> findByEventName(String eventName);
 
-    @NativeQuery("select * from events where (end_date is null AND start_date < ?1) OR start_date < ?1")
+    @NativeQuery("select * from events where event_name = ?2 and parent_event_id = ?1")
+    Optional<Event> findByEventName(long parentId, String eventName);
+
     List<Event> findAllBeforeEnd(LocalDateTime date);
 
     @NativeQuery("select * from events order by start_date desc limit 1")
