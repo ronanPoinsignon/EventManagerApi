@@ -33,7 +33,7 @@ public class EventController {
     }
 
     @PostMapping("/addSubEvent")
-    public PojoEvent addSubEvent(int parentEventId, @RequestBody PojoEvent event) {
+    public PojoEvent addSubEvent(@RequestParam("parentEventId") long parentEventId, @RequestBody PojoEvent event) {
         return eventService.addSubEvent(parentEventId, event);
     }
 

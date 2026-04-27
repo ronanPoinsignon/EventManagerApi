@@ -37,7 +37,8 @@ public class EventService extends AbstractService<Event, PojoEvent, @NonNull Eve
     }
 
     @Override
-    public PojoEvent addSubEvent(int parentEventId, PojoEvent event) {
+    @Transactional
+    public PojoEvent addSubEvent(long parentEventId, PojoEvent event) {
         if(event == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Aucun événement donné.");
         }
@@ -61,12 +62,8 @@ public class EventService extends AbstractService<Event, PojoEvent, @NonNull Eve
     }
 
     @Override
-    public PojoEvent addTo(Long eventId, List<Long> discordMemberIdList) {
-        if(eventId == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "L'id de l'événement ne peut être null.");
-        }
-
-        var event = getService().findById(eventId).orElseThrow(() -> new NotFoundException("Aucun événement trouvé."));
+    public PojoEvent addTo(long parentEventId, List<Long> discordMemberIdList) {
+        var event = getService().findById(parentEventId).orElseThrow(() -> new NotFoundException("Aucun événement trouvé."));
         var discordMembers = findMembers(discordMemberIdList);
 
         var hasChanged = event.getParticipants().addAll(discordMembers);
@@ -78,11 +75,7 @@ public class EventService extends AbstractService<Event, PojoEvent, @NonNull Eve
     }
 
     @Override
-    public PojoEvent addTodo(Long eventId, String todo, List<Long> discordMemberIdList) {
-        if(eventId == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "L'id de l'événement ne peut être null.");
-        }
-
+    public PojoEvent addTodo(long eventId, String todo, List<Long> discordMemberIdList) {
         var event = getService().findById(eventId).orElseThrow(() -> new NotFoundException("Aucun événement trouvé."));
         var discordMemberList = findMembers(discordMemberIdList);
         event.getTodoListMap().getOrDefault(todo, new HashSet<>()).addAll(discordMemberList);
