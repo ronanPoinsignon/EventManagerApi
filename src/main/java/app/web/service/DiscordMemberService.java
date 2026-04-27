@@ -1,12 +1,10 @@
 package app.web.service;
 
 import app.back.dto.DiscordMember;
-import app.back.repository.DiscordMemberRepository;
 import app.back.service.DtoDiscordMemberService;
 import app.web.api.DiscordMemberServiceApi;
 import app.web.pojo.PojoDiscordMember;
 import app.web.transform.TransformMember;
-import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
