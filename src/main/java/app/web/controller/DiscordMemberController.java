@@ -16,11 +16,6 @@ public class DiscordMemberController {
         this.discordMemberService = discordMemberService;
     }
 
-    @GetMapping("/test")
-    public String test() {
-       return "coucou";
-    }
-
     @PostMapping("/save")
     public PojoDiscordMember create(@RequestBody PojoDiscordMember pojoDiscordMember) {
         return discordMemberService.save(pojoDiscordMember);
