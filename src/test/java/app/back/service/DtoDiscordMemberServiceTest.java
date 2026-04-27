@@ -1,22 +1,23 @@
 package app.back.service;
 
 import app.back.dto.DiscordMember;
+import app.back.exception.BackBadRequestException;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestClassOrder(ClassOrderer.OrderAnnotation.class)
 @Transactional
-public class DtoDiscordMemberServiceTest {
-
-    private final DtoDiscordMemberService discordMemberService;
+public class DtoDiscordMemberServiceTest extends BasicDtoTestService<DiscordMember, DtoDiscordMemberService> {
 
     private final DiscordMember BASE_DISCORD_MEMBER;
 
     public DtoDiscordMemberServiceTest(@Autowired DtoDiscordMemberService discordMemberService) {
-        this.discordMemberService = discordMemberService;
+        super(discordMemberService);
 
         BASE_DISCORD_MEMBER = new DiscordMember();
         BASE_DISCORD_MEMBER.setDiscordId(1L);
@@ -24,7 +25,8 @@ public class DtoDiscordMemberServiceTest {
         BASE_DISCORD_MEMBER.setNickname("nickname");
     }
 
-    private DiscordMember createDiscordMember() {
+    @Override
+    protected DiscordMember createBasicObject() {
         var discordMember = new DiscordMember();
         discordMember.setDiscordId(BASE_DISCORD_MEMBER.getDiscordId());
         discordMember.setNickname(BASE_DISCORD_MEMBER.getNickname());
@@ -36,10 +38,10 @@ public class DtoDiscordMemberServiceTest {
     @Test
     @Order(1)
     void testCreate() {
-        var discordMember = createDiscordMember();
+        var discordMember = createBasicObject();
 
         Assertions.assertNull(discordMember.getId());
-        var result = discordMemberService.save(discordMember);
+        var result = dtoService.save(discordMember);
 
         Assertions.assertNotNull(discordMember.getId());
         Assertions.assertEquals(discordMember.getId(), result.getId());
@@ -50,28 +52,46 @@ public class DtoDiscordMemberServiceTest {
 
     @Test
     @Order(2)
-    void testFindOk() {
-        var discordMember = createDiscordMember();
-        var result = discordMemberService.save(discordMember);
-        var resultFind = discordMemberService.findById(result.getId()).orElseThrow(() -> new RuntimeException("Aucun objet trouvé."));
-        Assertions.assertEquals(result, resultFind);
+    void testFindByDiscordId() {
+        var discordMember = createBasicObject();
+        dtoService.save(discordMember);
+        var result = dtoService.findByDiscordId(discordMember.getDiscordId()).orElseThrow(() -> new RuntimeException("Aucun objet trouvé"));
+        Assertions.assertEquals(discordMember.getId(), result.getId());
     }
 
     @Test
     @Order(3)
-    void testDelete() {
-        var discordMember = createDiscordMember();
-        discordMemberService.save(discordMember);
-        discordMemberService.delete(discordMember.getId());
-        var result = discordMemberService.findById(discordMember.getId());
-        Assertions.assertTrue(result.isEmpty());
+    void testFindByDiscordIdList() {
+        var discordMember1 = createBasicObject();
+        var discordMember2 = createBasicObject();
+        var discordMember3 = createBasicObject();
+
+        dtoService.save(discordMember1);
+        dtoService.save(discordMember2);
+        dtoService.save(discordMember3);
+
+        var discordIdListToFind = List.of(discordMember1.getId(), discordMember2.getId());
+        var result = dtoService.findByDiscordId(discordIdListToFind);
+        Assertions.assertEquals(2, result.size());
+        var match = result.stream().map(DiscordMember::getId).allMatch(discordIdListToFind::contains);
+        Assertions.assertTrue(match);
     }
 
     @Test
-    @Order(3)
-    void testFindNok() {
-        var result = discordMemberService.findById(3L);
-        Assertions.assertTrue(result.isEmpty());
+    @Order(4)
+    void testFindByNickname() {
+        var discordMember = createBasicObject();
+        dtoService.save(discordMember);
+        var result = dtoService.findByNickname(discordMember.getNickname()).orElseThrow(() -> new RuntimeException("Aucun objet trouvé"));
+        Assertions.assertEquals(discordMember.getId(), result.getId());
+    }
+
+    @Test
+    @Order(5)
+    void testSaveWithoutDiscordId() {
+        var discordMember = createBasicObject();
+        discordMember.setDiscordId(null);
+        Assertions.assertThrows(BackBadRequestException.class, () -> dtoService.save(discordMember));
     }
 
 }
