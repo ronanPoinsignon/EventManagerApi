@@ -178,6 +178,7 @@ public class DtoEventServiceTest extends BasicDtoTestService<Event, DtoEventServ
 
         var event1 = createBasicObject();
         event1.setStartDate(start.plusDays(3));
+        event1.setEndDate(null);
         dtoService.save(event1);
 
         var event2 = createBasicObject();
@@ -203,6 +204,32 @@ public class DtoEventServiceTest extends BasicDtoTestService<Event, DtoEventServ
 
     @Test
     @Order(12)
+    void testFindBeforeEndNullDate() {
+        var start = LocalDateTime.now();
+
+        var event1 = createBasicObject();
+        event1.setStartDate(start.plusDays(3));
+        event1.setEndDate(null);
+        dtoService.save(event1);
+
+        var event2 = createBasicObject();
+        event2.setStartDate(start.minusDays(2));
+        event2.setEndDate(null);
+        dtoService.save(event2);
+
+        var event3 = createBasicObject();
+        event3.setStartDate(start.minusDays(3));
+        event3.setEndDate(start.plusDays(4));
+        dtoService.save(event3);
+
+        var result = dtoService.findAllBeforeEnd(null);
+        Assertions.assertEquals(2, result.size());
+        var match = result.stream().map(Event::getId).allMatch(List.of(event1.getId(), event3.getId())::contains);
+        Assertions.assertTrue(match);
+    }
+
+    @Test
+    @Order(13)
     void testLastEventCreated() {
         var event1 = createBasicObject();
         // obligé de set en dur la différence pour ne pas que les deux événements ne se créent à la même date
