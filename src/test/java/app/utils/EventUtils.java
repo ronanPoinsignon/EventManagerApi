@@ -103,24 +103,29 @@ public class EventUtils {
         return event;
     }
 
-    public void addSubEvent(Event event) {
+    public Event addSubEvent(Event event) {
         if(event.getSubEvents() == null) {
             event.setSubEvents(new ArrayList<>());
         }
 
-        event.addSubEvent(createSubEvent(event));
+        var result = createSubEvent(event);
+        event.addSubEvent(result);
+
+        return result;
     }
 
-    public void addDiscordMember(Event event) {
+    public DiscordMember addDiscordMember(Event event) {
         var discordMember = discordMemberService.save(discordMemberUtils.createBasicEntity());
         if(event.getParticipants() == null) {
             event.setParticipants(new ArrayList<>());
         }
         event.addParticipant(discordMember);
+
+        return discordMember;
     }
 
-    public void addTodo(Event event) {
-        event.addTodo("todo_name_test_" + counterStrategy.get(), "todo_test_" + counterStrategy.get());
+    public TodoEntry addTodo(Event event) {
+        return event.addTodo("todo_name_test_" + counterStrategy.get(), "todo_test_" + counterStrategy.get());
     }
 
     private Event createSubEvent(Event parent) {
@@ -151,23 +156,29 @@ public class EventUtils {
         return pojo;
     }
 
-    public void addSubEvent(PojoEvent event) {
+    public PojoEvent addSubEvent(PojoEvent event) {
         if(event.getSubEvents() == null) {
             event.setSubEvents(new ArrayList<>());
         }
 
-        event.getSubEvents().add(createSubEvent(event));
+        var result = createSubEvent(event);
+        event.getSubEvents().add(result);
+        return result;
     }
 
-    public void addDiscordMember(PojoEvent event) {
+    public PojoDiscordMember addDiscordMember(PojoEvent event) {
         var discordMember = discordMemberService.save(discordMemberUtils.createBasicEntity());
         if(event.getParticipants() == null) {
             event.setParticipants(new ArrayList<>());
         }
-        event.getParticipants().add(transformMember.toPojo(discordMember));
+
+        var result = transformMember.toPojo(discordMember);
+        event.getParticipants().add(result);
+
+        return result;
     }
 
-    public void addTodo(PojoEvent event) {
+    public PojoTodoEntry addTodo(PojoEvent event) {
         var entry = new PojoTodoEntry();
         entry.setName("todo_name_test_" + counterStrategy.get());
         entry.setTodoValue("todo_test_" + counterStrategy.get());
@@ -175,6 +186,8 @@ public class EventUtils {
             event.setTodoList(new ArrayList<>());
         }
         event.getTodoList().add(entry);
+
+        return entry;
     }
 
     private PojoEvent createSubEvent(PojoEvent parent) {
