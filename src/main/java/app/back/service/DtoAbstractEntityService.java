@@ -22,12 +22,16 @@ public abstract class DtoAbstractEntityService<T extends AbstractEntity, U exten
     public T save(T entity) {
         // si l'objet est rattaché à spring, pas besoin de le find
         if(entity.getId() == null || em.contains(entity)) {
-            return repository.save(entity);
+            var result = repository.save(entity);
+            em.flush();
+            return result;
         }
 
         var dbEntity = this.findById(entity.getId()).orElseThrow(() -> new BackNotFoundException("Aucun élément trouvé."));
         update(entity, dbEntity);
-        return  repository.save(dbEntity);
+        var result = repository.save(dbEntity);
+        em.flush();
+        return result;
     }
 
     protected abstract void update(T entityToSave, T dbEntity);
