@@ -180,12 +180,23 @@ public class EventUtils {
                 DiscordMemberUtils.compare(participantList.get(i), pojoParticipantList.get(i));
             }
         }
-        var eventTodoMap = event.getTodoListMap();
-        if(eventTodoMap != null) {
-            Assertions.assertEquals(eventTodoMap.size(), result.getTodoList().size());
-            for(int i = 0; i < eventTodoMap.size(); i++) {
-                var resultTodo = result.getTodoList().get(i);
-                var eventTodo = eventTodoMap.get(resultTodo.getName());
+        if(event.getTodoList() != null) {
+            Assertions.assertEquals(event.getTodoList().size(), result.getTodoList().size());
+            for(int i = 0; i < event.getTodoList().size(); i++) {
+                var pojoTodoList = event.getTodoList();
+                var resultTodoListMap = result.getTodoList().stream().collect(Collectors.toMap(PojoTodoEntry::getName, Function.identity()));
+                var pojoTodoEntry = pojoTodoList.get(i);
+                var resultTodoEntry = resultTodoListMap.get(pojoTodoEntry.getTodoName());
+
+                var resultDiscordMemberMap = resultTodoEntry.getDiscordMembers().stream().collect(Collectors.toMap(PojoDiscordMember::getDiscordId, Function.identity()));
+                if(pojoTodoEntry.getDiscordMembers() == null) {
+                    pojoTodoEntry.setDiscordMemberSet(new ArrayList<>());
+                }
+                Assertions.assertEquals(pojoTodoEntry.getDiscordMembers().size(), resultDiscordMemberMap.size());
+                var pojoTodoDiscordMembers = new ArrayList<>(pojoTodoEntry.getDiscordMembers());
+                for(DiscordMember pojoTodoMember : pojoTodoDiscordMembers) {
+                    DiscordMemberUtils.compare(pojoTodoMember, resultDiscordMemberMap.get(pojoTodoMember.getDiscordId()));
+                }
             }
         }
 
@@ -257,7 +268,7 @@ public class EventUtils {
             }
         }
         if(pojo.getTodoList() != null) {
-            Assertions.assertEquals(pojo.getTodoList().size(), result.getTodoListMap().size());
+            Assertions.assertEquals(pojo.getTodoList().size(), result.getTodoList().size());
             for(int i = 0; i < pojo.getTodoList().size(); i++) {
                 var pojoTodoList = pojo.getTodoList();
                 var resultTodoListMap = result.getTodoList().stream().collect(Collectors.toMap(TodoEntry::getTodoName, Function.identity()));
@@ -269,9 +280,8 @@ public class EventUtils {
                     pojoTodoEntry.setDiscordMembers(new ArrayList<>());
                 }
                 Assertions.assertEquals(pojoTodoEntry.getDiscordMembers().size(), resultDiscordMemberMap.size());
-                for(int j = 0; j < pojoTodoEntry.getDiscordMembers().size(); j++) {
-                    var pojoTodoMember = pojoTodoEntry.getDiscordMembers().get(j);
-                    DiscordMemberUtils.compare(pojoTodoEntry.getDiscordMembers().get(j), resultDiscordMemberMap.get(pojoTodoMember.getDiscordId()));
+                for(var pojoTodoMember : pojoTodoEntry.getDiscordMembers()) {
+                    DiscordMemberUtils.compare(pojoTodoMember, resultDiscordMemberMap.get(pojoTodoMember.getDiscordId()));
                 }
             }
         }
