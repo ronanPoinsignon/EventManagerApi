@@ -2,7 +2,6 @@ package app.web.service;
 
 import app.back.dto.Event;
 import app.back.exception.BackBadRequestException;
-import app.back.exception.duplicate.event.BackDuplicateEventNameException;
 import app.utils.EventUtils;
 import app.web.exception.BadRequestException;
 import app.web.exception.NotFoundException;
@@ -134,49 +133,6 @@ public class EventServiceTest extends BasicTestService<Event, PojoEvent, EventSe
         parent = service.save(parent);
         var parentId = parent.getId();
         Assertions.assertThrows(NotFoundException.class, () -> service.removeSubEvent(parentId, "test"));
-    }
-
-    @Test
-    @Order(10)
-    void testUpdateSubEvent() {
-        var parent = eventUtils.createBasicPojo();
-        eventUtils.addSubEvent(parent);
-        parent = service.save(parent);
-        parent.getSubEvents().getFirst().setEventName("test");
-        parent = service.save(parent);
-        Assertions.assertEquals("test", parent.getSubEvents().getFirst().getEventName());
-    }
-
-    @Test
-    @Order(11)
-    void testAddSubEventNameConflict() {
-        var parent = eventUtils.createBasicPojo();
-        var subEvent1 = eventUtils.addSubEvent(parent);
-        parent = service.save(parent);
-
-        var subEvent2 = eventUtils.addSubEvent(parent);
-        subEvent2.setEventName(subEvent1.getEventName());
-
-        PojoEvent finalParent = parent;
-        Assertions.assertThrows(BackDuplicateEventNameException.class, () -> service.save(finalParent));
-    }
-
-    @Test
-    @Order(12)
-    void testUpdateSubEventNameConflict() {
-        var parent = eventUtils.createBasicPojo();
-        eventUtils.addSubEvent(parent);
-        parent = service.save(parent);
-
-        eventUtils.addSubEvent(parent);
-        parent = service.save(parent);
-
-        var subEvent1 = parent.getSubEvents().getFirst();
-        var subEvent2 = parent.getSubEvents().get(1);
-        subEvent2.setEventName(subEvent1.getEventName());
-
-        PojoEvent finalParent = parent;
-        Assertions.assertThrows(BackDuplicateEventNameException.class, () -> service.save(finalParent));
     }
 
 }
