@@ -84,45 +84,22 @@ public class Event extends AbstractEntity {
     }
 
     public TodoEntry addTodo(String name, String todo, Collection<DiscordMember> discordMemberCollection) {
-        if(name == null || name.isBlank()) {
-            throw new BadRequestException("Le champ name ne peut être null ou vide.");
-        }
-        if(todo == null || todo.isBlank()) {
-            throw new BadRequestException("Le champ todo ne peut être null ou vide.");
-        }
         if(discordMemberCollection == null) {
             discordMemberCollection = new ArrayList<>();
         }
 
-        var todoEntry = findByTodo(name).orElseGet(() -> {
-            var entry = new TodoEntry(name, todo);
-            entry.setEvent(this);
-            shouldUpdateTodos = true;
-            this.todoListEntries.add(entry);
-            return entry;
-        });
-
-        todoEntry.addDiscordMembers(discordMemberCollection);
+        var todoEntry = addTodo(name, todo);
+        var result = todoEntry.addDiscordMembers(discordMemberCollection);
+        shouldUpdateTodos |= result;
         return todoEntry;
     }
 
     public TodoEntry addTodo(String name, String todo, DiscordMember discordMember) {
-        if(name == null || name.isBlank()) {
-            throw new BadRequestException("Le champ name ne peut être null ou vide.");
-        }
-        if(todo == null || todo.isBlank()) {
-            throw new BadRequestException("Le champ todo ne peut être null ou vide.");
-        }
         if(discordMember == null) {
             throw new BadRequestException("Le champ discordMember ne peut être null");
         }
 
-        var todoEntry = findByTodo(name).orElseGet(() -> {
-            var entry = new TodoEntry(name, todo);
-            entry.setEvent(this);
-            return entry;
-        });
-
+        var todoEntry = addTodo(name, todo);
         var result = todoEntry.addDiscordMember(discordMember);
         shouldUpdateTodos |= result;
         return todoEntry;
