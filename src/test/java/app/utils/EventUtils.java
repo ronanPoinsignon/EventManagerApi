@@ -275,4 +275,119 @@ public class EventUtils {
         result.getParentEvent().setSubEvents(resultSubEvents);
     }
 
+    public static void compare(PojoEvent pojo, PojoEvent result) {
+        Assertions.assertEquals(pojo.getId(), result.getId());
+        Assertions.assertEquals(pojo.getEventName(), result.getEventName());
+        Assertions.assertEquals(pojo.getLocation(), result.getLocation());
+        Assertions.assertEquals(pojo.getTricountUrl(), result.getTricountUrl());
+        Assertions.assertEquals(pojo.getStartDate(), result.getStartDate());
+        Assertions.assertEquals(pojo.getEndDate(), result.getEndDate());
+        if(pojo.getSubEvents() != null) {
+            Assertions.assertEquals(pojo.getSubEvents().size(), result.getSubEvents().size());
+            for(int i = 0; i < pojo.getSubEvents().size(); i++) {
+                compare(pojo.getSubEvents().get(i), result.getSubEvents().get(i));
+            }
+        }
+        if(pojo.getParticipants() != null) {
+            Assertions.assertEquals(pojo.getParticipants().size(), result.getParticipants().size());
+            for(int i = 0; i < pojo.getParticipants().size(); i++) {
+                var pojoParticipantList = new ArrayList<>(pojo.getParticipants());
+                var resultParticipantList = new ArrayList<>(result.getParticipants());
+                DiscordMemberUtils.compare(pojoParticipantList.get(i), resultParticipantList.get(i));
+            }
+        }
+        if(pojo.getTodoList() != null) {
+            Assertions.assertEquals(pojo.getTodoList().size(), result.getTodoList().size());
+            for(int i = 0; i < pojo.getTodoList().size(); i++) {
+                var pojoTodoList = pojo.getTodoList();
+                var resultTodoListMap = result.getTodoList().stream().collect(Collectors.toMap(PojoTodoEntry::getName, Function.identity()));
+                var pojoTodoEntry = pojoTodoList.get(i);
+                var resultTodoEntry = resultTodoListMap.get(pojoTodoEntry.getName());
+
+                var resultDiscordMemberMap = resultTodoEntry.getDiscordMembers().stream().collect(Collectors.toMap(PojoDiscordMember::getDiscordId, Function.identity()));
+                if(pojoTodoEntry.getDiscordMembers() == null) {
+                    pojoTodoEntry.setDiscordMembers(new ArrayList<>());
+                }
+                Assertions.assertEquals(pojoTodoEntry.getDiscordMembers().size(), resultDiscordMemberMap.size());
+                for(var pojoTodoMember : pojoTodoEntry.getDiscordMembers()) {
+                    DiscordMemberUtils.compare(pojoTodoMember, resultDiscordMemberMap.get(pojoTodoMember.getDiscordId()));
+                }
+            }
+        }
+
+        if(pojo.getParentEvent() == null && result.getParentEvent() == null) {
+            return;
+        }
+
+        // pour comparer de façon récursive, on enlève les enfants des parents pour ne pas revenir au point de départ lors de la récupération des sous événements
+        var pojoSubEvents = pojo.getParentEvent().getSubEvents();
+        var resultSubEvents = result.getParentEvent().getSubEvents();
+
+        pojo.getParentEvent().setSubEvents(new ArrayList<>());
+        result.getParentEvent().setSubEvents(new ArrayList<>());
+
+        compare(pojo.getParentEvent(), result.getParentEvent());
+
+        pojo.getParentEvent().setSubEvents(pojoSubEvents);
+        result.getParentEvent().setSubEvents(resultSubEvents);
+    }
+
+    public static void compare(Event event, Event result) {
+        Assertions.assertEquals(event.getId(), result.getId());
+        Assertions.assertEquals(event.getEventName(), result.getEventName());
+        Assertions.assertEquals(event.getLocation(), result.getLocation());
+        Assertions.assertEquals(event.getTricountUrl(), result.getTricountUrl());
+        Assertions.assertEquals(event.getStartDate(), result.getStartDate());
+        Assertions.assertEquals(event.getEndDate(), result.getEndDate());
+        if(event.getSubEvents() != null) {
+            Assertions.assertEquals(event.getSubEvents().size(), result.getSubEvents().size());
+            for(int i = 0; i < event.getSubEvents().size(); i++) {
+                compare(event.getSubEvents().get(i), result.getSubEvents().get(i));
+            }
+        }
+        if(event.getParticipants() != null) {
+            Assertions.assertEquals(event.getParticipants().size(), result.getParticipants().size());
+            for(int i = 0; i < event.getParticipants().size(); i++) {
+                var participantList = new ArrayList<>(event.getParticipants());
+                var resultParticipantList = new ArrayList<>(result.getParticipants());
+                DiscordMemberUtils.compare(participantList.get(i), resultParticipantList.get(i));
+            }
+        }
+        if(event.getTodoList() != null) {
+            Assertions.assertEquals(event.getTodoList().size(), result.getTodoList().size());
+            for(int i = 0; i < event.getTodoList().size(); i++) {
+                var todoList = event.getTodoList();
+                var resultTodoListMap = result.getTodoList().stream().collect(Collectors.toMap(TodoEntry::getTodoName, Function.identity()));
+                var todoEntry = todoList.get(i);
+                var resultTodoEntry = resultTodoListMap.get(todoEntry.getTodoName());
+
+                var resultDiscordMemberMap = resultTodoEntry.getDiscordMembers().stream().collect(Collectors.toMap(DiscordMember::getDiscordId, Function.identity()));
+                if(todoEntry.getDiscordMembers() == null) {
+                    todoEntry.setDiscordMemberSet(new ArrayList<>());
+                }
+                Assertions.assertEquals(todoEntry.getDiscordMembers().size(), resultDiscordMemberMap.size());
+                var todoDiscordMembers = new ArrayList<>(todoEntry.getDiscordMembers());
+                for(var pojoTodoMember : todoDiscordMembers) {
+                    DiscordMemberUtils.compare(pojoTodoMember, resultDiscordMemberMap.get(pojoTodoMember.getDiscordId()));
+                }
+            }
+        }
+
+        if(event.getParentEvent() == null && result.getParentEvent() == null) {
+            return;
+        }
+
+        // pour comparer de façon récursive, on enlève les enfants des parents pour ne pas revenir au point de départ lors de la récupération des sous événements
+        var pojoSubEvents = event.getParentEvent().getSubEvents();
+        var resultSubEvents = result.getParentEvent().getSubEvents();
+
+        event.getParentEvent().setSubEvents(new ArrayList<>());
+        result.getParentEvent().setSubEvents(new ArrayList<>());
+
+        compare(event.getParentEvent(), result.getParentEvent());
+
+        event.getParentEvent().setSubEvents(pojoSubEvents);
+        result.getParentEvent().setSubEvents(resultSubEvents);
+    }
+
 }

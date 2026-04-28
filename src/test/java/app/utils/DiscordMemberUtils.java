@@ -28,14 +28,28 @@ public class DiscordMemberUtils {
         return dm;
     }
 
-    public static void compare(DiscordMember dm, PojoDiscordMember pojo) {
-        Assertions.assertEquals(dm.getId(), pojo.getId());
-        Assertions.assertEquals(dm.getDiscordId(), pojo.getDiscordId());
-        Assertions.assertEquals(dm.getFirstname(), pojo.getFirstname());
-        Assertions.assertEquals(dm.getNickname(), pojo.getNickname());
+    public static void compare(DiscordMember dm, PojoDiscordMember result) {
+        Assertions.assertEquals(dm.getId(), result.getId());
+        Assertions.assertEquals(dm.getDiscordId(), result.getDiscordId());
+        Assertions.assertEquals(dm.getFirstname(), result.getFirstname());
+        Assertions.assertEquals(dm.getNickname(), result.getNickname());
     }
 
     public static void compare(PojoDiscordMember pojo, DiscordMember result) {
+        Assertions.assertEquals(pojo.getId(), result.getId());
+        Assertions.assertEquals(pojo.getDiscordId(), result.getDiscordId());
+        Assertions.assertEquals(pojo.getFirstname(), result.getFirstname());
+        Assertions.assertEquals(pojo.getNickname(), result.getNickname());
+    }
+
+    public static void compare(DiscordMember dm, DiscordMember result) {
+        Assertions.assertEquals(dm.getId(), result.getId());
+        Assertions.assertEquals(dm.getDiscordId(), result.getDiscordId());
+        Assertions.assertEquals(dm.getFirstname(), result.getFirstname());
+        Assertions.assertEquals(dm.getNickname(), result.getNickname());
+    }
+
+    public static void compare(PojoDiscordMember pojo, PojoDiscordMember result) {
         Assertions.assertEquals(pojo.getId(), result.getId());
         Assertions.assertEquals(pojo.getDiscordId(), result.getDiscordId());
         Assertions.assertEquals(pojo.getFirstname(), result.getFirstname());
