@@ -2,6 +2,7 @@ package app.back.service;
 
 import app.back.dto.Event;
 import app.back.exception.BackBadRequestException;
+import app.utils.DiscordMemberUtils;
 import app.utils.EventUtils;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -17,10 +19,12 @@ import java.util.List;
 public class DtoEventServiceTest extends BasicDtoTestService<Event, DtoEventService> {
 
     private final EventUtils eventUtils;
+    private final DiscordMemberUtils discordMemberUtils;
 
-    public DtoEventServiceTest(@Autowired DtoEventService dtoEventService, @Autowired EventUtils eventUtils) {
+    public DtoEventServiceTest(@Autowired DtoEventService dtoEventService, @Autowired EventUtils eventUtils, @Autowired DiscordMemberUtils discordMemberUtils) {
         super(dtoEventService);
         this.eventUtils = eventUtils;
+        this.discordMemberUtils = discordMemberUtils;
     }
 
     @Override
@@ -32,15 +36,20 @@ public class DtoEventServiceTest extends BasicDtoTestService<Event, DtoEventServ
     @Order(1)
     void testCreate() {
         eventUtils.stopAll();
+        discordMemberUtils.stopAll();
         var base = eventUtils.createFullEntity();
         var event = eventUtils.createFullEntity();
+        discordMemberUtils.playAll();
         eventUtils.playALl();
 
         event.setCreationDate(base.getCreationDate());
         event = dtoService.save(event);
 
         base.setId(event.getId());
-        base.getSubEvents().getFirst().setId(event.getSubEvents().getFirst().getId());
+        var baseSubEvent = base.getSubEvents().getFirst();
+        var eventSubEvent = event.getSubEvents().getFirst();
+        baseSubEvent.setId(eventSubEvent.getId());
+        new ArrayList<>(base.getParticipants()).getFirst().setId(new ArrayList<>(event.getParticipants()).getFirst().getId());
         EventUtils.compare(base, event);
     }
 

@@ -19,6 +19,14 @@ public class DiscordMemberUtils {
         playCounter();
     }
 
+    public void stopAll() {
+        stopCounter();
+    }
+
+    public void playAll() {
+        playCounter();
+    }
+
     public void stopCounter() {
         counterStrategy = counter::get;
     }
