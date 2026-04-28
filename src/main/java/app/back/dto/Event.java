@@ -206,15 +206,6 @@ public class Event extends AbstractEntity {
         return result;
     }
 
-    public boolean addSubEvents(Collection<Event> subEventCollection) {
-        if(subEventCollection == null) {
-            subEventCollection = new ArrayList<>();
-        }
-        var result = this.subEvents.addAll(subEventCollection);
-        shouldUpdateSubEvents |= result;
-        return result;
-    }
-
     public boolean removeSubEvent(Event event) {
         var result = this.subEvents.remove(event);
         shouldUpdateSubEvents |= result;
