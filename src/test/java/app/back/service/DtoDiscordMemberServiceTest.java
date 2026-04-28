@@ -3,6 +3,7 @@ package app.back.service;
 import app.back.dto.DiscordMember;
 import app.back.exception.BackBadRequestException;
 import app.utils.DiscordMemberUtils;
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -84,6 +85,30 @@ public class DtoDiscordMemberServiceTest extends BasicDtoTestService<DiscordMemb
         var discordMember = createBasicObject();
         discordMember.setDiscordId(null);
         Assertions.assertThrows(BackBadRequestException.class, () -> dtoService.save(discordMember));
+    }
+
+    @Test
+    @Order(6)
+    void updateWithNewEntity(@Autowired EntityManager entityManager) {
+        discordMemberUtils.stopAll();
+        var base = createBasicObject();
+        var discordMember = createBasicObject();
+        discordMemberUtils.playAll();
+
+        discordMember = dtoService.save(discordMember);
+        entityManager.detach(discordMember);
+        discordMember.setFirstname("update");
+
+        discordMember = dtoService.save(discordMember);
+        Assertions.assertEquals(base.getNickname(), discordMember.getNickname());
+        Assertions.assertEquals(base.getDiscordId(), discordMember.getDiscordId());
+        Assertions.assertEquals("update", discordMember.getFirstname());
+
+        entityManager.detach(discordMember);
+        discordMember = dtoService.findById(discordMember.getId()).orElseThrow(() -> new RuntimeException("Aucun objet trouvé."));
+        Assertions.assertEquals(base.getNickname(), discordMember.getNickname());
+        Assertions.assertEquals(base.getDiscordId(), discordMember.getDiscordId());
+        Assertions.assertEquals("update", discordMember.getFirstname());
     }
 
 }
