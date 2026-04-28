@@ -20,7 +20,7 @@ public interface EventRepository extends AbstractEntityRepository<Event> {
     @NativeQuery("select * from events where (end_date is null AND start_date >= ?1) OR end_date >= ?1")
     List<Event> findAllBeforeEnd(LocalDateTime date);
 
-    @NativeQuery("select * from events order by creation_date desc limit 1")
+    @NativeQuery("select * from events where parent_event_id is null order by creation_date desc limit 1")
     Optional<Event> getLast();
 
 }
