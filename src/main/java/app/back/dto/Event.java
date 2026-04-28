@@ -228,7 +228,7 @@ public class Event extends AbstractEntity {
     }
 
     public void setParentEvent(Event parentEvent) {
-        if(parentEvent != null) {
+        if(parentEvent != null && this.parentEvent != parentEvent) {
             shouldUpdateParentEvent = true;
         } else {
             if(this.parentEvent != null) {
