@@ -150,6 +150,10 @@ public class Event extends AbstractEntity {
     }
 
     public boolean addParticipant(DiscordMember discordMember) {
+        if(discordMember == null) {
+            return false;
+        }
+
         var result = this.participants.add(discordMember);
         shouldUpdateParticipants |= result;
         return result;
@@ -165,6 +169,10 @@ public class Event extends AbstractEntity {
     }
 
     public boolean removeParticipant(DiscordMember discordMember) {
+        if(discordMember == null) {
+            return false;
+        }
+
         var result = this.participants.remove(discordMember);
         shouldUpdateParticipants |= result;
         return result;
@@ -189,6 +197,10 @@ public class Event extends AbstractEntity {
     }
 
     public boolean addSubEvent(Event event) {
+        if(event == null) {
+            return false;
+        }
+
         var result = this.subEvents.add(event);
         shouldUpdateSubEvents |= result;
         return result;
