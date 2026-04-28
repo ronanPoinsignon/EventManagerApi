@@ -8,4 +8,8 @@ public class BackDuplicateEventNameException extends BackDuplicateConstraintExce
         super("Un événement de ce nom existe déjà.");
     }
 
+    public BackDuplicateEventNameException(String message) {
+        super(message);
+    }
+
 }
