@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -72,6 +73,36 @@ public class DtoDiscordMemberServiceTest extends BasicDtoTestService<DiscordMemb
 
     @Test
     @Order(4)
+    void testFindByDiscordIdListEmpty() {
+        var discordMember1 = createBasicObject();
+        var discordMember2 = createBasicObject();
+        var discordMember3 = createBasicObject();
+
+        dtoService.save(discordMember1);
+        dtoService.save(discordMember2);
+        dtoService.save(discordMember3);
+
+        var result = dtoService.findByDiscordId(new ArrayList<>());
+        Assertions.assertTrue(result.isEmpty());
+    }
+
+    @Test
+    @Order(5)
+    void testFindByDiscordIdListNull() {
+        var discordMember1 = createBasicObject();
+        var discordMember2 = createBasicObject();
+        var discordMember3 = createBasicObject();
+
+        dtoService.save(discordMember1);
+        dtoService.save(discordMember2);
+        dtoService.save(discordMember3);
+
+        var result = dtoService.findByDiscordId(null);
+        Assertions.assertTrue(result.isEmpty());
+    }
+
+    @Test
+    @Order(6)
     void testFindByNickname() {
         var discordMember = createBasicObject();
         dtoService.save(discordMember);
@@ -80,7 +111,7 @@ public class DtoDiscordMemberServiceTest extends BasicDtoTestService<DiscordMemb
     }
 
     @Test
-    @Order(5)
+    @Order(7)
     void testSaveWithoutDiscordId() {
         var discordMember = createBasicObject();
         discordMember.setDiscordId(null);
@@ -88,7 +119,7 @@ public class DtoDiscordMemberServiceTest extends BasicDtoTestService<DiscordMemb
     }
 
     @Test
-    @Order(6)
+    @Order(8)
     void updateWithNewEntity(@Autowired EntityManager entityManager) {
         discordMemberUtils.stopAll();
         var base = createBasicObject();
