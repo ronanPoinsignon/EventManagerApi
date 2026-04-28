@@ -3,6 +3,7 @@ package app.web.pojo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 public class PojoEvent extends PojoEntity {
@@ -64,7 +65,7 @@ public class PojoEvent extends PojoEntity {
     }
 
     public void setSubEvents(List<PojoEvent> subEvents) {
-        this.subEvents = subEvents;
+        this.subEvents = new ArrayList<>(subEvents);
     }
 
     public PojoEvent getParentEvent() {
@@ -80,7 +81,7 @@ public class PojoEvent extends PojoEntity {
     }
 
     public void setParticipants(List<PojoDiscordMember> participants) {
-        this.participants = participants;
+        this.participants = new ArrayList<>(participants);
     }
 
     public List<PojoTodoEntry> getTodoList() {
@@ -88,7 +89,7 @@ public class PojoEvent extends PojoEntity {
     }
 
     public void setTodoList(List<PojoTodoEntry> todoList) {
-        this.todoList = todoList;
+        this.todoList = new ArrayList<>(todoList);
     }
 
     public String getTricountUrl() {
