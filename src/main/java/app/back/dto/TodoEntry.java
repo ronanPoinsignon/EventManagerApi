@@ -33,6 +33,9 @@ public class TodoEntry extends AbstractEntity {
     }
 
     public TodoEntry(String todoName, String todoValue, Collection<DiscordMember> discordMemberSet) {
+        if(discordMemberSet == null) {
+            discordMemberSet = new ArrayList<>();
+        }
         this.todoName = todoName;
         this.todoValue = todoValue;
         this.discordMemberSet.addAll(discordMemberSet);
