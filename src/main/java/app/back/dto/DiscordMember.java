@@ -40,12 +40,4 @@ public class DiscordMember extends AbstractEntity {
     public void setFirstname(String firstname) {
         this.firstname = firstname;
     }
-
-    @Override
-    public String toString() {
-        return "DiscordMember{" +
-                "nickname='" + nickname + '\'' +
-                ", firstname='" + firstname + '\'' +
-                '}';
-    }
 }
