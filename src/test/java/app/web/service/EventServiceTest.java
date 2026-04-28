@@ -96,13 +96,13 @@ public class EventServiceTest extends BasicTestService<Event, PojoEvent, EventSe
     }
 
     @Test
-    @Order(7)
+    @Order(8)
     void testRemoveSubEventOnEmpty() {
         Assertions.assertThrows(BadRequestException.class, () -> service.removeSubEvent(0, ""));
     }
 
     @Test
-    @Order(7)
+    @Order(9)
     void testRemoveSubEventOnSubEventNotFound() {
         var parent = createBasicPojo();
         parent = service.save(parent);

@@ -18,12 +18,14 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @Service
 public class EventUtils {
 
     private static final AtomicLong counter = new AtomicLong();
+    private Supplier<Long> counterStrategy;
 
     @Autowired
     @Lazy
@@ -41,6 +43,17 @@ public class EventUtils {
     @Lazy
     private TransformMember transformMember;
 
+    public EventUtils() {
+        countCounter();
+    }
+
+    public void stopCounter() {
+        counterStrategy = counter::get;
+    }
+
+    public void countCounter() {
+        counterStrategy = counter::incrementAndGet;
+    }
 
     public Event createBasicEntity() {
         var event = new Event();
@@ -175,7 +188,22 @@ public class EventUtils {
                 var eventTodo = eventTodoMap.get(resultTodo.getName());
             }
         }
-        compareParent(event.getParentEvent(), result.getParentEvent());
+
+        if(event.getParentEvent() == null && result.getParentEvent() == null) {
+            return;
+        }
+
+        // pour comparer de façon récursive, on enlève les enfants des parents pour ne pas revenir au point de départ lors de la récupération des sous événements
+        var subEvents = event.getParentEvent().getSubEvents();
+        var resultSubEvents = result.getParentEvent().getSubEvents();
+
+        event.getParentEvent().setSubEvents(new ArrayList<>());
+        result.getParentEvent().setSubEvents(new ArrayList<>());
+
+        compare(event.getParentEvent(), result.getParentEvent());
+
+        event.getParentEvent().setSubEvents(subEvents);
+        result.getParentEvent().setSubEvents(resultSubEvents);
     }
 
     private static void compareParent(Event event, PojoEvent result) {
@@ -247,7 +275,22 @@ public class EventUtils {
                 }
             }
         }
-        compareParent(pojo.getParentEvent(), result.getParentEvent());
+
+        if(pojo.getParentEvent() == null && result.getParentEvent() == null) {
+            return;
+        }
+
+        // pour comparer de façon récursive, on enlève les enfants des parents pour ne pas revenir au point de départ lors de la récupération des sous événements
+        var pojoSubEvents = pojo.getParentEvent().getSubEvents();
+        var resultSubEvents = result.getParentEvent().getSubEvents();
+
+        pojo.getParentEvent().setSubEvents(new ArrayList<>());
+        result.getParentEvent().setSubEvents(new ArrayList<>());
+
+        compare(pojo.getParentEvent(), result.getParentEvent());
+
+        pojo.getParentEvent().setSubEvents(pojoSubEvents);
+        result.getParentEvent().setSubEvents(resultSubEvents);
     }
 
     private static void compareParent(PojoEvent pojo, Event result) {

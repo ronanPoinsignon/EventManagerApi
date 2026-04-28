@@ -2,6 +2,7 @@ package app.back.service;
 
 import app.back.dto.Event;
 import app.back.exception.BackBadRequestException;
+import app.utils.EventUtils;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -9,37 +10,39 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestClassOrder(ClassOrderer.OrderAnnotation.class)
 @Transactional
 public class DtoEventServiceTest extends BasicDtoTestService<Event, DtoEventService> {
 
-    private final Event BASIC_EVENT;
-    private final AtomicInteger counter = new AtomicInteger();
+    private final EventUtils eventUtils;
 
-    public DtoEventServiceTest(@Autowired DtoEventService dtoEventService) {
+    public DtoEventServiceTest(@Autowired DtoEventService dtoEventService, @Autowired EventUtils eventUtils) {
         super(dtoEventService);
-
-        BASIC_EVENT = new Event();
-        BASIC_EVENT.setEventName("eventName");
-        BASIC_EVENT.setLocation("location");
-        BASIC_EVENT.setTricountUrl("tricount");
+        this.eventUtils = eventUtils;
     }
 
     @Override
     protected Event createBasicObject() {
-        var event = new Event();
-        event.setEventName(BASIC_EVENT.getEventName() + '_' + counter.getAndIncrement());
-        event.setLocation(BASIC_EVENT.getLocation());
-        event.setTricountUrl(BASIC_EVENT.getTricountUrl());
-
-        return event;
+        return eventUtils.createBasicEntity();
     }
 
     @Test
     @Order(1)
+    void testCreate() {
+        var date = LocalDateTime.now();
+        eventUtils.stopCounter();
+        var base = eventUtils.createFullEntity();
+        var event = eventUtils.createFullEntity();
+        eventUtils.countCounter();
+
+        event.setCreationDate(base.getCreationDate());
+        event = dtoService.save(event);
+    }
+
+    @Test
+    @Order(2)
     void testFindByEventNameOk() {
         var event = createBasicObject();
         dtoService.save(event);
@@ -48,7 +51,7 @@ public class DtoEventServiceTest extends BasicDtoTestService<Event, DtoEventServ
     }
 
     @Test
-    @Order(2)
+    @Order(3)
     void testFindByEventNameNok() {
         var event = createBasicObject();
         dtoService.save(event);
@@ -57,7 +60,7 @@ public class DtoEventServiceTest extends BasicDtoTestService<Event, DtoEventServ
     }
 
     @Test
-    @Order(3)
+    @Order(4)
     void testFindByEventNameNull() {
         var event = createBasicObject();
         dtoService.save(event);
@@ -66,7 +69,7 @@ public class DtoEventServiceTest extends BasicDtoTestService<Event, DtoEventServ
     }
 
     @Test
-    @Order(4)
+    @Order(5)
     void testFindByEventNameSubEvent() {
         var event = createBasicObject();
         event = dtoService.save(event);
@@ -78,7 +81,7 @@ public class DtoEventServiceTest extends BasicDtoTestService<Event, DtoEventServ
     }
 
     @Test
-    @Order(5)
+    @Order(6)
     void testSaveEventNameNull() {
         var event = createBasicObject();
         event.setEventName(null);
@@ -86,7 +89,7 @@ public class DtoEventServiceTest extends BasicDtoTestService<Event, DtoEventServ
     }
 
     @Test
-    @Order(6)
+    @Order(7)
     void testSaveSameEventInfo() {
         var event1 = createBasicObject();
         var event2 = createBasicObject();
@@ -97,7 +100,7 @@ public class DtoEventServiceTest extends BasicDtoTestService<Event, DtoEventServ
     }
 
     @Test
-    @Order(7)
+    @Order(8)
     void testSaveSameEventInfoOnChildren() {
         var event1 = createBasicObject();
         event1 = dtoService.save(event1);
@@ -111,16 +114,18 @@ public class DtoEventServiceTest extends BasicDtoTestService<Event, DtoEventServ
     }
 
     @Test
-    @Order(8)
+    @Order(9)
     void testFindBeforeEndWithStart() {
         var start = LocalDateTime.now();
 
         var event1 = createBasicObject();
         event1.setStartDate(start.minusDays(1));
+        event1.setEndDate(null);
         dtoService.save(event1);
 
         var event2 = createBasicObject();
         event2.setStartDate(start.minusDays(2));
+        event2.setEndDate(null);
         dtoService.save(event2);
 
         var result = dtoService.findAllBeforeEnd(start.minusDays(1));
@@ -129,7 +134,7 @@ public class DtoEventServiceTest extends BasicDtoTestService<Event, DtoEventServ
     }
 
     @Test
-    @Order(9)
+    @Order(10)
     void testFindBeforeEndWithEnd() {
         var start = LocalDateTime.now();
 
@@ -155,7 +160,7 @@ public class DtoEventServiceTest extends BasicDtoTestService<Event, DtoEventServ
     }
 
     @Test
-    @Order(10)
+    @Order(11)
     void testFindBeforeEndWithStartAndEnd() {
         var start = LocalDateTime.now();
 
@@ -185,7 +190,7 @@ public class DtoEventServiceTest extends BasicDtoTestService<Event, DtoEventServ
     }
 
     @Test
-    @Order(11)
+    @Order(12)
     void testLastEventCreated() {
         var event1 = createBasicObject();
         // obligé de set en dur la différence pour ne pas que les deux événements ne se créent à la même date
@@ -204,7 +209,7 @@ public class DtoEventServiceTest extends BasicDtoTestService<Event, DtoEventServ
     }
 
     @Test
-    @Order(12)
+    @Order(13)
     void testLastEventCreatedEmpty() {
         var result = dtoService.getLast();
         Assertions.assertTrue(result.isEmpty());
