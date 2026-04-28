@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@TestClassOrder(ClassOrderer.OrderAnnotation.class)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @Transactional
 public class DtoEventServiceTest extends BasicDtoTestService<Event, DtoEventService> {
 

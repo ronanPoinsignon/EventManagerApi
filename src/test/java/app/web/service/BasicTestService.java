@@ -4,13 +4,13 @@ import app.back.dto.AbstractEntity;
 import app.back.repository.AbstractEntityRepository;
 import app.back.service.DtoAbstractEntityService;
 import app.web.pojo.PojoEntity;
-import org.junit.jupiter.api.ClassOrderer;
-import org.junit.jupiter.api.TestClassOrder;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@TestClassOrder(ClassOrderer.OrderAnnotation.class)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @Transactional
 public abstract class BasicTestService<T extends AbstractEntity, P extends PojoEntity, S extends AbstractService<T, P, ? extends DtoAbstractEntityService<T, ? extends AbstractEntityRepository<T>>>> {
 

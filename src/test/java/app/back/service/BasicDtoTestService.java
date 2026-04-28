@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Arrays;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@TestClassOrder(ClassOrderer.OrderAnnotation.class)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @Transactional
 public abstract class BasicDtoTestService<T extends AbstractEntity, S extends DtoAbstractEntityService<T, ? extends AbstractEntityRepository<T>>> {
 
