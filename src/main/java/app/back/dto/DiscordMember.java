@@ -1,11 +1,12 @@
 package app.back.dto;
 
+import app.back.entityname.EntityTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "discord_members")
+@Table(name = EntityTable.DISCORD_MEMBER)
 public class DiscordMember extends AbstractEntity {
 
     @Column(name = "discordId", nullable = false)

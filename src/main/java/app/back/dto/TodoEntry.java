@@ -1,11 +1,13 @@
 package app.back.dto;
 
+import app.back.entityname.Contrainte;
+import app.back.entityname.EntityTable;
 import jakarta.persistence.*;
 
 import java.util.*;
 
 @Entity
-@Table(name = "todos", uniqueConstraints = @UniqueConstraint(columnNames = {"name", "event_id"}))
+@Table(name = EntityTable.TODO_ENTRY, uniqueConstraints = @UniqueConstraint(columnNames = {"name", "event_id"}, name = Contrainte.TODO_DUPLICATE_NAME))
 public class TodoEntry extends AbstractEntity {
 
     @Column(name = "name", nullable = false)

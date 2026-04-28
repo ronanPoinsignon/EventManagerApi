@@ -1,5 +1,7 @@
 package app.back.dto;
 
+import app.back.entityname.Contrainte;
+import app.back.entityname.EntityTable;
 import app.web.exception.BadRequestException;
 import jakarta.persistence.*;
 
@@ -7,7 +9,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 @Entity
-@Table(name = "events", uniqueConstraints = @UniqueConstraint(columnNames = { "parent_event_id", "event_name" }))
+@Table(name = EntityTable.EVENT, uniqueConstraints = @UniqueConstraint(columnNames = { "parent_event_id", "event_name" }, name = Contrainte.EVENT_DUPLICATE_NAME))
 public class Event extends AbstractEntity {
 
     @Basic
@@ -33,7 +35,7 @@ public class Event extends AbstractEntity {
     private transient boolean shouldUpdateSubEvents;
 
     @OneToMany(mappedBy = "parentEvent", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Event> subEvents = new ArrayList<>();
+    private final List<Event> subEvents = new ArrayList<>();
 
     private transient boolean shouldUpdateParentEvent;
 
@@ -47,14 +49,14 @@ public class Event extends AbstractEntity {
             name = "discord_member_id",
             joinColumns = @JoinColumn(name = "participant_id"),
             inverseJoinColumns = @JoinColumn(name = "event_id"),
-            uniqueConstraints = @UniqueConstraint(columnNames = {"participant_id", "event_id"})
+            uniqueConstraints = @UniqueConstraint(columnNames = {"participant_id", "event_id"}, name = Contrainte.EVENT_DUPLICATE_PARTICIPANT)
     )
-    private Set<DiscordMember> participants = new HashSet<>();
+    private final Set<DiscordMember> participants = new HashSet<>();
 
     private transient boolean shouldUpdateTodos;
 
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<TodoEntry> todoListEntries = new ArrayList<>();
+    private final List<TodoEntry> todoListEntries = new ArrayList<>();
 
     @Column(name = "tricount")
     private String tricountUrl;
@@ -299,15 +301,4 @@ public class Event extends AbstractEntity {
         this.eventName = eventName;
     }
 
-    public Map<String, Set<DiscordMember>> getTodoListMap() {
-        Map<String, Set<DiscordMember>> result = new HashMap<>();
-        if(todoListEntries == null) {
-            return result;
-        }
-
-        for (TodoEntry entry : todoListEntries) {
-            result.put(entry.getTodoValue(), entry.getDiscordMembers());
-        }
-        return result;
-    }
 }
