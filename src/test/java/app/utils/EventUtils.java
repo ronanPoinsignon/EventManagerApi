@@ -5,6 +5,7 @@ import app.back.dto.Event;
 import app.back.dto.TodoEntry;
 import app.back.service.DtoDiscordMemberService;
 import app.back.service.DtoTodoEntryService;
+import app.web.pojo.PojoDiscordMember;
 import app.web.pojo.PojoEvent;
 import app.web.pojo.PojoTodoEntry;
 import app.web.transform.TransformMember;
@@ -217,35 +218,6 @@ public class EventUtils {
         result.getParentEvent().setSubEvents(resultSubEvents);
     }
 
-    private static void compareParent(Event event, PojoEvent result) {
-        if(event == null && result == null) {
-            return;
-        }
-        if(event == null) {
-            Assertions.fail("Event null but not result");
-        }
-        if(result == null) {
-            Assertions.fail("Result null but not event");
-        }
-
-        var subEvent = event.getSubEvents();
-        var resultSubEvent = result.getSubEvents();
-        if(event.getSubEvents() != null) {
-            Assertions.assertEquals(subEvent.size(), resultSubEvent.size());
-            for(int i = 0; i < subEvent.size(); i++) {
-                var child = subEvent.get(i);
-                Assertions.assertEquals(event, child.getParentEvent());
-                var resultChild = resultSubEvent.get(i);
-                Assertions.assertEquals(result, resultChild.getParentEvent());
-                child.setParentEvent(null);
-                resultChild.setParentEvent(null);
-                compare(child, resultChild);
-                child.setParentEvent(event);
-                resultChild.setParentEvent(result);
-            }
-        }
-    }
-
     public static void compare(PojoEvent pojo, Event result) {
         Assertions.assertEquals(pojo.getId(), result.getId());
         Assertions.assertEquals(pojo.getEventName(), result.getEventName());
@@ -301,35 +273,6 @@ public class EventUtils {
 
         pojo.getParentEvent().setSubEvents(pojoSubEvents);
         result.getParentEvent().setSubEvents(resultSubEvents);
-    }
-
-    private static void compareParent(PojoEvent pojo, Event result) {
-        if(pojo == null && result == null) {
-            return;
-        }
-        if(pojo == null) {
-            Assertions.fail("Event null but not result");
-        }
-        if(result == null) {
-            Assertions.fail("Result null but not event");
-        }
-
-        var subEvent = pojo.getSubEvents();
-        var resultSubEvent = result.getSubEvents();
-        if(pojo.getSubEvents() != null) {
-            Assertions.assertEquals(subEvent.size(), resultSubEvent.size());
-            for(int i = 0; i < subEvent.size(); i++) {
-                var child = subEvent.get(i);
-                Assertions.assertEquals(pojo, child.getParentEvent());
-                var resultChild = resultSubEvent.get(i);
-                Assertions.assertEquals(result, resultChild.getParentEvent());
-                child.setParentEvent(null);
-                resultChild.setParentEvent(null);
-                compare(child, resultChild);
-                child.setParentEvent(pojo);
-                resultChild.setParentEvent(result);
-            }
-        }
     }
 
 }
