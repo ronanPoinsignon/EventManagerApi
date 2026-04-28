@@ -8,24 +8,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestClassOrder(ClassOrderer.OrderAnnotation.class)
 public class TransformDiscordMemberTest {
 
-    private static final AtomicLong counter = new AtomicLong();
-
     private final TransformMember transformMember;
+    private final DiscordMemberUtils discordMemberUtils;
 
-    public TransformDiscordMemberTest(@Autowired TransformMember transformMember) {
+    public TransformDiscordMemberTest(@Autowired TransformMember transformMember, @Autowired DiscordMemberUtils discordMemberUtils) {
         this.transformMember = transformMember;
+        this.discordMemberUtils = discordMemberUtils;
     }
 
     @Test
     @Order(1)
     void testTransformEntityToPojo() {
-        var dm = DiscordMemberUtils.createBasicEntity();
+        var dm = discordMemberUtils.createBasicEntity();
         var result = transformMember.toPojo(dm);
         DiscordMemberUtils.compare(dm, result);
     }
@@ -41,8 +40,8 @@ public class TransformDiscordMemberTest {
     @Test
     @Order(3)
     void testTransformEntityToPojoList() {
-        var dm1 = DiscordMemberUtils.createBasicEntity();
-        var dm2 = DiscordMemberUtils.createBasicEntity();
+        var dm1 = discordMemberUtils.createBasicEntity();
+        var dm2 = discordMemberUtils.createBasicEntity();
         var dmList = List.of(dm1, dm2);
         var result = transformMember.toPojo(dmList);
         DiscordMemberUtils.compare(dm1, result.getFirst());
@@ -68,7 +67,7 @@ public class TransformDiscordMemberTest {
     @Test
     @Order(6)
     void testTransformPojoToEntity() {
-        var dm = DiscordMemberUtils.createBasicPojo();
+        var dm = discordMemberUtils.createBasicPojo();
 
         var result = transformMember.toDto(dm);
         Assertions.assertEquals(dm.getId(), result.getId());
@@ -88,12 +87,12 @@ public class TransformDiscordMemberTest {
     @Test
     @Order(8)
     void testTransformPojoToEntityList() {
-        var dm1 = DiscordMemberUtils.createBasicPojo();
-        var dm2 = DiscordMemberUtils.createBasicPojo();
+        var dm1 = discordMemberUtils.createBasicPojo();
+        var dm2 = discordMemberUtils.createBasicPojo();
         var dmList = List.of(dm1, dm2);
         var result = transformMember.toDto(dmList);
-        DiscordMemberUtils.compare(dm1, result.getFirst());
-        DiscordMemberUtils.compare(dm2, result.get(1));
+        discordMemberUtils.compare(dm1, result.getFirst());
+        discordMemberUtils.compare(dm2, result.get(1));
     }
 
     @Test

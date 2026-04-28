@@ -31,14 +31,17 @@ public class DtoEventServiceTest extends BasicDtoTestService<Event, DtoEventServ
     @Test
     @Order(1)
     void testCreate() {
-        var date = LocalDateTime.now();
-        eventUtils.stopCounter();
+        eventUtils.stopAll();
         var base = eventUtils.createFullEntity();
         var event = eventUtils.createFullEntity();
-        eventUtils.countCounter();
+        eventUtils.playALl();
 
         event.setCreationDate(base.getCreationDate());
         event = dtoService.save(event);
+
+        base.setId(event.getId());
+        base.getSubEvents().getFirst().setId(event.getSubEvents().getFirst().getId());
+        EventUtils.compare(base, event);
     }
 
     @Test

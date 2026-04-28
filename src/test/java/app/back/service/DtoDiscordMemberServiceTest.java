@@ -15,13 +15,16 @@ import java.util.List;
 @Transactional
 public class DtoDiscordMemberServiceTest extends BasicDtoTestService<DiscordMember, DtoDiscordMemberService> {
 
-    public DtoDiscordMemberServiceTest(@Autowired DtoDiscordMemberService discordMemberService) {
+    private final DiscordMemberUtils discordMemberUtils;
+
+    public DtoDiscordMemberServiceTest(@Autowired DtoDiscordMemberService discordMemberService, @Autowired DiscordMemberUtils discordMemberUtils) {
         super(discordMemberService);
+        this.discordMemberUtils = discordMemberUtils;
     }
 
     @Override
     protected DiscordMember createBasicObject() {
-        return DiscordMemberUtils.createBasicEntity();
+        return discordMemberUtils.createBasicEntity();
     }
 
     @Test

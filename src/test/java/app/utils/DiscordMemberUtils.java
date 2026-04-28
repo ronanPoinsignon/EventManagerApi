@@ -3,27 +3,44 @@ package app.utils;
 import app.back.dto.DiscordMember;
 import app.web.pojo.PojoDiscordMember;
 import org.junit.jupiter.api.Assertions;
+import org.springframework.stereotype.Service;
 
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Supplier;
 
+@Service
 public class DiscordMemberUtils {
 
     private static final AtomicLong counter = new AtomicLong();
 
-    public static DiscordMember createBasicEntity() {
+    private Supplier<Long> counterStrategy;
+
+    public DiscordMemberUtils() {
+        playCounter();
+    }
+
+    public void stopCounter() {
+        counterStrategy = counter::get;
+    }
+
+    public void playCounter() {
+        counterStrategy = counter::incrementAndGet;
+    }
+
+    public DiscordMember createBasicEntity() {
         var dm = new DiscordMember();
-        dm.setDiscordId(counter.getAndIncrement());
-        dm.setFirstname("firstname_test_" + counter.getAndIncrement());
-        dm.setNickname("nickname_test_" + counter.getAndIncrement());
+        dm.setDiscordId(counterStrategy.get());
+        dm.setFirstname("firstname_test_" + counterStrategy.get());
+        dm.setNickname("nickname_test_" + counterStrategy.get());
 
         return dm;
     }
 
-    public static PojoDiscordMember createBasicPojo() {
+    public PojoDiscordMember createBasicPojo() {
         var dm = new PojoDiscordMember();
-        dm.setDiscordId(counter.getAndIncrement());
-        dm.setFirstname("firstname_test_" + counter.getAndIncrement());
-        dm.setNickname("nickname_test_" + counter.getAndIncrement());
+        dm.setDiscordId(counterStrategy.get());
+        dm.setFirstname("firstname_test_" + counterStrategy.get());
+        dm.setNickname("nickname_test_" + counterStrategy.get());
 
         return dm;
     }

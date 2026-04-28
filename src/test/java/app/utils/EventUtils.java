@@ -27,6 +27,9 @@ public class EventUtils {
 
     private static final AtomicLong counter = new AtomicLong();
     private Supplier<Long> counterStrategy;
+    private Supplier<LocalDateTime> dateStrategy;
+
+    private LocalDateTime now;
 
     @Autowired
     @Lazy
@@ -44,26 +47,49 @@ public class EventUtils {
     @Lazy
     private TransformMember transformMember;
 
+    @Autowired
+    @Lazy
+    private DiscordMemberUtils discordMemberUtils;
+
     public EventUtils() {
-        countCounter();
+        now = LocalDateTime.now();
+        playCounter();
+        playDate();
+    }
+
+    public void stopAll() {
+        stopCounter();
+        stopDate();
+    }
+
+    public void playALl() {
+        playCounter();
+        playDate();
     }
 
     public void stopCounter() {
         counterStrategy = counter::get;
     }
 
-    public void countCounter() {
+    public void playCounter() {
         counterStrategy = counter::incrementAndGet;
+    }
+
+    public void stopDate() {
+        dateStrategy = () -> now;
+    }
+
+    public void playDate() {
+        dateStrategy = LocalDateTime::now;
     }
 
     public Event createBasicEntity() {
         var event = new Event();
-        event.setEventName("eventName_test_" + counter.getAndIncrement());
-        event.setLocation("location_test_" + counter.getAndIncrement());
-        event.setTricountUrl("tricount_test_" + counter.getAndIncrement());
-        event.addSubEvent(createSubEvent(event));
-        event.setStartDate(LocalDateTime.now().plusDays(counter.getAndIncrement()));
-        event.setEndDate(LocalDateTime.now().plusDays(counter.getAndIncrement()));
+        event.setEventName("eventName_test_" + counterStrategy.get());
+        event.setLocation("location_test_" + counterStrategy.get());
+        event.setTricountUrl("tricount_test_" + counterStrategy.get());
+        event.setStartDate(dateStrategy.get().plusDays(counterStrategy.get()));
+        event.setEndDate(dateStrategy.get().plusDays(counterStrategy.get()));
 
         return event;
     }
@@ -86,7 +112,7 @@ public class EventUtils {
     }
 
     public void addDiscordMember(Event event) {
-        var discordMember = discordMemberService.save(DiscordMemberUtils.createBasicEntity());
+        var discordMember = discordMemberService.save(discordMemberUtils.createBasicEntity());
         if(event.getParticipants() == null) {
             event.setParticipants(new ArrayList<>());
         }
@@ -94,24 +120,24 @@ public class EventUtils {
     }
 
     public void addTodo(Event event) {
-        event.addTodo("todo_name_test_" + counter.getAndIncrement(), "todo_test_" + counter.getAndIncrement());
+        event.addTodo("todo_name_test_" + counterStrategy.get(), "todo_test_" + counterStrategy.get());
     }
 
     private Event createSubEvent(Event parent) {
         var event = new Event();
         event.setParentEvent(parent);
-        event.setEventName("eventName_test_" + counter.getAndIncrement());
+        event.setEventName("eventName_test_" + counterStrategy.get());
 
         return event;
     }
 
     public PojoEvent createBasicPojo() {
         var event = new PojoEvent();
-        event.setEventName("eventName_test_" + counter.getAndIncrement());
-        event.setLocation("location_test_" + counter.getAndIncrement());
-        event.setTricountUrl("tricount_test_" + counter.getAndIncrement());
-        event.setStartDate(LocalDateTime.now().plusDays(counter.getAndIncrement()));
-        event.setEndDate(LocalDateTime.now().plusDays(counter.getAndIncrement()));
+        event.setEventName("eventName_test_" + counterStrategy.get());
+        event.setLocation("location_test_" + counterStrategy.get());
+        event.setTricountUrl("tricount_test_" + counterStrategy.get());
+        event.setStartDate(dateStrategy.get().plusDays(counterStrategy.get()));
+        event.setEndDate(dateStrategy.get().plusDays(counterStrategy.get()));
 
         return event;
     }
@@ -134,7 +160,7 @@ public class EventUtils {
     }
 
     public void addDiscordMember(PojoEvent event) {
-        var discordMember = discordMemberService.save(DiscordMemberUtils.createBasicEntity());
+        var discordMember = discordMemberService.save(discordMemberUtils.createBasicEntity());
         if(event.getParticipants() == null) {
             event.setParticipants(new ArrayList<>());
         }
@@ -143,8 +169,8 @@ public class EventUtils {
 
     public void addTodo(PojoEvent event) {
         var entry = new PojoTodoEntry();
-        entry.setName("todo_name_test_" + counter.getAndIncrement());
-        entry.setTodoValue("todo_test_" + counter.getAndIncrement());
+        entry.setName("todo_name_test_" + counterStrategy.get());
+        entry.setTodoValue("todo_test_" + counterStrategy.get());
         if(event.getTodoList() == null) {
             event.setTodoList(new ArrayList<>());
         }
@@ -154,8 +180,8 @@ public class EventUtils {
     private PojoEvent createSubEvent(PojoEvent parent) {
         var event = new PojoEvent();
         event.setParentEvent(parent);
-        event.setEventName("eventName_" + counter.getAndIncrement());
-        event.setStartDate(LocalDateTime.now().plusDays(counter.getAndIncrement()));
+        event.setEventName("eventName_" + counterStrategy.get());
+        event.setStartDate(dateStrategy.get().plusDays(counterStrategy.get()));
 
         return event;
     }
