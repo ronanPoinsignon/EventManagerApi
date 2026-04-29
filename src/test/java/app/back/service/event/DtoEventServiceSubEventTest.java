@@ -1,6 +1,8 @@
 package app.back.service.event;
 
 import app.back.dto.Event;
+import app.back.exception.BackBadRequestException;
+import app.back.exception.BackForbiddenException;
 import app.back.exception.duplicate.event.BackDuplicateEventNameException;
 import app.back.service.DtoEventService;
 import app.utils.EventUtils;
@@ -135,6 +137,37 @@ public class DtoEventServiceSubEventTest {
 
         var result = dtoService.findByEventName(subEvent1.getId(), null);
         Assertions.assertTrue(result.isEmpty());
+    }
+
+    @Test
+    @Order(9)
+    void testAddSubEventNull() {
+        var parent = eventUtils.createFullEntity();
+        Assertions.assertThrows(BackBadRequestException.class, () -> parent.addSubEvent(null));
+    }
+
+    @Test
+    @Order(10)
+    void testSetSubEventNull() {
+        var parent = eventUtils.createFullEntity();
+        Assertions.assertEquals(1, parent.getSubEvents().size());
+
+        parent.setSubEvents(null);
+        Assertions.assertTrue(parent.getSubEvents().isEmpty());
+    }
+
+    @Test
+    @Order(11)
+    void testMoveSubEvent() {
+        var parent1 = eventUtils.createBasicEntity();
+        parent1.setId(1L);
+        var parent2 = eventUtils.createBasicEntity();
+        parent2.setId(2L);
+        var subEvent = eventUtils.createBasicEntity();
+        parent1.addSubEvent(subEvent);
+        Assertions.assertThrows(BackForbiddenException.class, () -> parent2.addSubEvent(subEvent));
+        Assertions.assertTrue(parent2.getSubEvents().isEmpty());
+        Assertions.assertEquals(1, parent1.getSubEvents().size());
     }
 
 }
