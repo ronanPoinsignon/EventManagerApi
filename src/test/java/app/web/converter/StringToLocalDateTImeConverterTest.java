@@ -63,6 +63,7 @@ public class StringToLocalDateTImeConverterTest {
     @Order(3)
     void testIncoherentFormat() {
         var stringIncoherentDate = List.of(
+                "",
                 "01-02-202",
                 "01-13-2020",
                 "32-02-2020",
