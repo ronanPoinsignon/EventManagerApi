@@ -2,7 +2,6 @@ package app.back.dto;
 
 import app.back.entityname.Contrainte;
 import app.back.entityname.EntityTable;
-import app.back.exception.BackBadRequestException;
 import jakarta.persistence.*;
 
 import java.util.*;
@@ -78,21 +77,17 @@ public class TodoEntry extends AbstractEntity {
         return this.discordMemberSet.addAll(discordMemberCollection);
     }
 
-    public boolean remove(DiscordMember discordMember) {
-        if(discordMember == null) {
-            throw new BackBadRequestException("Impossible de retirer un élément inexistant.");
-        }
-
-        return remove(List.of(discordMember));
+    public boolean removeDiscordMember(long discordMemberId) {
+        return removeDiscordMember(List.of(discordMemberId));
     }
 
-    public boolean remove(Collection<DiscordMember> discordMemberCollection) {
-        if(discordMemberCollection == null) {
-            discordMemberCollection = new ArrayList<>();
+    public boolean removeDiscordMember(Collection<Long> discordMemberIdCollection) {
+        if(discordMemberIdCollection == null) {
+            discordMemberIdCollection = new ArrayList<>();
         }
 
-        var temp = new ArrayList<>(discordMemberCollection);
-        return this.discordMemberSet.removeAll(temp);
+        var temp = new ArrayList<>(discordMemberIdCollection);
+        return this.discordMemberSet.removeIf(member -> temp.contains(member.getId()));
     }
 
     public void setDiscordMemberSet(Collection<DiscordMember> discordMemberSet) {
