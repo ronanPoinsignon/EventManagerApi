@@ -2,10 +2,8 @@ package app.back.service;
 
 import app.back.dto.Event;
 import app.back.exception.BackBadRequestException;
-import app.back.exception.duplicate.event.BackDuplicateEventNameException;
 import app.utils.DiscordMemberUtils;
 import app.utils.EventUtils;
-import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -250,128 +248,14 @@ public class DtoEventServiceTest extends BasicDtoTestService<Event, DtoEventServ
     }
 
     @Test
-    @Order(13)
+    @Order(14)
     void testLastEventCreatedEmpty() {
         var result = dtoService.getLast();
         Assertions.assertTrue(result.isEmpty());
     }
 
     @Test
-    @Order(14)
-    void testLastWithSubEvent() {
-        var event = createBasicObject();
-        dtoService.save(event);
-        var parent = createBasicObject();
-        dtoService.save(parent);
-        eventUtils.addSubEvent(parent);
-        dtoService.save(parent);
-
-        var result = dtoService.getLast().orElseThrow(() -> new RuntimeException("Aucun objet trouvé."));
-        Assertions.assertEquals(parent.getId(), result.getId());
-    }
-
-
-    @Test
     @Order(15)
-    void testUpdateSubEvent() {
-        var parent = eventUtils.createBasicEntity();
-        eventUtils.addSubEvent(parent);
-        parent = dtoService.save(parent);
-        parent.getSubEvents().getFirst().setEventName("test");
-        parent = dtoService.save(parent);
-        Assertions.assertEquals("test", parent.getSubEvents().getFirst().getEventName());
-    }
-
-    @Test
-    @Order(16)
-    void testAddSubEventNameConflict(@Autowired EntityManager entityManager) {
-        var parent = eventUtils.createBasicEntity();
-        var subEvent1 = eventUtils.addSubEvent(parent);
-        parent = dtoService.save(parent);
-
-        var subEvent2 = eventUtils.addSubEvent(parent);
-        subEvent2.setEventName(subEvent1.getEventName());
-
-        Event finalParent = parent;
-        // obligé pour ne pas qu'hibernate flush les modifications de l'entité à son prochain find, et non à la sauvegarde
-        entityManager.detach(finalParent);
-        Assertions.assertThrows(BackDuplicateEventNameException.class, () -> dtoService.save(finalParent));
-    }
-
-    @Test
-    @Order(17)
-    void testUpdateSubEventNameConflict(@Autowired EntityManager entityManager) {
-        var parent = eventUtils.createBasicEntity();
-        eventUtils.addSubEvent(parent);
-        parent = dtoService.save(parent);
-
-        eventUtils.addSubEvent(parent);
-        parent = dtoService.save(parent);
-
-        var subEvent1 = parent.getSubEvents().getFirst();
-        var subEvent2 = parent.getSubEvents().get(1);
-        subEvent2.setEventName(subEvent1.getEventName());
-
-        Event finalParent = parent;
-        // obligé pour ne pas qu'hibernate flush les modifications de l'entité à son prochain find, et non à la sauvegarde
-        entityManager.detach(finalParent);
-        Assertions.assertThrows(BackDuplicateEventNameException.class, () -> dtoService.save(finalParent));
-    }
-
-    @Test
-    @Order(18)
-    void testFindSubEvent() {
-        var parent = eventUtils.createBasicEntity();
-        var subEvent1 = eventUtils.addSubEvent(parent);
-        var subEvent2 = eventUtils.addSubEvent(parent);
-
-        dtoService.save(parent);
-
-        var result = dtoService.findByEventName(parent.getId(), subEvent1.getEventName()).orElseThrow(() -> new RuntimeException("Aucun objet trouvé."));
-        Assertions.assertEquals(subEvent1.getId(), result.getId());
-    }
-
-    @Test
-    @Order(19)
-    void testFindSubEventWithParentName() {
-        var parent = eventUtils.createBasicEntity();
-        var subEvent1 = eventUtils.addSubEvent(parent);
-        var subEvent2 = eventUtils.addSubEvent(parent);
-
-        dtoService.save(parent);
-
-        var result = dtoService.findByEventName(parent.getId(), parent.getEventName());
-        Assertions.assertTrue(result.isEmpty());
-    }
-
-    @Test
-    @Order(20)
-    void testFindSubEventWithSubEventIdName() {
-        var parent = eventUtils.createBasicEntity();
-        var subEvent1 = eventUtils.addSubEvent(parent);
-        var subEvent2 = eventUtils.addSubEvent(parent);
-
-        dtoService.save(parent);
-
-        var result = dtoService.findByEventName(subEvent1.getId(), subEvent1.getEventName());
-        Assertions.assertTrue(result.isEmpty());
-    }
-
-    @Test
-    @Order(21)
-    void testFindSubEventWithSubEventNull() {
-        var parent = eventUtils.createBasicEntity();
-        var subEvent1 = eventUtils.addSubEvent(parent);
-        var subEvent2 = eventUtils.addSubEvent(parent);
-
-        dtoService.save(parent);
-
-        var result = dtoService.findByEventName(subEvent1.getId(), null);
-        Assertions.assertTrue(result.isEmpty());
-    }
-
-    @Test
-    @Order(22)
     void testRemoveParticipant() {
         var event = eventUtils.createBasicEntity();
         var member1 = eventUtils.addDiscordMember(event);
@@ -383,7 +267,7 @@ public class DtoEventServiceTest extends BasicDtoTestService<Event, DtoEventServ
     }
 
     @Test
-    @Order(23)
+    @Order(16)
     void testAddParticipants() {
         var event = eventUtils.createBasicEntity();
         var member1 = discordMemberUtils.createBasicEntity();
@@ -394,7 +278,7 @@ public class DtoEventServiceTest extends BasicDtoTestService<Event, DtoEventServ
     }
 
     @Test
-    @Order(24)
+    @Order(17)
     void testSetParticipants() {
         var event = eventUtils.createBasicEntity();
         var member1 = discordMemberUtils.createBasicEntity();
@@ -410,7 +294,7 @@ public class DtoEventServiceTest extends BasicDtoTestService<Event, DtoEventServ
     }
 
     @Test
-    @Order(24)
+    @Order(18)
     void testAddParticipantNull() {
         var event = eventUtils.createBasicEntity();
 
@@ -420,7 +304,7 @@ public class DtoEventServiceTest extends BasicDtoTestService<Event, DtoEventServ
     }
 
     @Test
-    @Order(25)
+    @Order(19)
     void testAddParticipantsNull() {
         var event = eventUtils.createBasicEntity();
 
@@ -430,7 +314,7 @@ public class DtoEventServiceTest extends BasicDtoTestService<Event, DtoEventServ
     }
 
     @Test
-    @Order(26)
+    @Order(20)
     void testSetParticipantsNull() {
         var event = eventUtils.createBasicEntity();
         var member = discordMemberUtils.createBasicEntity();

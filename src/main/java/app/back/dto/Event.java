@@ -2,7 +2,7 @@ package app.back.dto;
 
 import app.back.entityname.Contrainte;
 import app.back.entityname.EntityTable;
-import app.web.exception.BadRequestException;
+import app.back.exception.BackBadRequestException;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -96,7 +96,7 @@ public class Event extends AbstractEntity {
 
     public TodoEntry addTodo(String name, String todo, DiscordMember discordMember) {
         if(discordMember == null) {
-            throw new BadRequestException("Le champ discordMember ne peut être null");
+            throw new BackBadRequestException("Le champ discordMember ne peut être null");
         }
 
         var todoEntry = addTodo(name, todo);
@@ -107,10 +107,10 @@ public class Event extends AbstractEntity {
 
     public TodoEntry addTodo(String name, String todo) {
         if(name == null || name.isBlank()) {
-            throw new BadRequestException("Le champ name ne peut être null ou vide.");
+            throw new BackBadRequestException("Le champ name ne peut être null ou vide.");
         }
         if(todo == null || todo.isBlank()) {
-            throw new BadRequestException("Le champ todo ne peut être null ou vide.");
+            throw new BackBadRequestException("Le champ todo ne peut être null ou vide.");
         }
 
         return findByTodo(name).orElseGet(() -> {
@@ -151,7 +151,7 @@ public class Event extends AbstractEntity {
 
     public boolean addParticipant(DiscordMember discordMember) {
         if(discordMember == null) {
-            return false;
+            throw new BackBadRequestException("Le discordMember ne peut être null");
         }
 
         var result = this.participants.add(discordMember);
@@ -170,7 +170,7 @@ public class Event extends AbstractEntity {
 
     public boolean removeParticipant(DiscordMember discordMember) {
         if(discordMember == null) {
-            return false;
+            throw new BackBadRequestException("Le discordMember ne peut être null");
         }
 
         var result = this.participants.remove(discordMember);
@@ -198,7 +198,7 @@ public class Event extends AbstractEntity {
 
     public boolean addSubEvent(Event event) {
         if(event == null) {
-            return false;
+            throw new BackBadRequestException("L'event ne peut être null");
         }
 
         var result = this.subEvents.add(event);
