@@ -3,6 +3,7 @@ package app.back.dto;
 import app.back.entityname.Contrainte;
 import app.back.entityname.EntityTable;
 import app.back.exception.BackBadRequestException;
+import app.back.exception.BackForbiddenException;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -36,8 +37,6 @@ public class Event extends AbstractEntity {
 
     @OneToMany(mappedBy = "parentEvent", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<Event> subEvents = new ArrayList<>();
-
-    private transient boolean shouldUpdateParentEvent;
 
     @ManyToOne
     private Event parentEvent;
@@ -201,13 +200,20 @@ public class Event extends AbstractEntity {
     }
 
     public boolean addSubEvent(Event event) {
-        if(event == null) {
-            throw new BackBadRequestException("L'event ne peut être null");
-        }
+        checkSubEventBeforeAdd(event);
 
-        var result = this.subEvents.add(event);
-        shouldUpdateSubEvents |= result;
-        return result;
+        event.setParentEvent(this);
+        shouldUpdateSubEvents = true;
+        return this.subEvents.add(event);
+    }
+
+    private void checkSubEventBeforeAdd(Event event) {
+        if(event == null) {
+            throw new BackBadRequestException("L'événement ne peut être null");
+        }
+        if(event.getParentEvent() != null && !Objects.equals(event.getParentEvent().getId(), this.getId())) {
+            throw new BackForbiddenException("Ce sous événement a déjà un parent");
+        }
     }
 
     public boolean removeSubEvent(Event event) {
@@ -220,28 +226,23 @@ public class Event extends AbstractEntity {
         if(subEvents == null) {
             subEvents = new ArrayList<>();
         }
-        var temp = new ArrayList<>(subEvents);
-        this.subEvents.clear();
-        this.subEvents.addAll(temp);
-        shouldUpdateSubEvents = true;
-    }
 
-    public boolean shouldUpdateParentEvent() {
-        return shouldUpdateParentEvent;
+        var temp = new ArrayList<>(subEvents);
+        for(Event subEvent : temp) {
+            checkSubEventBeforeAdd(subEvent);
+        }
+        this.subEvents.clear();
+        for(Event event : temp) {
+            this.addSubEvent(event);
+        }
+        shouldUpdateSubEvents = true;
     }
 
     public Event getParentEvent() {
         return parentEvent;
     }
 
-    public void setParentEvent(Event parentEvent) {
-        if(parentEvent != null && this.parentEvent != parentEvent) {
-            shouldUpdateParentEvent = true;
-        } else {
-            if(this.parentEvent != null) {
-                shouldUpdateParentEvent = true;
-            }
-        }
+    private void setParentEvent(Event parentEvent) {
         this.parentEvent = parentEvent;
     }
 

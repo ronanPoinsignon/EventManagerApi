@@ -86,11 +86,9 @@ public class DtoEventServiceTest extends BasicDtoTestService<Event, DtoEventServ
     @Order(5)
     void testFindByEventNameSubEvent() {
         var event = createBasicObject();
+        eventUtils.addSubEvent(event);
         event = dtoService.save(event);
-        var enfant = createBasicObject();
-        enfant.setParentEvent(event);
-        dtoService.save(event);
-        var result = dtoService.findByEventName(enfant.getEventName());
+        var result = dtoService.findByEventName(event.getSubEvents().getFirst().getEventName());
         Assertions.assertTrue(result.isEmpty());
     }
 
@@ -119,11 +117,11 @@ public class DtoEventServiceTest extends BasicDtoTestService<Event, DtoEventServ
         var event1 = createBasicObject();
         event1 = dtoService.save(event1);
         var event2 = createBasicObject();
-        event2.setParentEvent(event1);
+        event1.addSubEvent(event2);
         dtoService.save(event2);
         var event3 = createBasicObject();
         event3.setEventName(event2.getEventName());
-        event3.setParentEvent(event1);
+        event1.addSubEvent(event3);
         Assertions.assertThrows(BackBadRequestException.class, () -> dtoService.save(event3));
     }
 

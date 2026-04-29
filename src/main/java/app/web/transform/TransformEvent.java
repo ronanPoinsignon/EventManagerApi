@@ -38,14 +38,6 @@ public class TransformEvent extends AbstractTransform<Event, PojoEvent> {
         event.setStartDate(pojo.getStartDate());
         event.setEndDate(pojo.getEndDate());
         event.setLocation(pojo.getLocation());
-        if(pojo.getParentEvent() != null) {
-            if(eventMap.containsKey(pojo.getParentEvent())) {
-                event.setParentEvent(eventMap.get(pojo.getParentEvent()));
-            } else {
-                var parentEvent = from(pojo.getParentEvent(), eventMap);
-                event.setParentEvent(parentEvent);
-            }
-        }
         if(pojo.getSubEvents() != null) {
             event.setSubEvents(pojo.getSubEvents().stream().map(subEvent -> {
                 if(eventMap.containsKey(subEvent)) {

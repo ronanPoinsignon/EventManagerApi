@@ -108,10 +108,7 @@ public class EventUtils {
             event.setSubEvents(new ArrayList<>());
         }
 
-        var result = createSubEvent(event);
-        event.addSubEvent(result);
-
-        return result;
+        return createSubEvent(event);
     }
 
     public DiscordMember addDiscordMember(Event event) {
@@ -130,9 +127,9 @@ public class EventUtils {
 
     private Event createSubEvent(Event parent) {
         var event = new Event();
-        event.setParentEvent(parent);
         event.setEventName("eventName_test_" + counterStrategy.get());
 
+        parent.addSubEvent(event);
         return event;
     }
 

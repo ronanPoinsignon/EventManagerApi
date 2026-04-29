@@ -44,7 +44,6 @@ public class EventService extends AbstractService<Event, PojoEvent, DtoEventServ
 
         var parentEvent = getService().findById(parentEventId).orElseThrow(() -> new NotFoundException("Aucun parent trouvé."));
         var dtoEvent = getTransform().toDto(event);
-        dtoEvent.setParentEvent(parentEvent);
         dtoEvent = getService().save(dtoEvent);
 
         parentEvent.addSubEvent(dtoEvent);
