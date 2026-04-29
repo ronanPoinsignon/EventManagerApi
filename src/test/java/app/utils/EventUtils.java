@@ -51,6 +51,10 @@ public class EventUtils {
     @Lazy
     private DiscordMemberUtils discordMemberUtils;
 
+    @Autowired
+    @Lazy
+    private TodoEntryUtils todoEntryUtils;
+
     public EventUtils() {
         now = LocalDateTime.now();
         playCounter();
@@ -176,9 +180,7 @@ public class EventUtils {
     }
 
     public PojoTodoEntry addTodo(PojoEvent event) {
-        var entry = new PojoTodoEntry();
-        entry.setName("todo_name_test_" + counterStrategy.get());
-        entry.setTodoValue("todo_test_" + counterStrategy.get());
+        var entry = todoEntryUtils.createBasicTodoEntry();
         if(event.getTodoList() == null) {
             event.setTodoList(new ArrayList<>());
         }
