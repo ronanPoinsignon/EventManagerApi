@@ -22,12 +22,17 @@ public class DiscordMemberController {
     }
 
     @GetMapping("/findById")
-    public PojoDiscordMember findById(Long id) {
+    public PojoDiscordMember findById(@RequestParam("id") Long id) {
         return discordMemberService.findOne(id);
     }
 
     @GetMapping("/findByNickname")
-    public PojoEntity findByNickname(String nickname) {
+    public PojoEntity findByNickname(@RequestParam("nickname") String nickname) {
         return discordMemberService.findByNickname(nickname);
+    }
+
+    @GetMapping("/findByDiscordId")
+    public PojoEntity findByDiscordId(@RequestParam("discordId") long discordId) {
+        return discordMemberService.findByDiscordId(discordId);
     }
 }

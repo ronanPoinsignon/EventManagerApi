@@ -21,4 +21,11 @@ public class DiscordMemberService extends AbstractService<DiscordMember, PojoDis
                 .map(getTransform()::toPojo)
                 .orElse(null);
     }
+
+    @Override
+    public PojoDiscordMember findByDiscordId(long discordId) {
+        return getService().findByDiscordId(discordId)
+                .map(getTransform()::toPojo)
+                .orElse(null);
+    }
 }

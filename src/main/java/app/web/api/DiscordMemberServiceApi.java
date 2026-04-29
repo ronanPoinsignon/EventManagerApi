@@ -6,4 +6,6 @@ public interface DiscordMemberServiceApi extends AbstractServiceApi<PojoDiscordM
 
     PojoDiscordMember findByNickname(String nickname);
 
+    PojoDiscordMember findByDiscordId(long discordId);
+
 }
