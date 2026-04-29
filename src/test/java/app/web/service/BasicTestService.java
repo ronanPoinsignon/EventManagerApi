@@ -1,8 +1,6 @@
 package app.web.service;
 
-import app.back.dto.AbstractEntity;
-import app.back.repository.AbstractEntityRepository;
-import app.back.service.DtoAbstractEntityService;
+import app.web.api.AbstractServiceApi;
 import app.web.pojo.PojoEntity;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.TestMethodOrder;
@@ -12,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @Transactional
-public abstract class BasicTestService<T extends AbstractEntity, P extends PojoEntity, S extends AbstractService<T, P, ? extends DtoAbstractEntityService<T, ? extends AbstractEntityRepository<T>>>> {
+public abstract class BasicTestService<P extends PojoEntity, S extends AbstractServiceApi<P>> {
 
     protected final S service;
 
