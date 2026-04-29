@@ -225,6 +225,14 @@ public class Event extends AbstractEntity {
         if(event.getParentEvent() != null && !Objects.equals(event.getParentEvent().getId(), this.getId())) {
             throw new BackForbiddenException("Ce sous événement a déjà un parent");
         }
+
+        Event parent = this;
+        while((parent = parent.getParentEvent()) != null) {
+            // premier check pour savoir s'il y a ajout récursif avant de sauvegarder l'objet global
+            if(parent == event || parent.getId() != null && event.getId() != null && parent.getId().equals(event.getId())) {
+                throw new BackForbiddenException("l'événement à ajouter est déjà parent d'un événement hiérarchique supérieur.");
+            }
+        }
     }
 
     public boolean removeSubEvent(Event event) {
