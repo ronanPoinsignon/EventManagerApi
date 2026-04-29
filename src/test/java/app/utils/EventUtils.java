@@ -198,6 +198,7 @@ public class EventUtils {
 
     public static void compare(Event event, PojoEvent result) {
         Assertions.assertEquals(event.getId(), result.getId());
+        Assertions.assertEquals(event.getCreationDate(), result.getCreationDate());
         Assertions.assertEquals(event.getEventName(), result.getEventName());
         Assertions.assertEquals(event.getLocation(), result.getLocation());
         Assertions.assertEquals(event.getTricountUrl(), result.getTricountUrl());
