@@ -170,4 +170,13 @@ public class DtoEventServiceSubEventTest {
         Assertions.assertEquals(1, parent1.getSubEvents().size());
     }
 
+    @Test
+    @Order(12)
+    void testAddRecursivity() {
+        var event1 = eventUtils.createBasicEntity();
+        var event2 = eventUtils.createBasicEntity();
+        event1.addSubEvent(event2);
+        Assertions.assertThrows(BackForbiddenException.class, () -> event2.addSubEvent(event1));
+    }
+
 }

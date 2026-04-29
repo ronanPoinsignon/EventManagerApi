@@ -114,6 +114,18 @@ public class EventServiceTodoTest {
 
     @Test
     @Order(8)
+    void testRemoveTodoNotFound() {
+        var event = eventUtils.createBasicPojo();
+        var todo = eventUtils.addTodo(event);
+        event = service.save(event);
+
+        app.web.pojo.PojoEvent finalEvent = event;
+        event = service.removeTodo(finalEvent.getId(), "test");
+        Assertions.assertEquals(todo.getName(), event.getTodoList().getFirst().getName());
+    }
+
+    @Test
+    @Order(9)
     void testAddMember() {
         var event = eventUtils.createBasicPojo();
         eventUtils.addTodo(event);
@@ -126,7 +138,7 @@ public class EventServiceTodoTest {
     }
 
     @Test
-    @Order(8)
+    @Order(10)
     void testAddMemberNotFound() {
         var event = eventUtils.createBasicPojo();
         var todo = eventUtils.addTodo(event);
@@ -141,7 +153,7 @@ public class EventServiceTodoTest {
     }
 
     @Test
-    @Order(8)
+    @Order(11)
     void testAddMemberNull() {
         var event = eventUtils.createBasicPojo();
         var todo = eventUtils.addTodo(event);
@@ -152,6 +164,121 @@ public class EventServiceTodoTest {
         event = service.addTodoMembers(event.getId(), event.getTodoList().getFirst().getName(), null);
         event = service.findOne(event.getId());
         Assertions.assertEquals(1, event.getTodoList().getFirst().getDiscordMembers().size());
+    }
+
+    @Test
+    @Order(12)
+    void testAddMemberEventNull() {
+        var event = eventUtils.createBasicPojo();
+        var todo = eventUtils.addTodo(event);
+        todoEntryUtils.addDiscordMember(todo);
+        event = service.save(event);
+        Assertions.assertEquals(1, event.getTodoList().getFirst().getDiscordMembers().size());
+
+        app.web.pojo.PojoEvent finalEvent = event;
+        Assertions.assertThrows(BadRequestException.class, () -> service.addTodoMembers(finalEvent.getId(), null, List.of(finalEvent.getTodoList().getFirst().getDiscordMembers().getFirst().getId())));
+        Assertions.assertThrows(BadRequestException.class, () -> service.addTodoMembers(finalEvent.getId(), "", List.of(finalEvent.getTodoList().getFirst().getDiscordMembers().getFirst().getId())));
+    }
+
+    @Test
+    @Order(13)
+    void testAddMemberTodoNull() {
+        var event = eventUtils.createBasicPojo();
+        var todo = eventUtils.addTodo(event);
+        todoEntryUtils.addDiscordMember(todo);
+        event = service.save(event);
+        Assertions.assertEquals(1, event.getTodoList().getFirst().getDiscordMembers().size());
+
+        app.web.pojo.PojoEvent finalEvent = event;
+        Assertions.assertThrows(BadRequestException.class, () -> service.addTodoMembers(finalEvent.getId(), null, List.of(finalEvent.getTodoList().getFirst().getDiscordMembers().getFirst().getId())));
+        Assertions.assertThrows(BadRequestException.class, () -> service.addTodoMembers(finalEvent.getId(), "", List.of(finalEvent.getTodoList().getFirst().getDiscordMembers().getFirst().getId())));
+    }
+
+    @Test
+    @Order(14)
+    void testAddMemberTodoNotFound() {
+        var event = eventUtils.createBasicPojo();
+        var todo = eventUtils.addTodo(event);
+        todoEntryUtils.addDiscordMember(todo);
+        event = service.save(event);
+        Assertions.assertEquals(1, event.getTodoList().getFirst().getDiscordMembers().size());
+
+        app.web.pojo.PojoEvent finalEvent = event;
+        Assertions.assertThrows(NotFoundException.class, () -> service.addTodoMembers(finalEvent.getId(), "test", List.of(finalEvent.getTodoList().getFirst().getDiscordMembers().getFirst().getId())));
+    }
+
+    @Test
+    @Order(15)
+    void testRemoveMember() {
+        var event = eventUtils.createBasicPojo();
+        var todo = eventUtils.addTodo(event);
+        todoEntryUtils.addDiscordMember(todo);
+        todoEntryUtils.addDiscordMember(todo);
+        event = service.save(event);
+        Assertions.assertEquals(2, event.getTodoList().getFirst().getDiscordMembers().size());
+        var member1 = event.getTodoList().getFirst().getDiscordMembers().getFirst();
+        var member2 = event.getTodoList().getFirst().getDiscordMembers().get(1);
+
+        event = service.removeTodoMembers(event.getId(), event.getTodoList().getFirst().getName(), List.of(member1.getId()));
+        Assertions.assertEquals(1, event.getTodoList().getFirst().getDiscordMembers().size());
+        Assertions.assertEquals(member2.getId(), event.getTodoList().getFirst().getDiscordMembers().getFirst().getId());
+    }
+
+    @Test
+    @Order(16)
+    void testRemoveMemberNotFound() {
+        var event = eventUtils.createBasicPojo();
+        var todo = eventUtils.addTodo(event);
+         todoEntryUtils.addDiscordMember(todo);
+        todoEntryUtils.addDiscordMember(todo);
+        event = service.save(event);
+        Assertions.assertEquals(2, event.getTodoList().getFirst().getDiscordMembers().size());
+
+        service.removeTodoMembers(event.getId(), event.getTodoList().getFirst().getName(), List.of(2L));
+        event = service.findOne(event.getId());
+        Assertions.assertEquals(2, event.getTodoList().getFirst().getDiscordMembers().size());
+    }
+
+    @Test
+    @Order(17)
+    void testRemoveMemberNull() {
+        var event = eventUtils.createBasicPojo();
+        var todo = eventUtils.addTodo(event);
+        todoEntryUtils.addDiscordMember(todo);
+        todoEntryUtils.addDiscordMember(todo);
+        event = service.save(event);
+        Assertions.assertEquals(2, event.getTodoList().getFirst().getDiscordMembers().size());
+
+        event = service.addTodoMembers(event.getId(), event.getTodoList().getFirst().getName(), null);
+        event = service.findOne(event.getId());
+        Assertions.assertEquals(2, event.getTodoList().getFirst().getDiscordMembers().size());
+    }
+
+    @Test
+    @Order(18)
+    void testRemoveMemberTodoNull() {
+        var event = eventUtils.createBasicPojo();
+        var todo = eventUtils.addTodo(event);
+        todoEntryUtils.addDiscordMember(todo);
+        event = service.save(event);
+        Assertions.assertEquals(1, event.getTodoList().getFirst().getDiscordMembers().size());
+
+        app.web.pojo.PojoEvent finalEvent = event;
+        Assertions.assertThrows(BadRequestException.class, () -> service.removeTodoMembers(finalEvent.getId(), null, List.of(finalEvent.getTodoList().getFirst().getDiscordMembers().getFirst().getId())));
+        Assertions.assertThrows(BadRequestException.class, () -> service.removeTodoMembers(finalEvent.getId(), "", List.of(finalEvent.getTodoList().getFirst().getDiscordMembers().getFirst().getId())));
+    }
+
+    @Test
+    @Order(19)
+    void testRemoveMemberTodoNotFound() {
+        var event = eventUtils.createBasicPojo();
+        var todo = eventUtils.addTodo(event);
+        todoEntryUtils.addDiscordMember(todo);
+        event = service.save(event);
+        Assertions.assertEquals(1, event.getTodoList().getFirst().getDiscordMembers().size());
+
+        app.web.pojo.PojoEvent finalEvent = event;
+        Assertions.assertThrows(NotFoundException.class, () -> service.removeTodoMembers(finalEvent.getId(), "test", List.of(finalEvent.getTodoList().getFirst().getDiscordMembers().getFirst().getId())));
     }
 
 }

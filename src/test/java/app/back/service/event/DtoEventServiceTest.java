@@ -98,6 +98,8 @@ public class DtoEventServiceTest extends BasicDtoTestService<Event, DtoEventServ
         var event = createBasicObject();
         event.setEventName(null);
         Assertions.assertThrows(BackBadRequestException.class, () -> dtoService.save(event));
+        event.setEventName("");
+        Assertions.assertThrows(BackBadRequestException.class, () -> dtoService.save(event));
     }
 
     @Test

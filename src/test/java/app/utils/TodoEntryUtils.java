@@ -12,7 +12,6 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Supplier;
 
@@ -66,7 +65,11 @@ public class TodoEntryUtils {
 
     public PojoDiscordMember addDiscordMember(PojoTodoEntry todoEntry) {
         var discordMember = transformMember.toPojo(discordMemberService.save(discordMemberUtils.createBasicEntity()));
-        todoEntry.setDiscordMembers(List.of(discordMember));
+        if(todoEntry.getDiscordMembers() == null) {
+            todoEntry.setDiscordMembers(new ArrayList<>());
+        }
+        todoEntry.getDiscordMembers().add(discordMember);
+
         return discordMember;
     }
 

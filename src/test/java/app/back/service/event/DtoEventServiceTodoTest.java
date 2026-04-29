@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -194,11 +195,14 @@ public class DtoEventServiceTodoTest {
         var event = new Event();
         Assertions.assertTrue(event.getTodoList().isEmpty());
         var member1 = new DiscordMember();
+        member1.setId(1L);
         var member2 = new DiscordMember();
+        member2.setId(2L);
         var member3 = new DiscordMember();
+        member3.setId(3L);
         event.addTodo("test", "todo", List.of(member1, member2, member3));
 
-        event.getTodoList().getFirst().remove(member2);
+        event.getTodoList().getFirst().removeDiscordMember(member2.getId());
         Assertions.assertEquals(2, event.getTodoList().getFirst().getDiscordMembers().size());
         var result = List.of(member1, member3).containsAll(event.getTodoList().getFirst().getDiscordMembers());
         Assertions.assertTrue(result);
@@ -241,15 +245,7 @@ public class DtoEventServiceTodoTest {
     }
 
     @Test
-    @Order(16)
-    void testRemoveMemberNull() {
-        var event = eventUtils.createBasicEntity();
-        var todo = eventUtils.addTodo(event);
-        Assertions.assertThrows(BackBadRequestException.class, () -> todo.remove((DiscordMember) null));
-    }
-
-    @Test
-    @Order(16)
+    @Order(15)
     void testRemoveMemberListNull() {
         var event = eventUtils.createBasicEntity();
         var todo = eventUtils.addTodo(event);
@@ -258,7 +254,21 @@ public class DtoEventServiceTodoTest {
         var member2 = new DiscordMember();
         member2.setId(2L);
         todo.addDiscordMembers(List.of(member1, member2));
-        todo.remove((List<DiscordMember>) null);
+        todo.removeDiscordMember(null);
+        Assertions.assertEquals(2, todo.getDiscordMembers().size());
+    }
+
+    @Test
+    @Order(16)
+    void testRemoveMemberListNullValue() {
+        var event = eventUtils.createBasicEntity();
+        var todo = eventUtils.addTodo(event);
+        var member1 = new DiscordMember();
+        member1.setId(1L);
+        var member2 = new DiscordMember();
+        member2.setId(2L);
+        todo.addDiscordMembers(List.of(member1, member2));
+        todo.removeDiscordMember(Collections.singletonList(null));
         Assertions.assertEquals(2, todo.getDiscordMembers().size());
     }
 
