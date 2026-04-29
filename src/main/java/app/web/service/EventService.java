@@ -83,7 +83,7 @@ public class EventService extends AbstractService<Event, PojoEvent, DtoEventServ
     @Override
     public PojoEvent addTo(long parentEventId, List<Long> discordMemberIdList) {
         var event = getService().findById(parentEventId).orElseThrow(() -> new NotFoundException("Aucun événement trouvé."));
-        var discordMembers = findMembers(discordMemberIdList);
+        var discordMembers = findAllMembers(discordMemberIdList);
 
         var hasChanged = event.addParticipants(discordMembers);
         if(!hasChanged) {
@@ -114,7 +114,7 @@ public class EventService extends AbstractService<Event, PojoEvent, DtoEventServ
         }
 
         var event = getService().findById(eventId).orElseThrow(() -> new NotFoundException("Aucun événement trouvé."));
-        var discordMemberList = findMembers(lightPojoTodoEntry.getParticipants());
+        var discordMemberList = findAllMembers(lightPojoTodoEntry.getParticipants());
         event.addTodo(lightPojoTodoEntry.getName(), lightPojoTodoEntry.getTodo(), discordMemberList);
 
         return getTransform().toPojo(getService().save(event));
@@ -149,7 +149,7 @@ public class EventService extends AbstractService<Event, PojoEvent, DtoEventServ
             throw new NotFoundException("Aucun todo enregistré avec ce nom pour l'événement " + event.getEventName() + ".");
         }
 
-        var members = findMembers(discordMemberIds);
+        var members = findAllMembers(discordMemberIds);
         var result = todo.addDiscordMembers(members);
         if(!result) {
             return getTransform().toPojo(event);
@@ -171,8 +171,7 @@ public class EventService extends AbstractService<Event, PojoEvent, DtoEventServ
             throw new NotFoundException("Aucun todo enregistré avec ce nom pour l'événement " + event.getEventName() + ".");
         }
 
-        var members = findMembers(discordMemberIds);
-        var result = todo.remove(members);
+        var result = todo.removeDiscordMember(discordMemberIds);
         if(!result) {
             return getTransform().toPojo(event);
         }
@@ -186,12 +185,12 @@ public class EventService extends AbstractService<Event, PojoEvent, DtoEventServ
      * @throws NotFoundException Si certains utilisateurs n'ont pas été trouvés, une {@link NotFoundException} est levée indiquant quels utilisateurs n'ont pas été récupérés.
      * @return
      */
-    private List<DiscordMember> findMembers(List<Long> discordMemberIdList) {
-        if(discordMemberIdList == null || discordMemberIdList.isEmpty()) {
-            return new ArrayList<>();
+    private List<DiscordMember> findAllMembers(List<Long> discordMemberIdList) throws NotFoundException {
+        if(discordMemberIdList == null) {
+            discordMemberIdList = new ArrayList<>();
         }
+        var result = this.findMembers(discordMemberIdList);
 
-        var result = discordMemberService.findByDiscordId(discordMemberIdList);
         if(result.size() != discordMemberIdList.size()) {
             var newDiscordMemberIds = new ArrayList<>(discordMemberIdList);
             newDiscordMemberIds.removeAll(result.stream().map(DiscordMember::getId).toList());
@@ -199,6 +198,14 @@ public class EventService extends AbstractService<Event, PojoEvent, DtoEventServ
         }
 
         return result;
+    }
+
+    private List<DiscordMember> findMembers(List<Long> discordMemberIdList) {
+        if(discordMemberIdList == null || discordMemberIdList.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        return discordMemberService.findByDiscordId(discordMemberIdList);
     }
 
 }
