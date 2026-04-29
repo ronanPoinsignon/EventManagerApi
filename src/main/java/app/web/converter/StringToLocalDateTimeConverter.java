@@ -43,7 +43,7 @@ public class StringToLocalDateTimeConverter implements StringConverter<LocalDate
     @NullMarked
     public LocalDateTime convert(String source) {
         if(source.isBlank()) {
-            return null;
+            throw new BadRequestException("Aucun format de date correspondant.");
         }
 
         for(var pattern : computeParsers()) {
