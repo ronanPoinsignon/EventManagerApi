@@ -1,8 +1,9 @@
-package app.web.service;
+package app.web.service.event;
 
 import app.utils.EventUtils;
 import app.web.api.EventServiceApi;
 import app.web.pojo.PojoEvent;
+import app.web.service.BasicTestService;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;

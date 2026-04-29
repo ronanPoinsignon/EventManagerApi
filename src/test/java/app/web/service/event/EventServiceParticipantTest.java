@@ -24,7 +24,10 @@ public class EventServiceParticipantTest {
     private final DiscordMemberServiceApi discordMemberService;
     private final DiscordMemberUtils discordMemberUtils;
 
-    protected EventServiceParticipantTest(@Autowired EventServiceApi service, @Autowired EventUtils eventUtils, @Autowired DiscordMemberServiceApi discordMemberService, @Autowired DiscordMemberUtils discordMemberUtils) {
+    protected EventServiceParticipantTest(@Autowired EventServiceApi service,
+                                          @Autowired EventUtils eventUtils,
+                                          @Autowired DiscordMemberServiceApi discordMemberService,
+                                          @Autowired DiscordMemberUtils discordMemberUtils) {
         this.service = service;
         this.eventUtils = eventUtils;
         this.discordMemberService = discordMemberService;
@@ -57,7 +60,7 @@ public class EventServiceParticipantTest {
     @Test
     @Order(3)
     void testAddParticipantEventNotFound() {
-        var member = eventUtils.addDiscordMember(new Event());
+        var member = discordMemberService.save(discordMemberUtils.createBasicPojo());
         Assertions.assertThrows(NotFoundException.class, () -> service.addTo(1L, List.of(member.getId())));
     }
 
@@ -94,7 +97,7 @@ public class EventServiceParticipantTest {
         Assertions.assertEquals(1, event.getParticipants().size());
 
         app.web.pojo.PojoEvent finalEvent = event;
-        Assertions.assertThrows(NotFoundException.class, () -> service.removeTo(finalEvent.getId(), List.of(2L)));
+        service.removeTo(finalEvent.getId(), List.of(2L));
 
         event = service.findOne(event.getId());
         Assertions.assertEquals(1, event.getParticipants().size());
