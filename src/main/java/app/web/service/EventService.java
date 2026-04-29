@@ -112,10 +112,70 @@ public class EventService extends AbstractService<Event, PojoEvent, DtoEventServ
         if(lightPojoTodoEntry == null) {
             throw new BadRequestException("Document d'information manquant.");
         }
-        
+
         var event = getService().findById(eventId).orElseThrow(() -> new NotFoundException("Aucun événement trouvé."));
         var discordMemberList = findMembers(lightPojoTodoEntry.getParticipants());
         event.addTodo(lightPojoTodoEntry.getName(), lightPojoTodoEntry.getTodo(), discordMemberList);
+
+        return getTransform().toPojo(getService().save(event));
+    }
+
+    @Transactional
+    @Override
+    public PojoEvent removeTodo(long eventId, String name) {
+        if(name == null || name.isBlank()) {
+            throw new BadRequestException("Le nom est obligatoire.");
+        }
+
+        var event = getService().findById(eventId).orElseThrow(() -> new NotFoundException("Aucun événement trouvé."));
+        var result = event.removeTodo(name);
+        if(!result) {
+            return getTransform().toPojo(event);
+        }
+
+        return getTransform().toPojo(getService().save(event));
+    }
+
+    @Transactional
+    @Override
+    public PojoEvent addTodoMembers(long eventId, String todoName, List<Long> discordMemberIds) {
+        if(todoName == null || todoName.isBlank()) {
+            throw new BadRequestException("Le nom est obligatoire.");
+        }
+
+        var event = getService().findById(eventId).orElseThrow(() -> new NotFoundException("Aucun événement trouvé."));
+        var todo = event.findTodoEntryByName(todoName);
+        if(todo == null) {
+            throw new NotFoundException("Aucun todo enregistré avec ce nom pour l'événement " + event.getEventName() + ".");
+        }
+
+        var members = findMembers(discordMemberIds);
+        var result = todo.addDiscordMembers(members);
+        if(!result) {
+            return getTransform().toPojo(event);
+        }
+
+        return getTransform().toPojo(getService().save(event));
+    }
+
+    @Transactional
+    @Override
+    public PojoEvent removeTodoMembers(long eventId, String todoName, List<Long> discordMemberIds) {
+        if(todoName == null || todoName.isBlank()) {
+            throw new BadRequestException("Le nom est obligatoire.");
+        }
+
+        var event = getService().findById(eventId).orElseThrow(() -> new NotFoundException("Aucun événement trouvé."));
+        var todo = event.findTodoEntryByName(todoName);
+        if(todo == null) {
+            throw new NotFoundException("Aucun todo enregistré avec ce nom pour l'événement " + event.getEventName() + ".");
+        }
+
+        var members = findMembers(discordMemberIds);
+        var result = todo.remove(members);
+        if(!result) {
+            return getTransform().toPojo(event);
+        }
 
         return getTransform().toPojo(getService().save(event));
     }

@@ -144,6 +144,13 @@ public class Event extends AbstractEntity {
         todoListEntries.forEach(todo -> addTodo(todo.getTodoName(), todo.getTodoValue(), todo.getDiscordMembers()));
     }
 
+    public TodoEntry findTodoEntryByName(String name) {
+        return this.todoListEntries.stream()
+                .filter(todo -> todo.getTodoName().equals(name))
+                .findFirst()
+                .orElse(null);
+    }
+
     public boolean shouldUpdateParticipants() {
         return shouldUpdateParticipants;
     }

@@ -2,6 +2,7 @@ package app.back.dto;
 
 import app.back.entityname.Contrainte;
 import app.back.entityname.EntityTable;
+import app.back.exception.BackBadRequestException;
 import jakarta.persistence.*;
 
 import java.util.*;
@@ -78,7 +79,20 @@ public class TodoEntry extends AbstractEntity {
     }
 
     public boolean remove(DiscordMember discordMember) {
-        return this.discordMemberSet.remove(discordMember);
+        if(discordMember == null) {
+            throw new BackBadRequestException("Impossible de retirer un élément inexistant.");
+        }
+
+        return remove(List.of(discordMember));
+    }
+
+    public boolean remove(Collection<DiscordMember> discordMemberCollection) {
+        if(discordMemberCollection == null) {
+            discordMemberCollection = new ArrayList<>();
+        }
+
+        var temp = new ArrayList<>(discordMemberCollection);
+        return this.discordMemberSet.removeAll(temp);
     }
 
     public void setDiscordMemberSet(Collection<DiscordMember> discordMemberSet) {

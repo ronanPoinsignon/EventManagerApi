@@ -4,11 +4,11 @@ import app.back.dto.AbstractEntity;
 import app.back.repository.AbstractEntityRepository;
 import app.back.service.DtoAbstractEntityService;
 import app.web.api.AbstractServiceApi;
+import app.web.exception.BadRequestException;
+import app.web.exception.NotFoundException;
 import app.web.pojo.PojoEntity;
 import app.web.transform.Transform;
-import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 public abstract class AbstractService<T extends AbstractEntity, U extends PojoEntity, V extends DtoAbstractEntityService<T, ? extends AbstractEntityRepository<T>>> implements AbstractServiceApi<U> {
 
@@ -22,7 +22,11 @@ public abstract class AbstractService<T extends AbstractEntity, U extends PojoEn
 
     @Transactional
     public U findOne(Long id) {
-        var result = service.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Aucun élément trouvé pour l'id " + id + "."));
+        if(id == null) {
+            throw new BadRequestException("L'id ne peut être null.");
+        }
+
+        var result = service.findById(id).orElseThrow(() -> new NotFoundException("Aucun élément trouvé pour l'id " + id + "."));
         return transform.toPojo(result);
     }
 

@@ -1,7 +1,6 @@
-package app.web.controller;
+package app.web.controller.event;
 
 import app.web.api.EventServiceApi;
-import app.web.pojo.LightPojoTodoEntry;
 import app.web.pojo.PojoEvent;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,16 +32,6 @@ public class EventController {
         return eventService.findByEventName(name);
     }
 
-    @PostMapping("/addSubEvent")
-    public PojoEvent addSubEvent(@RequestParam("parentEventId") long parentEventId, @RequestBody PojoEvent event) {
-        return eventService.addSubEvent(parentEventId, event);
-    }
-
-    @PostMapping("/removeSubEvent")
-    public PojoEvent removeSubEvent(@RequestParam("parentEventId") long parentEventId, @RequestParam("subEventName") String subEventName) {
-        return eventService.removeSubEvent(parentEventId, subEventName);
-    }
-
     @GetMapping("/findActive")
     public List<PojoEvent> findAllBeforeEnd(@RequestParam(required = false) LocalDateTime date) {
         return eventService.findAllBeforeEnd(date);
@@ -51,16 +40,6 @@ public class EventController {
     @GetMapping("/getLast")
     public PojoEvent getLast() {
         return eventService.getLast();
-    }
-
-    @PostMapping("/addTo")
-    public PojoEvent addTo(@RequestParam(value = "eventId") long eventId, @RequestParam(value = "discordMemberIds", required = false) List<Long> discordMemberIds) {
-        return eventService.addTo(eventId, discordMemberIds);
-    }
-
-    @PostMapping("/addTodo")
-    public PojoEvent addTodo(@RequestParam(value = "eventId") long eventId, @RequestBody LightPojoTodoEntry todoEntry) {
-        return eventService.addTodo(eventId, todoEntry);
     }
 
 }
