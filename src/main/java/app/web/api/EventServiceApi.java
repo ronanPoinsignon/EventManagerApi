@@ -10,19 +10,19 @@ public interface EventServiceApi extends AbstractServiceApi<PojoEvent> {
 
     PojoEvent findByEventName(String name);
 
-    PojoEvent addSubEvent(long parentEventId, PojoEvent event);
-
     List<PojoEvent> findAllBeforeEnd(LocalDateTime date);
 
     PojoEvent getLast();
+
+    PojoEvent addSubEvent(long parentEventId, PojoEvent event);
+
+    PojoEvent removeSubEvent(long parentEventId, String subEventName);
 
     PojoEvent addTo(long parentEventId, List<Long> discordMemberIds);
 
     PojoEvent removeTo(long parentEventId, List<Long> discordMemberIdList);
 
     PojoEvent addTodo(long eventId, LightPojoTodoEntry lightPojoTodoEntry);
-
-    PojoEvent removeSubEvent(long parentEventId, String subEventName);
 
     PojoEvent removeTodo(long eventId, String name);
 
