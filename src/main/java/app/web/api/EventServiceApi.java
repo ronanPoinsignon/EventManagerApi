@@ -18,6 +18,8 @@ public interface EventServiceApi extends AbstractServiceApi<PojoEvent> {
 
     PojoEvent addTo(long parentEventId, List<Long> discordMemberIds);
 
+    PojoEvent removeTo(long parentEventId, List<Long> discordMemberIdList);
+
     PojoEvent addTodo(long eventId, LightPojoTodoEntry lightPojoTodoEntry);
 
     PojoEvent removeSubEvent(long parentEventId, String subEventName);

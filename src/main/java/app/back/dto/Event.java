@@ -171,12 +171,16 @@ public class Event extends AbstractEntity {
         return result;
     }
 
-    public boolean removeParticipant(DiscordMember discordMember) {
-        if(discordMember == null) {
-            throw new BackBadRequestException("Le discordMember ne peut être null");
-        }
+    public boolean removeParticipant(long discordMemberId) {
+        return removeParticipants(List.of(discordMemberId));
+    }
 
-        var result = this.participants.remove(discordMember);
+    public boolean removeParticipants(Collection<Long> discordMemberIdCollection) {
+        if(discordMemberIdCollection == null) {
+            discordMemberIdCollection = new ArrayList<>();
+        }
+        var temp = new ArrayList<>(discordMemberIdCollection);
+        var result = this.participants.removeIf(participant -> temp.contains(participant.getId()));
         shouldUpdateParticipants |= result;
         return result;
     }

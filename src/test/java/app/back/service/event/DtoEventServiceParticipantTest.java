@@ -34,17 +34,8 @@ public class DtoEventServiceParticipantTest {
         var member2 = eventUtils.addDiscordMember(event);
         Assertions.assertEquals(2, event.getParticipants().size());
 
-        event.removeParticipant(member1);
+        event.removeParticipant(member1.getId());
         Assertions.assertEquals(1, event.getParticipants().size());
-    }
-
-    @Test
-    @Order(1)
-    void testRemoveParticipantNull() {
-        var event = eventUtils.createBasicEntity();
-
-        Assertions.assertThrows(BackBadRequestException.class, () -> event.removeParticipant(null));
-        Assertions.assertTrue(event.getParticipants().isEmpty());
     }
 
     @Test
