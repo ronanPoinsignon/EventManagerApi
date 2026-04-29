@@ -1,7 +1,9 @@
-package app.back.service;
+package app.back.service.event;
 
 import app.back.dto.Event;
 import app.back.exception.BackBadRequestException;
+import app.back.service.BasicDtoTestService;
+import app.back.service.DtoEventService;
 import app.utils.DiscordMemberUtils;
 import app.utils.EventUtils;
 import org.junit.jupiter.api.*;
@@ -252,76 +254,6 @@ public class DtoEventServiceTest extends BasicDtoTestService<Event, DtoEventServ
     void testLastEventCreatedEmpty() {
         var result = dtoService.getLast();
         Assertions.assertTrue(result.isEmpty());
-    }
-
-    @Test
-    @Order(15)
-    void testRemoveParticipant() {
-        var event = eventUtils.createBasicEntity();
-        var member1 = eventUtils.addDiscordMember(event);
-        var member2 = eventUtils.addDiscordMember(event);
-        Assertions.assertEquals(2, event.getParticipants().size());
-
-        event.removeParticipant(member1);
-        Assertions.assertEquals(1, event.getParticipants().size());
-    }
-
-    @Test
-    @Order(16)
-    void testAddParticipants() {
-        var event = eventUtils.createBasicEntity();
-        var member1 = discordMemberUtils.createBasicEntity();
-        var member2 = discordMemberUtils.createBasicEntity();
-
-        event.addParticipants(List.of(member1, member2));
-        Assertions.assertEquals(2, event.getParticipants().size());
-    }
-
-    @Test
-    @Order(17)
-    void testSetParticipants() {
-        var event = eventUtils.createBasicEntity();
-        var member1 = discordMemberUtils.createBasicEntity();
-        var member2 = discordMemberUtils.createBasicEntity();
-        var member3 = discordMemberUtils.createBasicEntity();
-
-        event.addParticipant(member1);
-        var memberList = List.of(member2, member3);
-        event.setParticipants(memberList);
-        Assertions.assertEquals(2, event.getParticipants().size());
-        var result = memberList.containsAll(event.getParticipants());
-        Assertions.assertTrue(result);
-    }
-
-    @Test
-    @Order(18)
-    void testAddParticipantNull() {
-        var event = eventUtils.createBasicEntity();
-
-        var result = event.addParticipant(null);
-        Assertions.assertFalse(result);
-        Assertions.assertEquals(0, event.getParticipants().size());
-    }
-
-    @Test
-    @Order(19)
-    void testAddParticipantsNull() {
-        var event = eventUtils.createBasicEntity();
-
-        var result = event.addParticipants(null);
-        Assertions.assertFalse(result);
-        Assertions.assertEquals(0, event.getParticipants().size());
-    }
-
-    @Test
-    @Order(20)
-    void testSetParticipantsNull() {
-        var event = eventUtils.createBasicEntity();
-        var member = discordMemberUtils.createBasicEntity();
-
-        event.addParticipant(member);
-        event.setParticipants(null);
-        Assertions.assertEquals(0, event.getParticipants().size());
     }
 
 }

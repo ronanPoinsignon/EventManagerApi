@@ -3,7 +3,7 @@ package app.back.entityname;
 import app.back.exception.duplicate.BackConstraintException;
 import app.back.exception.duplicate.event.BackDuplicateEventNameException;
 import app.back.exception.duplicate.event.BackDuplicateEventParticipant;
-import app.back.exception.duplicate.todo.BackDuplicateTodoName;
+import app.back.exception.duplicate.todo.BackDuplicateTodoNameException;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -25,7 +25,7 @@ public class ContrainteUtiles {
         eventMap.put(Contrainte.EVENT_DUPLICATE_PARTICIPANT, BackDuplicateEventParticipant::new);
 
         Map<String, Supplier<? extends BackConstraintException>> todoMap = new HashMap<>();
-        todoMap.put(Contrainte.TODO_DUPLICATE_NAME, BackDuplicateTodoName::new);
+        todoMap.put(Contrainte.TODO_DUPLICATE_NAME, BackDuplicateTodoNameException::new);
 
         Map<String, Supplier<? extends BackConstraintException>> discordMemberMap = new HashMap<>();
 

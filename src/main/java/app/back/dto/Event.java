@@ -113,13 +113,17 @@ public class Event extends AbstractEntity {
             throw new BackBadRequestException("Le champ todo ne peut être null ou vide.");
         }
 
-        return findByTodo(name).orElseGet(() -> {
+        var result =  findByTodo(name).orElseGet(() -> {
             var entry = new TodoEntry(name, todo);
             entry.setEvent(this);
             this.todoListEntries.add(entry);
-            shouldUpdateTodos = true;
             return entry;
         });
+        result.setTodoValue(todo);
+
+        shouldUpdateTodos = true;
+
+        return result;
     }
 
     public boolean removeTodo(String name) {

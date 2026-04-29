@@ -17,7 +17,7 @@ public abstract class DtoAbstractEntityService<T extends AbstractEntity, U exten
     @Autowired
     private EntityManager em;
 
-    private Logger logger = LoggerFactory.getLogger(DtoAbstractEntityService.class);
+    private final Logger logger = LoggerFactory.getLogger(DtoAbstractEntityService.class);
 
     protected final U repository;
 
