@@ -240,4 +240,26 @@ public class DtoEventServiceTodoTest {
         Assertions.assertThrows(BackDuplicateTodoNameException.class, () -> dtoService.save(finalParent));
     }
 
+    @Test
+    @Order(16)
+    void testRemoveMemberNull() {
+        var event = eventUtils.createBasicEntity();
+        var todo = eventUtils.addTodo(event);
+        Assertions.assertThrows(BackBadRequestException.class, () -> todo.remove((DiscordMember) null));
+    }
+
+    @Test
+    @Order(16)
+    void testRemoveMemberListNull() {
+        var event = eventUtils.createBasicEntity();
+        var todo = eventUtils.addTodo(event);
+        var member1 = new DiscordMember();
+        member1.setId(1L);
+        var member2 = new DiscordMember();
+        member2.setId(2L);
+        todo.addDiscordMembers(List.of(member1, member2));
+        todo.remove((List<DiscordMember>) null);
+        Assertions.assertEquals(2, todo.getDiscordMembers().size());
+    }
+
 }
