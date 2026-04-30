@@ -1,9 +1,9 @@
 package app.web.service;
 
+import app.back.api.DtoDiscordMemberServiceApi;
+import app.back.api.DtoEventServiceApi;
 import app.back.dto.DiscordMember;
 import app.back.dto.Event;
-import app.back.service.DtoDiscordMemberService;
-import app.back.service.DtoEventService;
 import app.web.api.EventServiceApi;
 import app.web.exception.BadRequestException;
 import app.web.exception.NotFoundException;
@@ -18,11 +18,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class EventService extends AbstractService<Event, PojoEvent, DtoEventService> implements EventServiceApi {
+public class EventService extends AbstractService<Event, PojoEvent, DtoEventServiceApi> implements EventServiceApi {
 
-    private final DtoDiscordMemberService discordMemberService;
+    private final DtoDiscordMemberServiceApi discordMemberService;
 
-    public EventService(DtoEventService eventService, TransformEvent transformEvent, DtoDiscordMemberService discordMemberService) {
+    public EventService(DtoEventServiceApi eventService, TransformEvent transformEvent, DtoDiscordMemberServiceApi discordMemberService) {
         super(eventService, transformEvent);
         this.discordMemberService = discordMemberService;
     }

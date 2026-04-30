@@ -1,7 +1,7 @@
 package app.web.service;
 
+import app.back.api.DtoDiscordMemberServiceApi;
 import app.back.dto.DiscordMember;
-import app.back.service.DtoDiscordMemberService;
 import app.web.api.DiscordMemberServiceApi;
 import app.web.pojo.PojoDiscordMember;
 import app.web.transform.TransformMember;
@@ -9,9 +9,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class DiscordMemberService extends AbstractService<DiscordMember, PojoDiscordMember, DtoDiscordMemberService> implements DiscordMemberServiceApi {
+public class DiscordMemberService extends AbstractService<DiscordMember, PojoDiscordMember, DtoDiscordMemberServiceApi> implements DiscordMemberServiceApi {
 
-    public DiscordMemberService(DtoDiscordMemberService service, TransformMember transformMember) {
+    public DiscordMemberService(DtoDiscordMemberServiceApi service, TransformMember transformMember) {
         super(service, transformMember);
     }
 

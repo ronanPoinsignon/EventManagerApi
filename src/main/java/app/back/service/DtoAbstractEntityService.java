@@ -1,5 +1,6 @@
 package app.back.service;
 
+import app.back.api.AbstractDtoServiceApi;
 import app.back.dto.AbstractEntity;
 import app.back.entityname.ContrainteUtiles;
 import app.back.exception.BackNotFoundException;
@@ -12,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Optional;
 
-public abstract class DtoAbstractEntityService<T extends AbstractEntity, U extends AbstractEntityRepository<T>> {
+public abstract class DtoAbstractEntityService<T extends AbstractEntity, U extends AbstractEntityRepository<T>> implements AbstractDtoServiceApi<T> {
 
     @Autowired
     private EntityManager em;
@@ -25,6 +26,7 @@ public abstract class DtoAbstractEntityService<T extends AbstractEntity, U exten
         this.repository = repository;
     }
 
+    @Override
     public T save(T entity) {
         // si l'objet est rattaché à spring, pas besoin de le find
         if(entity.getId() == null || em.contains(entity)) {
@@ -79,19 +81,39 @@ public abstract class DtoAbstractEntityService<T extends AbstractEntity, U exten
 
     protected abstract void update(T entityToSave, T dbEntity);
 
-    public Optional<T> findById(long id) {
+    @Override
+    public Optional<T> findById(Long id) {
+        if(id == null) {
+            return Optional.empty();
+        }
+
         return repository.findById(id);
     }
 
+    @Override
     public void delete(Long id) {
+        if(id == null) {
+            return;
+        }
+
         repository.deleteById(id);
     }
 
-    public void delete(T id) {
-        repository.delete(id);
+    @Override
+    public void delete(T entity) {
+        if(entity == null) {
+            return;
+        }
+
+        repository.delete(entity);
     }
 
-    public Optional<T> findAndDelete(long id) {
+    @Override
+    public Optional<T> findAndDelete(Long id) {
+        if(id == null) {
+            return Optional.empty();
+        }
+
         var resultOptional = repository.findById(id);
         resultOptional.ifPresent(this::delete);
         return resultOptional;

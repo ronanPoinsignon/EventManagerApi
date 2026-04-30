@@ -1,5 +1,6 @@
 package app.back.service;
 
+import app.back.api.DtoEventServiceApi;
 import app.back.dto.Event;
 import app.back.exception.BackBadRequestException;
 import app.back.exception.duplicate.event.BackDuplicateEventNameException;
@@ -14,7 +15,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Service
-public class DtoEventService extends DtoAbstractEntityService<Event, @NonNull EventRepository> {
+public class DtoEventService extends DtoAbstractEntityService<Event, @NonNull EventRepository> implements DtoEventServiceApi {
 
     protected DtoEventService(@NonNull EventRepository repository) {
         super(repository);
@@ -26,7 +27,7 @@ public class DtoEventService extends DtoAbstractEntityService<Event, @NonNull Ev
             "todoListEntries"
     })
     @Override
-    public Optional<Event> findById(long id) {
+    public Optional<Event> findById(Long id) {
         return super.findById(id);
     }
 
@@ -63,14 +64,17 @@ public class DtoEventService extends DtoAbstractEntityService<Event, @NonNull Ev
         }
     }
 
+    @Override
     public Optional<Event> findByEventName(String name) {
         return repository.findByEventName(name);
     }
 
+    @Override
     public Optional<Event> findByEventName(long parentId, String name) {
         return repository.findByEventName(parentId, name);
     }
 
+    @Override
     public List<Event> findAllBeforeEnd(LocalDateTime date) {
         if(date == null) {
             date = LocalDateTime.now();
@@ -78,6 +82,7 @@ public class DtoEventService extends DtoAbstractEntityService<Event, @NonNull Ev
         return repository.findAllBeforeEnd(date);
     }
 
+    @Override
     public Optional<Event> getLast() {
         return repository.getLast();
     }

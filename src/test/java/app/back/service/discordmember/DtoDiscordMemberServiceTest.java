@@ -1,7 +1,9 @@
-package app.back.service;
+package app.back.service.discordmember;
 
 import app.back.dto.DiscordMember;
 import app.back.exception.BackBadRequestException;
+import app.back.service.BasicDtoTestService;
+import app.back.service.DtoDiscordMemberService;
 import app.utils.DiscordMemberUtils;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.*;
@@ -97,7 +99,7 @@ public class DtoDiscordMemberServiceTest extends BasicDtoTestService<DiscordMemb
         dtoService.save(discordMember2);
         dtoService.save(discordMember3);
 
-        var result = dtoService.findByDiscordId(null);
+        var result = dtoService.findByDiscordId((List<Long>) null);
         Assertions.assertTrue(result.isEmpty());
     }
 

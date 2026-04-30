@@ -1,5 +1,6 @@
 package app.back.service;
 
+import app.back.api.DtoDiscordMemberServiceApi;
 import app.back.dto.DiscordMember;
 import app.back.exception.BackBadRequestException;
 import app.back.repository.DiscordMemberRepository;
@@ -11,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class DtoDiscordMemberService extends DtoAbstractEntityService<DiscordMember, @NonNull DiscordMemberRepository> {
+public class DtoDiscordMemberService extends DtoAbstractEntityService<DiscordMember, @NonNull DiscordMemberRepository> implements DtoDiscordMemberServiceApi {
 
     protected DtoDiscordMemberService(DiscordMemberRepository repository) {
         super(repository);
@@ -33,10 +34,16 @@ public class DtoDiscordMemberService extends DtoAbstractEntityService<DiscordMem
         dbEntity.setNickname(entityToSave.getNickname());
     }
 
-    public Optional<DiscordMember> findByDiscordId(long id) {
+    @Override
+    public Optional<DiscordMember> findByDiscordId(Long id) {
+        if(id == null) {
+            return Optional.empty();
+        }
+
         return repository.findByDiscordId(id);
     }
 
+    @Override
     public List<DiscordMember> findByDiscordId(List<Long> idList) {
         if(idList == null || idList.isEmpty()) {
             return new ArrayList<>();
@@ -45,6 +52,7 @@ public class DtoDiscordMemberService extends DtoAbstractEntityService<DiscordMem
         return repository.findByDiscordId(idList);
     }
 
+    @Override
     public Optional<DiscordMember> findByNickname(String nickname) {
         return repository.findByNickname(nickname);
     }
