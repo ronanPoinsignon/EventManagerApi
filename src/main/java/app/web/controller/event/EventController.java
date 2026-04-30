@@ -23,17 +23,17 @@ public class EventController {
     }
 
     @GetMapping("/findById")
-    public PojoEvent findById(long id) {
+    public PojoEvent findById(@RequestParam("id") long id) {
         return eventService.findOne(id);
     }
 
     @GetMapping("/findByEventName")
-    public PojoEvent findById(String name) {
+    public PojoEvent findById(@RequestParam("name") String name) {
         return eventService.findByEventName(name);
     }
 
     @GetMapping("/findActive")
-    public List<PojoEvent> findAllBeforeEnd(@RequestParam(required = false) LocalDateTime date) {
+    public List<PojoEvent> findAllBeforeEnd(@RequestParam(name = "date", required = false) LocalDateTime date) {
         return eventService.findAllBeforeEnd(date);
     }
 
