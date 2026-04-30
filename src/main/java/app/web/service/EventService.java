@@ -4,6 +4,7 @@ import app.back.api.DtoDiscordMemberServiceApi;
 import app.back.api.DtoEventServiceApi;
 import app.back.dto.DiscordMember;
 import app.back.dto.Event;
+import app.back.dto.TodoEntry;
 import app.web.api.EventServiceApi;
 import app.web.exception.BadRequestException;
 import app.web.exception.NotFoundException;
@@ -16,6 +17,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 @Service
 public class EventService extends AbstractService<Event, PojoEvent, DtoEventServiceApi> implements EventServiceApi {
@@ -81,24 +85,20 @@ public class EventService extends AbstractService<Event, PojoEvent, DtoEventServ
 
     @Transactional
     @Override
-    public PojoEvent addTo(long parentEventId, List<Long> discordMemberIdList) {
-        var event = getService().findById(parentEventId).orElseThrow(() -> new NotFoundException("Aucun événement trouvé."));
-        var discordMembers = findAllMembers(discordMemberIdList);
-
-        var hasChanged = event.addParticipants(discordMembers);
-        if(!hasChanged) {
-            return getTransform().toPojo(event);
-        }
-
-        return getTransform().toPojo(getService().save(event));
+    public PojoEvent addTo(long eventId, List<Long> discordMemberIdList) {
+        return manageParticipants(eventId, () -> findAllMembers(discordMemberIdList), Event::addParticipants);
     }
 
     @Transactional
     @Override
-    public PojoEvent removeTo(long parentEventId, List<Long> discordMemberIdList) {
-        var event = getService().findById(parentEventId).orElseThrow(() -> new NotFoundException("Aucun événement trouvé."));
+    public PojoEvent removeTo(long eventId, List<Long> discordMemberIdList) {
+        return manageParticipants(eventId, () -> discordMemberIdList, Event::removeParticipants);
+    }
 
-        var hasChanged = event.removeParticipants(discordMemberIdList);
+    private <T> PojoEvent manageParticipants(long eventId, Supplier<List<T>> participantList, BiFunction<Event, List<T>, Boolean> participantFunction) {
+        var event = getService().findById(eventId).orElseThrow(() -> new NotFoundException("Aucun événement trouvé."));
+
+        var hasChanged = participantFunction.apply(event, participantList.get());
         if(!hasChanged) {
             return getTransform().toPojo(event);
         }
@@ -139,44 +139,22 @@ public class EventService extends AbstractService<Event, PojoEvent, DtoEventServ
     @Transactional
     @Override
     public PojoEvent addTodoMembers(long eventId, String todoName, List<Long> discordMemberIds) {
-        if(todoName == null || todoName.isBlank()) {
-            throw new BadRequestException("Le nom est obligatoire.");
-        }
-
-        var event = getService().findById(eventId).orElseThrow(() -> new NotFoundException("Aucun événement trouvé."));
-        var todo = event.findTodoEntryByName(todoName);
-        if(todo == null) {
-            throw new NotFoundException("Aucun todo enregistré avec ce nom pour l'événement " + event.getEventName() + ".");
-        }
-
-        var members = findAllMembers(discordMemberIds);
-        var result = todo.addDiscordMembers(members);
-        if(!result) {
-            return getTransform().toPojo(event);
-        }
-
-        return getTransform().toPojo(getService().save(event));
+        return manageTodoMember(eventId, todoName, () -> findAllMembers(discordMemberIds), TodoEntry::addDiscordMembers);
     }
 
     @Transactional
     @Override
     public PojoEvent removeTodoMembers(long eventId, String todoName, List<Long> discordMemberIds) {
-        if(todoName == null || todoName.isBlank()) {
-            throw new BadRequestException("Le nom est obligatoire.");
-        }
+        return manageTodoMember(eventId, todoName, () -> discordMemberIds, TodoEntry::removeDiscordMember);
+    }
 
-        var event = getService().findById(eventId).orElseThrow(() -> new NotFoundException("Aucun événement trouvé."));
-        var todo = event.findTodoEntryByName(todoName);
-        if(todo == null) {
-            throw new NotFoundException("Aucun todo enregistré avec ce nom pour l'événement " + event.getEventName() + ".");
-        }
+    private <T> PojoEvent manageTodoMember(long eventId, String todoName, Supplier<T> discordMemberList, BiFunction<TodoEntry, T, Boolean> memberFunction) {
+        return updateTodoInfo(eventId, todoName, todo -> memberFunction.apply(todo, discordMemberList.get()));
+    }
 
-        var result = todo.removeDiscordMember(discordMemberIds);
-        if(!result) {
-            return getTransform().toPojo(event);
-        }
-
-        return getTransform().toPojo(getService().save(event));
+    @Override
+    public PojoEvent updateTodoStatus(long eventId, String todoName, boolean isDone) {
+        return updateTodoInfo(eventId, todoName, todo -> todo.setDone(isDone));
     }
 
     /**
@@ -206,6 +184,26 @@ public class EventService extends AbstractService<Event, PojoEvent, DtoEventServ
         }
 
         return discordMemberService.findByDiscordId(discordMemberIdList);
+    }
+
+    private PojoEvent updateTodoInfo(long eventId, String todoName, Function<TodoEntry, Boolean> todoFunction) {
+        if(todoName == null || todoName.isBlank()) {
+            throw new BadRequestException("Le nom est obligatoire.");
+        }
+
+        var event = getService().findById(eventId).orElseThrow(() -> new NotFoundException("Aucun événement trouvé."));
+        var todo = event.findTodoEntryByName(todoName);
+        if(todo == null) {
+            throw new NotFoundException("Aucun todo enregistré avec ce nom pour l'événement " + event.getEventName() + ".");
+        }
+
+        var result = todoFunction.apply(todo);
+
+        if(!result) {
+            return getTransform().toPojo(event);
+        }
+
+        return getTransform().toPojo(getService().save(event));
     }
 
 }

@@ -8,6 +8,7 @@ public class PojoTodoEntry extends PojoEntity {
     private String todoValue;
     private List<PojoDiscordMember> discordMembers;
     private PojoEvent event;
+    private boolean isDone;
 
     public String getName() {
         return name;
@@ -39,5 +40,13 @@ public class PojoTodoEntry extends PojoEntity {
 
     public void setEvent(PojoEvent event) {
         this.event = event;
+    }
+
+    public boolean isDone() {
+        return isDone;
+    }
+
+    public void setDone(boolean done) {
+        isDone = done;
     }
 }

@@ -28,6 +28,9 @@ public class TodoEntry extends AbstractEntity {
     )
     private final Set<DiscordMember> discordMemberSet = new HashSet<>();
 
+    @Column(name = "wasDone")
+    private boolean isDone;
+
     public TodoEntry() {
 
     }
@@ -101,5 +104,16 @@ public class TodoEntry extends AbstractEntity {
 
     public void setEvent(Event event) {
         this.event = event;
+    }
+
+    public boolean isDone() {
+        return isDone;
+    }
+
+    public boolean setDone(boolean isDone) {
+        var before = this.isDone;
+        this.isDone = isDone;
+
+        return before != this.isDone;
     }
 }

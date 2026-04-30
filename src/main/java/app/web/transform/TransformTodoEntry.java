@@ -25,6 +25,7 @@ public class TransformTodoEntry extends AbstractTransform<TodoEntry, PojoTodoEnt
         pojo.setTodoValue(dto.getTodoValue());
         pojo.setEvent(transformEvent.toPojo(dto.getEvent()));
         pojo.setDiscordMembers(transformMember.toPojo(dto.getDiscordMembers()));
+        pojo.setDone(dto.isDone());
 
         return pojo;
     }

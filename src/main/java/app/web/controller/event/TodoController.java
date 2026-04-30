@@ -37,4 +37,9 @@ public class TodoController {
         return eventService.removeTodoMembers(eventId, todoName, discordMemberIds);
     }
 
+    @PostMapping("/updateStatus")
+    public PojoEvent updateTodoStatus(@RequestParam(value = "eventId") long eventId, @RequestParam("todoName") String todoName, @RequestParam("isDone") boolean isDone) {
+        return eventService.updateTodoStatus(eventId, todoName, isDone);
+    }
+
 }
