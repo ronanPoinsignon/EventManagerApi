@@ -4,7 +4,6 @@ import app.back.dto.DiscordMember;
 import app.back.dto.Event;
 import app.back.dto.TodoEntry;
 import app.back.service.DtoDiscordMemberService;
-import app.back.service.DtoTodoEntryService;
 import app.web.pojo.PojoDiscordMember;
 import app.web.pojo.PojoEvent;
 import app.web.pojo.PojoTodoEntry;
@@ -29,11 +28,7 @@ public class EventUtils {
     private Supplier<Long> counterStrategy;
     private Supplier<LocalDateTime> dateStrategy;
 
-    private LocalDateTime now;
-
-    @Autowired
-    @Lazy
-    private DtoTodoEntryService dtoTodoEntryService;
+    private final LocalDateTime now;
 
     @Autowired
     @Lazy
