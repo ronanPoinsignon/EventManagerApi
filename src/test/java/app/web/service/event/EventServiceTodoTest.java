@@ -1,5 +1,6 @@
 package app.web.service.event;
 
+import app.back.dto.TodoEntry;
 import app.utils.DiscordMemberUtils;
 import app.utils.EventUtils;
 import app.utils.TodoEntryUtils;
@@ -281,4 +282,30 @@ public class EventServiceTodoTest {
         Assertions.assertThrows(NotFoundException.class, () -> service.removeTodoMembers(finalEvent.getId(), "test", List.of(finalEvent.getTodoList().getFirst().getDiscordMembers().getFirst().getId())));
     }
 
+    @Test
+    @Order(20)
+    void testTodoStatus() {
+        var todo = new TodoEntry();
+        Assertions.assertFalse(todo.isDone());
+
+        var result = todo.setDone(true);
+        Assertions.assertTrue(todo.isDone());
+        Assertions.assertTrue(result);
+
+        result = todo.setDone(true);
+        Assertions.assertTrue(todo.isDone());
+        Assertions.assertFalse(result);
+    }
+
+    @Test
+    @Order(21)
+    void testUpdateTodoStatus() {
+        var event = eventUtils.createBasicPojo();
+        eventUtils.addTodo(event);
+        event = service.save(event);
+
+        Assertions.assertFalse(event.getTodoList().getFirst().isDone());
+        event = service.updateTodoStatus(event.getId(), event.getTodoList().getFirst().getName(), true);
+        Assertions.assertTrue(event.getTodoList().getFirst().isDone());
+    }
 }

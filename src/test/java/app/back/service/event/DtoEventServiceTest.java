@@ -48,10 +48,17 @@ public class DtoEventServiceTest extends BasicDtoTestService<Event, DtoEventServ
         event = dtoService.save(event);
 
         base.setId(event.getId());
+
         var baseSubEvent = base.getSubEvents().getFirst();
         var eventSubEvent = event.getSubEvents().getFirst();
         baseSubEvent.setId(eventSubEvent.getId());
+
         new ArrayList<>(base.getParticipants()).getFirst().setId(new ArrayList<>(event.getParticipants()).getFirst().getId());
+
+        var baseTodo = base.getTodoList().getFirst();
+        var eventTodo = event.getTodoList().getFirst();
+        baseTodo.setId(eventTodo.getId());
+
         EventUtils.compare(base, event);
     }
 
