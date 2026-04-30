@@ -1,4 +1,4 @@
-package app.web.controller;
+package app.web.controller.discordMember;
 
 import app.web.api.DiscordMemberServiceApi;
 import app.web.pojo.PojoDiscordMember;
