@@ -1,5 +1,7 @@
 package app.web.pojo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.List;
 
 public class PojoTodoEntry extends PojoEntity {
@@ -7,6 +9,7 @@ public class PojoTodoEntry extends PojoEntity {
     private String name;
     private String todoValue;
     private List<PojoDiscordMember> discordMembers;
+    @JsonIgnore
     private PojoEvent event;
     private boolean isDone;
 
