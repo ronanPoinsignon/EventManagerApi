@@ -8,8 +8,8 @@ spring:
   datasource:
     platform: mysql
     url: jdbc:mysql://localhost:${MYSQL_PORT}/test?createDatabaseIfNotExist=true
-    username: ${MYSQL_ROOT_USERNAME}
-    password: ${MYSQL_ROOT_PASSWORD}
+    username: ${MYSQL_USER}
+    password: ${MYSQL_PASSWORD}
     initialization-mode: always
     dialect: org.hibernate.dialect.MySQLDialect
   db:
