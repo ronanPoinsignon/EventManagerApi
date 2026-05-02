@@ -33,7 +33,7 @@ public class GlobalExceptionHandler {
         Map<String, Object> error = Map.of(
                 "message", ex.getMessage()
         );
-        problem.setProperty("errors", error);
+        problem.setProperty("error", error);
 
         return problem;
     }
