@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -26,11 +27,47 @@ public class StringToLocalDateTImeConverterTest {
         var date = LocalDate.of(2020, 2, 1);
         for(var stringDate : stringDateList) {
             var result = converter.convert(stringDate);
-            Assertions.assertEquals(LocalDateTime.of(2020, 2, 1, 0, 0), result);
+            Assertions.assertEquals(LocalDateTime.of(date, LocalTime.of(0, 0)), result);
+        }
+
+        stringDateList = List.of(
+                "01-01-2000",
+                "01/01/2000",
+                "2000-01-01",
+                "2000/01/01"
+        );
+        date = LocalDate.of(2000, 1, 1);
+        for(var stringDate : stringDateList) {
+            var result = converter.convert(stringDate);
+            Assertions.assertEquals(LocalDateTime.of(date, LocalTime.of(0, 0)), result);
+        }
+
+        stringDateList = List.of(
+                "31-12-1999",
+                "31/12/1999",
+                "1999-12-31",
+                "1999/12/31"
+        );
+        date = LocalDate.of(1999, 12, 31);
+        for(var stringDate : stringDateList) {
+            var result = converter.convert(stringDate);
+            Assertions.assertEquals(LocalDateTime.of(date, LocalTime.of(0, 0)), result);
         }
 
         var result = converter.convert("29-02-2004");
         Assertions.assertEquals(LocalDateTime.of(2004, 2, 29, 0, 0), result);
+
+        result = converter.convert("01-01-2000");
+        Assertions.assertEquals(LocalDateTime.of(2000, 1, 1, 0, 0), result);
+        result = converter.convert("01/01/2000");
+        Assertions.assertEquals(LocalDateTime.of(2000, 1, 1, 0, 0), result);
+        result = converter.convert("01/01/2000");
+        Assertions.assertEquals(LocalDateTime.of(2000, 1, 1, 0, 0), result);
+    }
+
+    @Test
+    void test() {
+        converter.convert("2026-12-31");
     }
 
     @Test
