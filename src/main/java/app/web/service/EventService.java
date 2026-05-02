@@ -148,10 +148,20 @@ public class EventService extends AbstractService<Event, PojoEvent, DtoEventServ
         return manageTodoMember(eventId, todoName, () -> discordMemberIds, TodoEntry::removeDiscordMember);
     }
 
+    @Transactional
     private <T> PojoEvent manageTodoMember(long eventId, String todoName, Supplier<T> discordMemberList, BiFunction<TodoEntry, T, Boolean> memberFunction) {
         return updateTodoInfo(eventId, todoName, todo -> memberFunction.apply(todo, discordMemberList.get()));
     }
 
+    @Transactional
+    @Override
+    public PojoEvent delete(long eventId) {
+        return getService().findAndDelete(eventId)
+                .map(getTransform()::toPojo)
+                .orElse(null);
+    }
+
+    @Transactional
     @Override
     public PojoEvent updateTodoStatus(long eventId, String todoName, boolean isDone) {
         return updateTodoInfo(eventId, todoName, todo -> todo.setDone(isDone));

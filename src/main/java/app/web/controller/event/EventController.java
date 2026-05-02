@@ -42,4 +42,9 @@ public class EventController {
         return eventService.getLast();
     }
 
+    @DeleteMapping("/delete")
+    public PojoEvent delete(@RequestParam("eventId") long eventId) {
+        return eventService.delete(eventId);
+    }
+
 }

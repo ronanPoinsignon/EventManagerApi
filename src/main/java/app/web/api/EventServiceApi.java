@@ -32,4 +32,6 @@ public interface EventServiceApi extends AbstractServiceApi<PojoEvent> {
 
     PojoEvent updateTodoStatus(long eventId, String todoName, boolean isDone);
 
+    PojoEvent delete(long eventId);
+
 }
