@@ -1,0 +1,28 @@
+{
+  "realm": "event-organizer",
+  "enabled": true,
+  "clients": [
+    {
+      "clientId": "pladonf_front_end",
+      "publicClient": true,
+      "redirectUris": ["http://localhost:4200/*"]
+    }
+  ],
+  "users": [
+    {
+      "username": "test",
+      "enabled": true,
+      "emailVerified": true,
+      "email": "test@test.test",
+      "firstName": "test",
+      "lastName": "test",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "test"
+        }
+      ],
+      "realmRoles": []
+    }
+  ]
+}

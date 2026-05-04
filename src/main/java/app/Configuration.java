@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.format.FormatterRegistry;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import tools.jackson.databind.DeserializationFeature;
 import tools.jackson.databind.SerializationFeature;
@@ -37,6 +38,16 @@ public class Configuration implements WebMvcConfigurer {
 
         return builder.build();
     }
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedMethods("*")
+                .allowedHeaders("*")
+                .allowedOrigins("http://localhost:4200")
+                .allowCredentials(true);
+    }
+
 
     @Override
     public void addFormatters(FormatterRegistry registry) {

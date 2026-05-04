@@ -23,3 +23,9 @@ spring:
         format_sql: true
       naming:
         strategy: org.hibernate.cfg.ImprovedNamingStrategy
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/event-organizer
+          jwk-set-uri: http://keycloak:8080/realms/event-organizer/protocol/openid-connect/certs
