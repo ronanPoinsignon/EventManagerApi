@@ -20,8 +20,8 @@ public class KeycloakUserService {
     @Value("${KEYCLOAK_REALM}")
     private String keycloakRealmValue;
 
-    @Value("${KEYCLOAK_PORT}")
-    private int keycloakPort;
+    @Value("${keycloak.server-url}")
+    private String keycloakBaseUrl;
 
     @Value("${KEYCLOAK_CLIENT_ID}")
     private String clientId;
@@ -114,7 +114,7 @@ public class KeycloakUserService {
     }
 
     private String getBaseURL() {
-        return "http://keycloak:" + keycloakPort;
+        return keycloakBaseUrl;
     }
 
     private String getRealmURL() {
