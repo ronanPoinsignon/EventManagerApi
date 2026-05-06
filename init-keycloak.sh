@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 set -e
 
 until /opt/keycloak/bin/kcadm.sh config credentials \
