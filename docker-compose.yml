@@ -3,16 +3,23 @@ services:
     container_name: back_end_pladonf
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.java
     ports:
       - ${SPRING_PORT}:8000
     depends_on:
       mysqldb:
         condition: service_healthy
+      init-keycloak:
+        condition: service_completed_successfully
     environment:
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysqldb:3306/${DATABASE_NAME}
       - SPRING_DATASOURCE_USERNAME=${MYSQL_USER}
       - SPRING_DATASOURCE_PASSWORD=${MYSQL_PASSWORD}
+      - KEYCLOAK_REALM=${KEYCLOAK_REALM}
+      - KEYCLOAK_PORT=${KEYCLOAK_PORT}
+      - KEYCLOAK_CLIENT_ID=${KEYCLOAK_CLIENT_ID}
+      - KEYCLOAK_USER=${KEYCLOAK_USER}
+      - KEYCLOAK_PASSWORD=${KEYCLOAK_PASSWORD}
     networks:
       - pladonf_api
       - pladonf_auth
@@ -20,7 +27,7 @@ services:
   keycloak:
     container_name: keycloak
     image: quay.io/keycloak/keycloak:24.0.4
-    command: start-dev --import-realm --verbose
+    command: start-dev --features=preview --import-realm --verbose
     environment:
       KEYCLOAK_ADMIN: ${KEYCLOAK_USER}
       KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_PASSWORD}
@@ -30,6 +37,22 @@ services:
     volumes:
       - keycloak_data:/opt/keycloak/data
       - ./keycloak-realm.json:/opt/keycloak/data/import/keycloak-realm.json
+    healthcheck:
+      test: ["CMD", "/opt/keycloak/bin/kcadm.sh", "get", "realms/master", "--server", "http://localhost:8080"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    networks:
+      - pladonf_auth
+
+  init-keycloak:
+    image: quay.io/keycloak/keycloak:24.0.4
+    entrypoint: [ "/bin/sh", "/init-keycloak.sh" ]
+    environment:
+      KEYCLOAK_USER: ${KEYCLOAK_USER}
+      KEYCLOAK_PASSWORD: ${KEYCLOAK_PASSWORD}
+    volumes:
+      - ./init-keycloak.sh:/init-keycloak.sh
     networks:
       - pladonf_auth
 
