@@ -22,11 +22,9 @@ import java.util.function.Function;
 @Service
 public class EventService extends AbstractService<Event, PojoEvent, DtoEventServiceApi> implements EventServiceApi {
 
-    private final DtoUserAttributesServiceApi discordMemberService;
 
     public EventService(DtoEventServiceApi eventService, TransformEvent transformEvent, DtoUserAttributesServiceApi discordMemberService) {
         super(eventService, transformEvent);
-        this.discordMemberService = discordMemberService;
     }
 
     @Transactional
