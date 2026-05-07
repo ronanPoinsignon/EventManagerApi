@@ -1,7 +1,9 @@
 package app.web.transform;
 
+import app.back.api.KeycloakServiceApi;
 import app.back.dto.Event;
 import app.web.pojo.PojoEvent;
+import app.web.pojo.PojoUser;
 import jakarta.annotation.Nonnull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -9,13 +11,18 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class TransformEvent extends AbstractTransform<Event, PojoEvent> {
 
     @Autowired
     @Lazy
-    private TransformMember transformMember;
+    private TransformKeycloakUser transformKeycloakUser;
+
+    @Autowired
+    @Lazy
+    private KeycloakServiceApi keycloakServiceApi;
 
     @Autowired
     @Lazy
@@ -35,7 +42,9 @@ public class TransformEvent extends AbstractTransform<Event, PojoEvent> {
         eventMap.put(pojo, event);
 
         event.setEventName(pojo.getEventName());
-        event.setOwnerUserId(pojo.getOwnerUserId());
+        if(pojo.getOwnerUser() != null) {
+            event.setOwnerUserId(pojo.getOwnerUser().getId());
+        }
         event.setStartDate(pojo.getStartDate());
         event.setEndDate(pojo.getEndDate());
         event.setLocation(pojo.getLocation());
@@ -49,7 +58,7 @@ public class TransformEvent extends AbstractTransform<Event, PojoEvent> {
             }).toList());
         }
         if(pojo.getParticipants() != null) {
-            event.setParticipants(pojo.getParticipants());
+            event.setParticipants(pojo.getParticipants().stream().map(PojoUser::getId).toList());
         }
         if(pojo.getTodoList() != null) {
             pojo.getTodoList().stream().map(pojoTodo -> {
@@ -81,7 +90,8 @@ public class TransformEvent extends AbstractTransform<Event, PojoEvent> {
         pojoEventMap.put(dto, pojoEvent);
 
         pojoEvent.setEventName(dto.getEventName());
-        pojoEvent.setOwnerUserId(dto.getOwnerUserId());
+        keycloakServiceApi.getUserById(dto.getOwnerUserId())
+                .ifPresent(pojoUser -> pojoEvent.setOwnerUser(transformKeycloakUser.toPojo(pojoUser)));
         pojoEvent.setCreationDate(dto.getCreationDate());
         pojoEvent.setStartDate(dto.getStartDate());
         pojoEvent.setEndDate(dto.getEndDate());
@@ -101,7 +111,12 @@ public class TransformEvent extends AbstractTransform<Event, PojoEvent> {
                 return from(subEvent, pojoEventMap);
             }
         }).toList());
-        pojoEvent.setParticipants(dto.getParticipants());
+        pojoEvent.setParticipants(dto.getParticipants().stream()
+                .map(keycloakServiceApi::getUserById)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .map(transformKeycloakUser::toPojoWithAttributes)
+                .toList());
         pojoEvent.setTodoList(dto.getTodoList().stream().map(todo -> {
             var todoEvent = todo.getEvent();
             todo.setEvent(null);

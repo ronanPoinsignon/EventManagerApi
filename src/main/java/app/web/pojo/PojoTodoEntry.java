@@ -5,13 +5,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.UUID;
 
 public class PojoTodoEntry extends PojoEntity {
 
     private String name;
     private String todoValue;
-    private List<UUID> userIds;
+    private List<PojoUser> users;
     @JsonIgnore
     private PojoEvent event;
     private boolean isDone;
@@ -32,12 +31,12 @@ public class PojoTodoEntry extends PojoEntity {
         this.todoValue = todoValue;
     }
 
-    public List<UUID> getUserIds() {
-        return userIds;
+    public List<PojoUser> getUsers() {
+        return users;
     }
 
-    public void setUserIds(Collection<UUID> userIds) {
-        this.userIds = new ArrayList<>(userIds);
+    public void setUsers(Collection<? extends PojoUser> users) {
+        this.users = new ArrayList<>(users);
     }
 
     public PojoEvent getEvent() {

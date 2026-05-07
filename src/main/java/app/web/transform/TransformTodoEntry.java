@@ -1,11 +1,15 @@
 package app.web.transform;
 
 import app.back.dto.TodoEntry;
+import app.back.service.KeycloakUserService;
 import app.web.pojo.PojoTodoEntry;
+import app.web.pojo.PojoUser;
 import jakarta.annotation.Nonnull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class TransformTodoEntry extends AbstractTransform<TodoEntry, PojoTodoEntry> {
@@ -14,13 +18,26 @@ public class TransformTodoEntry extends AbstractTransform<TodoEntry, PojoTodoEnt
     @Lazy
     private TransformEvent transformEvent;
 
+    @Autowired
+    @Lazy
+    private KeycloakUserService keycloakUserService;
+
+    @Autowired
+    @Lazy
+    private TransformKeycloakUser transformKeycloakUser;
+
     @Override
     protected PojoTodoEntry from(@Nonnull TodoEntry dto) {
         var pojo = super.from(dto);
         pojo.setName(dto.getTodoName());
         pojo.setTodoValue(dto.getTodoValue());
         pojo.setEvent(transformEvent.toPojo(dto.getEvent()));
-        pojo.setUserIds(dto.getuserIds());
+        pojo.setUsers(dto.getuserIds().stream()
+                .map(keycloakUserService::getUserById)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .map(transformKeycloakUser::toPojoWithAttributes)
+                .toList());
         pojo.setDone(dto.isDone());
 
         return pojo;
@@ -32,7 +49,9 @@ public class TransformTodoEntry extends AbstractTransform<TodoEntry, PojoTodoEnt
         entity.setTodoName(pojo.getName());
         entity.setTodoValue(pojo.getTodoValue());
         entity.setEvent(transformEvent.toDto(pojo.getEvent()));
-        entity.setUserIdSet(pojo.getUserIds());
+        if(pojo.getUsers() != null) {
+            entity.setUserIdSet(pojo.getUsers().stream().map(PojoUser::getId).toList());
+        }
 
         return entity;
     }

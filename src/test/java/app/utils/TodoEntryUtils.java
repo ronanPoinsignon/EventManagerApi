@@ -70,10 +70,10 @@ public class TodoEntryUtils {
 
     public UUID addUser(PojoTodoEntry todoEntry) {
         var user = uuidUtils.generate();
-        if(todoEntry.getUserIds() == null) {
-            todoEntry.setUserIds(new ArrayList<>());
+        if(todoEntry.getUsers() == null) {
+            todoEntry.setUsers(new ArrayList<>());
         }
-        todoEntry.getUserIds().add(user);
+        todoEntry.getUsers().add(user);
 
         return user;
     }
@@ -102,7 +102,7 @@ public class TodoEntryUtils {
         var todo = new PojoTodoEntry();
         todo.setTodoValue("todo_" + counterStrategy.get());
         todo.setName("name_" + counterStrategy.get());
-        todo.setUserIds(new ArrayList<>());
+        todo.setUsers(new ArrayList<>());
 
         return todo;
     }
@@ -126,7 +126,7 @@ public class TodoEntryUtils {
         }
         Assertions.assertEquals(base.isDone(), result.isDone());
         var baseDiscordMemberList = new ArrayList<>(base.getuserIds());
-        var resultDiscordMemberMap = result.getUserIds().stream().collect(Collectors.toMap(Function.identity(), Function.identity()));
+        var resultDiscordMemberMap = result.getUsers().stream().collect(Collectors.toMap(Function.identity(), Function.identity()));
         for(int i = 0; i < base.getuserIds().size(); i++) {
             var userId = baseDiscordMemberList.get(i);
             Assertions.assertEquals(baseDiscordMemberList.get(i), resultDiscordMemberMap.get(userId));
@@ -156,8 +156,8 @@ public class TodoEntryUtils {
         }
         Assertions.assertEquals(base.isDone(), result.isDone());
         var resultDiscordMemberMap = result.getuserIds().stream().collect(Collectors.toMap(Function.identity(), Function.identity()));
-        if(base.getUserIds() != null) {
-            for(var userid : base.getUserIds()) {
+        if(base.getUsers() != null) {
+            for(var userid : base.getUsers()) {
                 Assertions.assertEquals(userid, resultDiscordMemberMap.get(userid));
             }
         }
@@ -171,9 +171,9 @@ public class TodoEntryUtils {
             Assertions.assertEquals(base.getEvent().getId(), result.getEvent().getId());
         }
         Assertions.assertEquals(base.isDone(), result.isDone());
-        var resultDiscordMemberMap = result.getUserIds().stream().collect(Collectors.toMap(Function.identity(), Function.identity()));
-        if(base.getUserIds() != null) {
-            for(var userid : base.getUserIds()) {
+        var resultDiscordMemberMap = result.getUsers().stream().collect(Collectors.toMap(Function.identity(), Function.identity()));
+        if(base.getUsers() != null) {
+            for(var userid : base.getUsers()) {
                 Assertions.assertEquals(userid, resultDiscordMemberMap.get(userid));
             }
         }

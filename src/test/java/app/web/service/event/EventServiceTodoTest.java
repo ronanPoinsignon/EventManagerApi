@@ -46,7 +46,7 @@ public class EventServiceTodoTest {
         Assertions.assertEquals(event, event.getTodoList().getFirst().getEvent());
         Assertions.assertEquals(todo.getName(), event.getTodoList().getFirst().getName());
         Assertions.assertEquals(todo.getTodo(), event.getTodoList().getFirst().getTodoValue());
-        Assertions.assertEquals(1, event.getTodoList().getFirst().getUserIds().size());
+        Assertions.assertEquals(1, event.getTodoList().getFirst().getUsers().size());
     }
 
     @Test
@@ -128,10 +128,10 @@ public class EventServiceTodoTest {
         eventUtils.addTodo(event);
         event = service.linkDiscordId(event);
         var user = uuidUtils.generate();
-        Assertions.assertTrue(event.getTodoList().getFirst().getUserIds().isEmpty());
+        Assertions.assertTrue(event.getTodoList().getFirst().getUsers().isEmpty());
 
         event = service.addTodoUsers(event.getId(), event.getTodoList().getFirst().getName(), List.of(user));
-        Assertions.assertEquals(1, event.getTodoList().getFirst().getUserIds().size());
+        Assertions.assertEquals(1, event.getTodoList().getFirst().getUsers().size());
     }
 
     @Test
@@ -141,12 +141,12 @@ public class EventServiceTodoTest {
         var todo = eventUtils.addTodo(event);
         todoEntryUtils.addUser(todo);
         event = service.linkDiscordId(event);
-        Assertions.assertEquals(1, event.getTodoList().getFirst().getUserIds().size());
+        Assertions.assertEquals(1, event.getTodoList().getFirst().getUsers().size());
 
         app.web.pojo.PojoEvent finalEvent = event;
         service.addTodoUsers(finalEvent.getId(), finalEvent.getTodoList().getFirst().getName(), List.of(uuidUtils.generate()));
         event = service.findOne(event.getId());
-        Assertions.assertEquals(2, event.getTodoList().getFirst().getUserIds().size());
+        Assertions.assertEquals(2, event.getTodoList().getFirst().getUsers().size());
     }
 
     @Test
@@ -156,11 +156,11 @@ public class EventServiceTodoTest {
         var todo = eventUtils.addTodo(event);
         todoEntryUtils.addUser(todo);
         event = service.linkDiscordId(event);
-        Assertions.assertEquals(1, event.getTodoList().getFirst().getUserIds().size());
+        Assertions.assertEquals(1, event.getTodoList().getFirst().getUsers().size());
 
         event = service.addTodoUsers(event.getId(), event.getTodoList().getFirst().getName(), null);
         event = service.findOne(event.getId());
-        Assertions.assertEquals(1, event.getTodoList().getFirst().getUserIds().size());
+        Assertions.assertEquals(1, event.getTodoList().getFirst().getUsers().size());
     }
 
     @Test
@@ -170,11 +170,11 @@ public class EventServiceTodoTest {
         var todo = eventUtils.addTodo(event);
         todoEntryUtils.addUser(todo);
         event = service.linkDiscordId(event);
-        Assertions.assertEquals(1, event.getTodoList().getFirst().getUserIds().size());
+        Assertions.assertEquals(1, event.getTodoList().getFirst().getUsers().size());
 
         app.web.pojo.PojoEvent finalEvent = event;
-        Assertions.assertThrows(BadRequestException.class, () -> service.addTodoUsers(finalEvent.getId(), null, List.of(finalEvent.getTodoList().getFirst().getUserIds().getFirst())));
-        Assertions.assertThrows(BadRequestException.class, () -> service.addTodoUsers(finalEvent.getId(), "", List.of(finalEvent.getTodoList().getFirst().getUserIds().getFirst())));
+        Assertions.assertThrows(BadRequestException.class, () -> service.addTodoUsers(finalEvent.getId(), null, List.of(finalEvent.getTodoList().getFirst().getUsers().getFirst())));
+        Assertions.assertThrows(BadRequestException.class, () -> service.addTodoUsers(finalEvent.getId(), "", List.of(finalEvent.getTodoList().getFirst().getUsers().getFirst())));
     }
 
     @Test
@@ -184,11 +184,11 @@ public class EventServiceTodoTest {
         var todo = eventUtils.addTodo(event);
         todoEntryUtils.addUser(todo);
         event = service.linkDiscordId(event);
-        Assertions.assertEquals(1, event.getTodoList().getFirst().getUserIds().size());
+        Assertions.assertEquals(1, event.getTodoList().getFirst().getUsers().size());
 
         app.web.pojo.PojoEvent finalEvent = event;
-        Assertions.assertThrows(BadRequestException.class, () -> service.addTodoUsers(finalEvent.getId(), null, List.of(finalEvent.getTodoList().getFirst().getUserIds().getFirst())));
-        Assertions.assertThrows(BadRequestException.class, () -> service.addTodoUsers(finalEvent.getId(), "", List.of(finalEvent.getTodoList().getFirst().getUserIds().getFirst())));
+        Assertions.assertThrows(BadRequestException.class, () -> service.addTodoUsers(finalEvent.getId(), null, List.of(finalEvent.getTodoList().getFirst().getUsers().getFirst())));
+        Assertions.assertThrows(BadRequestException.class, () -> service.addTodoUsers(finalEvent.getId(), "", List.of(finalEvent.getTodoList().getFirst().getUsers().getFirst())));
     }
 
     @Test
@@ -198,10 +198,10 @@ public class EventServiceTodoTest {
         var todo = eventUtils.addTodo(event);
         todoEntryUtils.addUser(todo);
         event = service.linkDiscordId(event);
-        Assertions.assertEquals(1, event.getTodoList().getFirst().getUserIds().size());
+        Assertions.assertEquals(1, event.getTodoList().getFirst().getUsers().size());
 
         app.web.pojo.PojoEvent finalEvent = event;
-        Assertions.assertThrows(NotFoundException.class, () -> service.addTodoUsers(finalEvent.getId(), "test", List.of(finalEvent.getTodoList().getFirst().getUserIds().getFirst())));
+        Assertions.assertThrows(NotFoundException.class, () -> service.addTodoUsers(finalEvent.getId(), "test", List.of(finalEvent.getTodoList().getFirst().getUsers().getFirst())));
     }
 
     @Test
@@ -212,13 +212,13 @@ public class EventServiceTodoTest {
         todoEntryUtils.addUser(todo);
         todoEntryUtils.addUser(todo);
         event = service.linkDiscordId(event);
-        Assertions.assertEquals(2, event.getTodoList().getFirst().getUserIds().size());
-        var user1 = event.getTodoList().getFirst().getUserIds().getFirst();
-        var user2 = event.getTodoList().getFirst().getUserIds().get(1);
+        Assertions.assertEquals(2, event.getTodoList().getFirst().getUsers().size());
+        var user1 = event.getTodoList().getFirst().getUsers().getFirst();
+        var user2 = event.getTodoList().getFirst().getUsers().get(1);
 
         event = service.removeTodoUsers(event.getId(), event.getTodoList().getFirst().getName(), List.of(user1));
-        Assertions.assertEquals(1, event.getTodoList().getFirst().getUserIds().size());
-        Assertions.assertEquals(user2, event.getTodoList().getFirst().getUserIds().getFirst());
+        Assertions.assertEquals(1, event.getTodoList().getFirst().getUsers().size());
+        Assertions.assertEquals(user2, event.getTodoList().getFirst().getUsers().getFirst());
     }
 
     @Test
@@ -229,11 +229,11 @@ public class EventServiceTodoTest {
          todoEntryUtils.addUser(todo);
         todoEntryUtils.addUser(todo);
         event = service.linkDiscordId(event);
-        Assertions.assertEquals(2, event.getTodoList().getFirst().getUserIds().size());
+        Assertions.assertEquals(2, event.getTodoList().getFirst().getUsers().size());
 
         service.removeTodoUsers(event.getId(), event.getTodoList().getFirst().getName(), List.of(uuidUtils.generate()));
         event = service.findOne(event.getId());
-        Assertions.assertEquals(2, event.getTodoList().getFirst().getUserIds().size());
+        Assertions.assertEquals(2, event.getTodoList().getFirst().getUsers().size());
     }
 
     @Test
@@ -244,11 +244,11 @@ public class EventServiceTodoTest {
         todoEntryUtils.addUser(todo);
         todoEntryUtils.addUser(todo);
         event = service.linkDiscordId(event);
-        Assertions.assertEquals(2, event.getTodoList().getFirst().getUserIds().size());
+        Assertions.assertEquals(2, event.getTodoList().getFirst().getUsers().size());
 
         event = service.addTodoUsers(event.getId(), event.getTodoList().getFirst().getName(), null);
         event = service.findOne(event.getId());
-        Assertions.assertEquals(2, event.getTodoList().getFirst().getUserIds().size());
+        Assertions.assertEquals(2, event.getTodoList().getFirst().getUsers().size());
     }
 
     @Test
@@ -258,11 +258,11 @@ public class EventServiceTodoTest {
         var todo = eventUtils.addTodo(event);
         todoEntryUtils.addUser(todo);
         event = service.linkDiscordId(event);
-        Assertions.assertEquals(1, event.getTodoList().getFirst().getUserIds().size());
+        Assertions.assertEquals(1, event.getTodoList().getFirst().getUsers().size());
 
         app.web.pojo.PojoEvent finalEvent = event;
-        Assertions.assertThrows(BadRequestException.class, () -> service.removeTodoUsers(finalEvent.getId(), null, List.of(finalEvent.getTodoList().getFirst().getUserIds().getFirst())));
-        Assertions.assertThrows(BadRequestException.class, () -> service.removeTodoUsers(finalEvent.getId(), "", List.of(finalEvent.getTodoList().getFirst().getUserIds().getFirst())));
+        Assertions.assertThrows(BadRequestException.class, () -> service.removeTodoUsers(finalEvent.getId(), null, List.of(finalEvent.getTodoList().getFirst().getUsers().getFirst())));
+        Assertions.assertThrows(BadRequestException.class, () -> service.removeTodoUsers(finalEvent.getId(), "", List.of(finalEvent.getTodoList().getFirst().getUsers().getFirst())));
     }
 
     @Test
@@ -272,10 +272,10 @@ public class EventServiceTodoTest {
         var todo = eventUtils.addTodo(event);
         todoEntryUtils.addUser(todo);
         event = service.linkDiscordId(event);
-        Assertions.assertEquals(1, event.getTodoList().getFirst().getUserIds().size());
+        Assertions.assertEquals(1, event.getTodoList().getFirst().getUsers().size());
 
         app.web.pojo.PojoEvent finalEvent = event;
-        Assertions.assertThrows(NotFoundException.class, () -> service.removeTodoUsers(finalEvent.getId(), "test", List.of(finalEvent.getTodoList().getFirst().getUserIds().getFirst())));
+        Assertions.assertThrows(NotFoundException.class, () -> service.removeTodoUsers(finalEvent.getId(), "test", List.of(finalEvent.getTodoList().getFirst().getUsers().getFirst())));
     }
 
     @Test

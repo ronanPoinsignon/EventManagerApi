@@ -6,12 +6,11 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.UUID;
 
 public class PojoEvent extends PojoEntity {
 
     private String eventName;
-    private UUID ownerUserId;
+    private PojoUser ownerUser;
     private LocalDateTime creationDate;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
@@ -19,7 +18,7 @@ public class PojoEvent extends PojoEntity {
     private List<PojoEvent> subEvents;
     @JsonIgnore
     private PojoEvent parentEvent;
-    private List<UUID> participants;
+    private List<PojoUser> participants;
     private List<PojoTodoEntry> todoList;
     private String tricountUrl;
 
@@ -31,12 +30,12 @@ public class PojoEvent extends PojoEntity {
         this.eventName = eventName;
     }
 
-    public UUID getOwnerUserId() {
-        return ownerUserId;
+    public PojoUser getOwnerUser() {
+        return ownerUser;
     }
 
-    public void setOwnerUserId(UUID ownerUserId) {
-        this.ownerUserId = ownerUserId;
+    public void setOwnerUser(PojoUser ownerUser) {
+        this.ownerUser = ownerUser;
     }
 
     public LocalDateTime getCreationDate() {
@@ -87,11 +86,11 @@ public class PojoEvent extends PojoEntity {
         this.parentEvent = parentEvent;
     }
 
-    public List<UUID> getParticipants() {
+    public List<PojoUser> getParticipants() {
         return participants;
     }
 
-    public void setParticipants(Collection<UUID> participants) {
+    public void setParticipants(Collection<? extends PojoUser> participants) {
         this.participants = new ArrayList<>(participants);
     }
 
