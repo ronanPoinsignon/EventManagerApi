@@ -21,7 +21,7 @@ public class UserService implements UserServiceApi {
         }
 
         var user = new User();
-        user.setUserId(UUID.fromString(jswtUser.getId()));
+        user.setUserId(UUID.fromString(jswtUser.getSubject()));
         var claims = jswtUser.getClaims();
         user.setPrenom((String) claims.get("given_name"));
         user.setNom((String) claims.get("family_name"));
