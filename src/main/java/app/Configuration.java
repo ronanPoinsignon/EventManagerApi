@@ -54,7 +54,6 @@ public class Configuration implements WebMvcConfigurer {
                 .allowCredentials(true);
     }
 
-
     @Override
     public void addFormatters(FormatterRegistry registry) {
         registry.addConverter(new StringToLocalDateTimeConverter());
