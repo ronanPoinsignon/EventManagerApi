@@ -27,7 +27,7 @@ public class EventServiceSubEventTest {
     @Order(1)
     void testAddSubEvent() {
         var parent = eventUtils.createBasicPojo();
-        parent = service.save(parent);
+        parent = service.linkDiscordId(parent);
         Assertions.assertTrue(parent.getSubEvents().isEmpty());
 
         var resultAdd = service.addSubEvent(parent.getId(), eventUtils.createBasicPojo());
@@ -45,7 +45,7 @@ public class EventServiceSubEventTest {
     @Order(2)
     void testAddSubEventWithoutName() {
         var parent = eventUtils.createBasicPojo();
-        parent = service.save(parent);
+        parent = service.linkDiscordId(parent);
         var parentId = parent.getId();
 
         var enfant = eventUtils.createBasicPojo();
@@ -69,7 +69,7 @@ public class EventServiceSubEventTest {
     @Order(5)
     void testRemoveSubEvent() {
         var parent = eventUtils.createBasicPojo();
-        parent = service.save(parent);
+        parent = service.linkDiscordId(parent);
         var enfant = eventUtils.createBasicPojo();
         parent = service.addSubEvent(parent.getId(), enfant);
         enfant =  parent.getSubEvents().getFirst();
@@ -100,7 +100,7 @@ public class EventServiceSubEventTest {
     @Order(9)
     void testRemoveSubEventOnSubEventNotFound() {
         var parent = eventUtils.createBasicPojo();
-        parent = service.save(parent);
+        parent = service.linkDiscordId(parent);
         var parentId = parent.getId();
         Assertions.assertThrows(NotFoundException.class, () -> service.removeSubEvent(parentId, "test"));
     }
