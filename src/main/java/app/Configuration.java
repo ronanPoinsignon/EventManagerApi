@@ -5,6 +5,7 @@ import app.web.deserializer.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.web.client.RestTemplate;
@@ -20,6 +21,7 @@ import java.time.LocalDateTime;
 @org.springframework.context.annotation.Configuration
 @ComponentScan
 @EnableJpaRepositories
+@Import({ CacheConfiguration.class })
 public class Configuration implements WebMvcConfigurer {
 
     @Bean

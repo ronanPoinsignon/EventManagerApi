@@ -4,6 +4,7 @@ import app.back.api.KeycloakServiceApi;
 import app.back.dto.KeycloakUser;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -109,6 +110,7 @@ public class KeycloakUserService implements KeycloakServiceApi {
         return requestWithToken(route, HttpMethod.GET, null, new ParameterizedTypeReference<>() {});
     }
 
+    @Cacheable(cacheNames="keycloak_users", cacheManager="keycloakUserCache", key = "#userId.toString()", sync = true)
     @Override
     public Optional<KeycloakUser> getUserById(UUID userId) {
         var route = getBaseURL() + "/admin/realms/" + keycloakRealmValue + "/users/" + userId;
