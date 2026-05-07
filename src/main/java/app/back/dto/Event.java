@@ -18,6 +18,10 @@ public class Event extends AbstractEntity {
     private String eventName;
 
     @Basic
+    @Column(name = "owner", nullable = false)
+    private UUID ownerUserId;
+
+    @Basic
     @Column(name = "creationDate", nullable = false)
     private LocalDateTime creationDate = LocalDateTime.now();
 
@@ -43,7 +47,7 @@ public class Event extends AbstractEntity {
 
     private transient boolean shouldUpdateParticipants;
 
-private final Set<UUID> participants = new HashSet<>();
+    private final Set<UUID> participants = new HashSet<>();
 
     private transient boolean shouldUpdateTodos;
 
@@ -59,6 +63,14 @@ private final Set<UUID> participants = new HashSet<>();
 
     public void setTricountUrl(String tricountUrl) {
         this.tricountUrl = tricountUrl;
+    }
+
+    public UUID getOwnerUserId() {
+        return ownerUserId;
+    }
+
+    public void setOwnerUserId(UUID ownerUserId) {
+        this.ownerUserId = ownerUserId;
     }
 
     public boolean isShouldUpdateTodos() {

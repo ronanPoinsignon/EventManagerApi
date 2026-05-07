@@ -35,6 +35,7 @@ public class TransformEvent extends AbstractTransform<Event, PojoEvent> {
         eventMap.put(pojo, event);
 
         event.setEventName(pojo.getEventName());
+        event.setOwnerUserId(pojo.getOwnerUserId());
         event.setStartDate(pojo.getStartDate());
         event.setEndDate(pojo.getEndDate());
         event.setLocation(pojo.getLocation());
@@ -80,6 +81,7 @@ public class TransformEvent extends AbstractTransform<Event, PojoEvent> {
         pojoEventMap.put(dto, pojoEvent);
 
         pojoEvent.setEventName(dto.getEventName());
+        pojoEvent.setOwnerUserId(dto.getOwnerUserId());
         pojoEvent.setCreationDate(dto.getCreationDate());
         pojoEvent.setStartDate(dto.getStartDate());
         pojoEvent.setEndDate(dto.getEndDate());

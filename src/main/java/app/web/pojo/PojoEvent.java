@@ -11,6 +11,7 @@ import java.util.UUID;
 public class PojoEvent extends PojoEntity {
 
     private String eventName;
+    private UUID ownerUserId;
     private LocalDateTime creationDate;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
@@ -28,6 +29,14 @@ public class PojoEvent extends PojoEntity {
 
     public void setEventName(String eventName) {
         this.eventName = eventName;
+    }
+
+    public UUID getOwnerUserId() {
+        return ownerUserId;
+    }
+
+    public void setOwnerUserId(UUID ownerUserId) {
+        this.ownerUserId = ownerUserId;
     }
 
     public LocalDateTime getCreationDate() {

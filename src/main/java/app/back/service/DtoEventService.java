@@ -5,6 +5,7 @@ import app.back.dto.Event;
 import app.back.exception.BackBadRequestException;
 import app.back.exception.duplicate.event.BackDuplicateEventNameException;
 import app.back.repository.EventRepository;
+import app.back.security.UserService;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.stereotype.Service;
@@ -17,8 +18,11 @@ import java.util.Optional;
 @Service
 public class DtoEventService extends DtoAbstractEntityService<Event, @NonNull EventRepository> implements DtoEventServiceApi {
 
-    protected DtoEventService(@NonNull EventRepository repository) {
+    private final UserService userService;
+
+    protected DtoEventService(@NonNull EventRepository repository, UserService userService) {
         super(repository);
+        this.userService = userService;
     }
 
     @EntityGraph(attributePaths = {
@@ -43,6 +47,11 @@ public class DtoEventService extends DtoAbstractEntityService<Event, @NonNull Ev
             }
         }
 
+        if(entity.getId() == null) {
+            var user = userService.getUser();
+            entity.setOwnerUserId(user.getUserId());
+        }
+
         return super.save(entity);
     }
 
@@ -53,6 +62,7 @@ public class DtoEventService extends DtoAbstractEntityService<Event, @NonNull Ev
         dbEntity.setTricountUrl(entityToSave.getTricountUrl());
         dbEntity.setStartDate(entityToSave.getStartDate());
         dbEntity.setEndDate(entityToSave.getEndDate());
+        dbEntity.setOwnerUserId(entityToSave.getOwnerUserId());
         if(entityToSave.shouldUpdateSubEvents()) {
             dbEntity.setSubEvents(entityToSave.getSubEvents());
         }
