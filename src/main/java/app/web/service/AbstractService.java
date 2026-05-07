@@ -20,6 +20,7 @@ public abstract class AbstractService<T extends AbstractEntity, U extends PojoEn
     }
 
     @Transactional
+    @Override
     public U findOne(Long id) {
         if(id == null) {
             throw new BadRequestException("L'id ne peut être null.");
@@ -30,6 +31,7 @@ public abstract class AbstractService<T extends AbstractEntity, U extends PojoEn
     }
 
     @Transactional
+    @Override
     public U save(U pojo) {
         var dto = transform.toDto(pojo);
         if(dto == null) {
