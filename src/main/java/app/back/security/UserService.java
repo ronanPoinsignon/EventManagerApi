@@ -8,8 +8,9 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 @Service
-public class UserService {
+public class UserService implements UserServiceApi {
 
+    @Override
     public User getUser() {
         var jswtUser = (Jwt) Objects.requireNonNull(SecurityContextHolder.getContext()
                         .getAuthentication())

@@ -1,5 +1,6 @@
 package app.back.service;
 
+import app.back.api.KeycloakServiceApi;
 import app.back.dto.KeycloakUser;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,10 +14,11 @@ import tools.jackson.databind.ObjectMapper;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
-public class KeycloakUserService {
+public class KeycloakUserService implements KeycloakServiceApi {
 
     @Value("${KEYCLOAK_REALM}")
     private String keycloakRealmValue;
@@ -101,14 +103,17 @@ public class KeycloakUserService {
         return response.getBody().get("access_token").toString();
     }
 
+    @Override
     public List<KeycloakUser> getUsers() {
         var route = getBaseURL() + "/admin/realms/" + keycloakRealmValue + "/users";
         return requestWithToken(route, HttpMethod.GET, null, new ParameterizedTypeReference<>() {});
     }
 
-    public KeycloakUser getUserById(UUID userId) {
+    @Override
+    public Optional<KeycloakUser> getUserById(UUID userId) {
         var route = getBaseURL() + "/admin/realms/" + keycloakRealmValue + "/users/" + userId;
-        return requestWithToken(route, HttpMethod.GET, null, new ParameterizedTypeReference<>() {});
+        var result = requestWithToken(route, HttpMethod.GET, null, new ParameterizedTypeReference<KeycloakUser>() {});
+        return Optional.ofNullable(result);
     }
 
     private <T> T requestWithToken(String route, HttpMethod method, MultiValueMap<String, String> body, ParameterizedTypeReference<T> type) {
