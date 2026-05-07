@@ -8,18 +8,23 @@ spring:
   datasource:
     platform: mysql
     url: jdbc:mysql://localhost:${MYSQL_PORT}/test?createDatabaseIfNotExist=true
-    username: ${MYSQL_USER}
-    password: ${MYSQL_PASSWORD}
+    username: root
+    password: ${MYSQL_ROOT_PASSWORD}
     initialization-mode: always
-    dialect: org.hibernate.dialect.MySQLDialect
-  db:
-  driver: com.mysql.jdbc.Driver
+    driver: com.mysql.jdbc.Driver
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
     properties:
       hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
         format_sql: true
       naming:
         strategy: org.hibernate.cfg.ImprovedNamingStrategy
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:${KEYCLOAK_PORT}/realms/${KEYCLOAK_REALM}
+          jwk-set-uri: ${keycloak.server-url}/realms/${KEYCLOAK_REALM}/protocol/openid-connect/certs
