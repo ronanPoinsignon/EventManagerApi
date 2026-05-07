@@ -1,41 +1,39 @@
 package app.web.transform;
 
-import app.back.dto.DiscordMember;
-import app.web.pojo.PojoDiscordMember;
+import app.back.dto.UserAttributes;
+import app.web.pojo.PojoUserAttributes;
 import jakarta.annotation.Nonnull;
 import org.springframework.stereotype.Service;
 
 @Service
-public class TransformMember extends AbstractTransform<DiscordMember, PojoDiscordMember> {
+public class TransformMember extends AbstractTransform<UserAttributes, PojoUserAttributes> {
 
     @Override
-    protected DiscordMember from(@Nonnull PojoDiscordMember pojo) {
-        var member = super.from(pojo);
-        member.setDiscordId(pojo.getDiscordId());
-        member.setNickname(pojo.getNickname());
-        member.setFirstname(pojo.getFirstname());
+    protected UserAttributes from(@Nonnull PojoUserAttributes pojo) {
+        var user = super.from(pojo);
+        user.setDiscordId(pojo.getDiscordId());
+        user.setKeycloakUserId(pojo.getKeycloakUserId());
 
-        return member;
+        return user;
     }
 
     @Override
-    protected PojoDiscordMember from(@Nonnull DiscordMember dto) {
-        var member = super.from(dto);
-        member.setNickname(dto.getNickname());
-        member.setFirstname(dto.getFirstname());
-        member.setDiscordId(dto.getDiscordId());
+    protected PojoUserAttributes from(@Nonnull UserAttributes dto) {
+        var user = super.from(dto);
+        user.setDiscordId(dto.getDiscordId());
+        user.setKeycloakUserId(dto.getKeycloakUserId());
 
-        return member;
+        return user;
     }
 
     @Override
-    protected DiscordMember createDto() {
-        return new DiscordMember();
+    protected UserAttributes createDto() {
+        return new UserAttributes();
     }
 
     @Override
-    protected PojoDiscordMember createPojo() {
-        return new PojoDiscordMember();
+    protected PojoUserAttributes createPojo() {
+        return new PojoUserAttributes();
     }
 
 }

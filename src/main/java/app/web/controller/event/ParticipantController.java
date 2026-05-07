@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/events/participants")
@@ -21,14 +22,14 @@ public class ParticipantController {
 
     @PostMapping("/add")
     public PojoEvent addTo(@RequestParam(value = "eventId") long eventId,
-                           @RequestParam(value = "discordMemberIds", required = false) List<Long> discordMemberIds) {
-        return eventService.addTo(eventId, discordMemberIds);
+                           @RequestParam(value = "userIds", required = false) List<UUID> userIds) {
+        return eventService.addTo(eventId, userIds);
     }
 
     @PostMapping("/remove")
     public PojoEvent removeTo(@RequestParam(value = "eventId") long eventId,
-                              @RequestParam(value = "discordMemberIds", required = false) List<Long> discordMemberIds) {
-        return eventService.removeTo(eventId, discordMemberIds);
+                              @RequestParam(value = "userids", required = false) List<UUID> userIds) {
+        return eventService.removeTo(eventId, userIds);
     }
 
 }

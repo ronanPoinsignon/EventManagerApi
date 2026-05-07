@@ -1,10 +1,8 @@
 package app.utils;
 
-import app.back.dto.DiscordMember;
 import app.back.dto.Event;
 import app.back.dto.TodoEntry;
-import app.back.service.DtoDiscordMemberService;
-import app.web.pojo.PojoDiscordMember;
+import app.back.service.DtoUserAttributesService;
 import app.web.pojo.PojoEvent;
 import app.web.pojo.PojoTodoEntry;
 import app.web.transform.TransformMember;
@@ -16,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -32,7 +31,11 @@ public class EventUtils {
 
     @Autowired
     @Lazy
-    private DtoDiscordMemberService discordMemberService;
+    private DtoUserAttributesService discordMemberService;
+
+    @Autowired
+    @Lazy
+    private UuidUtils uuidUtils;
 
     @Autowired
     @Lazy
@@ -44,7 +47,7 @@ public class EventUtils {
 
     @Autowired
     @Lazy
-    private DiscordMemberUtils discordMemberUtils;
+    private UserAttributesUtils discordMemberUtils;
 
     @Autowired
     @Lazy
@@ -97,7 +100,7 @@ public class EventUtils {
         var event = createBasicEntity();
         addSubEvent(event);
         addTodo(event);
-        addDiscordMember(event);
+        addUserId(event);
 
         return event;
     }
@@ -110,14 +113,14 @@ public class EventUtils {
         return createSubEvent(event);
     }
 
-    public DiscordMember addDiscordMember(Event event) {
-        var discordMember = discordMemberService.save(discordMemberUtils.createBasicEntity());
+    public UUID addUserId(Event event) {
+        var userId = uuidUtils.generate();
         if(event.getParticipants() == null) {
             event.setParticipants(new ArrayList<>());
         }
-        event.addParticipant(discordMember);
+        event.addParticipant(userId);
 
-        return discordMember;
+        return userId;
     }
 
     public TodoEntry addTodo(Event event) {
@@ -147,7 +150,7 @@ public class EventUtils {
         var event = createBasicPojo();
         addSubEvent(event);
         addTodo(event);
-        addDiscordMember(event);
+        addUserId(event);
 
         return event;
     }
@@ -162,16 +165,15 @@ public class EventUtils {
         return result;
     }
 
-    public PojoDiscordMember addDiscordMember(PojoEvent event) {
-        var discordMember = discordMemberService.save(discordMemberUtils.createBasicEntity());
+    public UUID addUserId(PojoEvent event) {
+        var userId = uuidUtils.generate();
         if(event.getParticipants() == null) {
             event.setParticipants(new ArrayList<>());
         }
 
-        var result = transformMember.toPojo(discordMember);
-        event.getParticipants().add(result);
+        event.getParticipants().add(userId);
 
-        return result;
+        return userId;
     }
 
     public PojoTodoEntry addTodo(PojoEvent event) {
@@ -212,7 +214,7 @@ public class EventUtils {
             for(int i = 0; i < base.getParticipants().size(); i++) {
                 var participantList = new ArrayList<>(base.getParticipants());
                 var resultParticipantList = new ArrayList<>(result.getParticipants());
-                DiscordMemberUtils.compare(participantList.get(i), resultParticipantList.get(i));
+                Assertions.assertEquals(participantList.get(i), resultParticipantList.get(i));
             }
         }
         if(base.getTodoList() != null) {
@@ -259,7 +261,7 @@ public class EventUtils {
             for(int i = 0; i < base.getParticipants().size(); i++) {
                 var baseParticipantList = new ArrayList<>(base.getParticipants());
                 var resultParticipantList = new ArrayList<>(result.getParticipants());
-                DiscordMemberUtils.compare(baseParticipantList.get(i), resultParticipantList.get(i));
+                Assertions.assertEquals(baseParticipantList.get(i), resultParticipantList.get(i));
             }
         }
         if(base.getTodoList() != null) {
@@ -307,7 +309,7 @@ public class EventUtils {
             for(int i = 0; i < base.getParticipants().size(); i++) {
                 var baseParticipantList = new ArrayList<>(base.getParticipants());
                 var resultParticipantList = new ArrayList<>(result.getParticipants());
-                DiscordMemberUtils.compare(baseParticipantList.get(i), resultParticipantList.get(i));
+                Assertions.assertEquals(baseParticipantList.get(i), resultParticipantList.get(i));
             }
         }
         if(base.getTodoList() != null) {
@@ -355,7 +357,7 @@ public class EventUtils {
             for(int i = 0; i < base.getParticipants().size(); i++) {
                 var participantList = new ArrayList<>(base.getParticipants());
                 var resultParticipantList = new ArrayList<>(result.getParticipants());
-                DiscordMemberUtils.compare(participantList.get(i), resultParticipantList.get(i));
+                Assertions.assertEquals(participantList.get(i), resultParticipantList.get(i));
             }
         }
         if(base.getTodoList() != null) {

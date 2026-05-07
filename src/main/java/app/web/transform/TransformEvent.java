@@ -48,7 +48,7 @@ public class TransformEvent extends AbstractTransform<Event, PojoEvent> {
             }).toList());
         }
         if(pojo.getParticipants() != null) {
-            event.setParticipants(pojo.getParticipants().stream().map(transformMember::toDto).toList());
+            event.setParticipants(pojo.getParticipants());
         }
         if(pojo.getTodoList() != null) {
             pojo.getTodoList().stream().map(pojoTodo -> {
@@ -59,7 +59,7 @@ public class TransformEvent extends AbstractTransform<Event, PojoEvent> {
                 todo.setEvent(event);
 
                 return todo;
-            }).forEach(todo -> event.addTodo(todo.getTodoName(), todo.getTodoValue(), todo.getDiscordMembers()));
+            }).forEach(todo -> event.addTodo(todo.getTodoName(), todo.getTodoValue(), todo.getuserIds()));
         }
         event.setTricountUrl(pojo.getTricountUrl());
 
@@ -99,7 +99,7 @@ public class TransformEvent extends AbstractTransform<Event, PojoEvent> {
                 return from(subEvent, pojoEventMap);
             }
         }).toList());
-        pojoEvent.setParticipants(dto.getParticipants().stream().map(transformMember::toPojo).toList());
+        pojoEvent.setParticipants(dto.getParticipants());
         pojoEvent.setTodoList(dto.getTodoList().stream().map(todo -> {
             var todoEvent = todo.getEvent();
             todo.setEvent(null);

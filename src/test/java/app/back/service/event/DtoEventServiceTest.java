@@ -4,7 +4,7 @@ import app.back.dto.Event;
 import app.back.exception.BackBadRequestException;
 import app.back.service.BasicDtoTestService;
 import app.back.service.DtoEventService;
-import app.utils.DiscordMemberUtils;
+import app.utils.UserAttributesUtils;
 import app.utils.EventUtils;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +12,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -21,9 +20,9 @@ import java.util.List;
 public class DtoEventServiceTest extends BasicDtoTestService<Event, DtoEventService> {
 
     private final EventUtils eventUtils;
-    private final DiscordMemberUtils discordMemberUtils;
+    private final UserAttributesUtils discordMemberUtils;
 
-    public DtoEventServiceTest(@Autowired DtoEventService dtoEventService, @Autowired EventUtils eventUtils, @Autowired DiscordMemberUtils discordMemberUtils) {
+    public DtoEventServiceTest(@Autowired DtoEventService dtoEventService, @Autowired EventUtils eventUtils, @Autowired UserAttributesUtils discordMemberUtils) {
         super(dtoEventService);
         this.eventUtils = eventUtils;
         this.discordMemberUtils = discordMemberUtils;
@@ -53,7 +52,8 @@ public class DtoEventServiceTest extends BasicDtoTestService<Event, DtoEventServ
         var eventSubEvent = event.getSubEvents().getFirst();
         baseSubEvent.setId(eventSubEvent.getId());
 
-        new ArrayList<>(base.getParticipants()).getFirst().setId(new ArrayList<>(event.getParticipants()).getFirst().getId());
+        base.removeParticipants(base.getParticipants());
+        base.addParticipants(event.getParticipants());
 
         var baseTodo = base.getTodoList().getFirst();
         var eventTodo = event.getTodoList().getFirst();

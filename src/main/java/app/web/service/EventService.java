@@ -1,8 +1,7 @@
 package app.web.service;
 
-import app.back.api.DtoDiscordMemberServiceApi;
 import app.back.api.DtoEventServiceApi;
-import app.back.dto.DiscordMember;
+import app.back.api.DtoUserAttributesServiceApi;
 import app.back.dto.Event;
 import app.back.dto.TodoEntry;
 import app.web.api.EventServiceApi;
@@ -15,18 +14,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 @Service
 public class EventService extends AbstractService<Event, PojoEvent, DtoEventServiceApi> implements EventServiceApi {
 
-    private final DtoDiscordMemberServiceApi discordMemberService;
+    private final DtoUserAttributesServiceApi discordMemberService;
 
-    public EventService(DtoEventServiceApi eventService, TransformEvent transformEvent, DtoDiscordMemberServiceApi discordMemberService) {
+    public EventService(DtoEventServiceApi eventService, TransformEvent transformEvent, DtoUserAttributesServiceApi discordMemberService) {
         super(eventService, transformEvent);
         this.discordMemberService = discordMemberService;
     }
@@ -85,20 +83,20 @@ public class EventService extends AbstractService<Event, PojoEvent, DtoEventServ
 
     @Transactional
     @Override
-    public PojoEvent addTo(long eventId, List<Long> discordMemberIdList) {
-        return manageParticipants(eventId, () -> findAllMembers(discordMemberIdList), Event::addParticipants);
+    public PojoEvent addTo(long eventId, List<UUID> userIds) {
+        return manageParticipants(eventId, userIds, Event::addParticipants);
     }
 
     @Transactional
     @Override
-    public PojoEvent removeTo(long eventId, List<Long> discordMemberIdList) {
-        return manageParticipants(eventId, () -> discordMemberIdList, Event::removeParticipants);
+    public PojoEvent removeTo(long eventId, List<UUID> userIdList) {
+        return manageParticipants(eventId, userIdList, Event::removeParticipants);
     }
 
-    private <T> PojoEvent manageParticipants(long eventId, Supplier<List<T>> participantList, BiFunction<Event, List<T>, Boolean> participantFunction) {
+    private <T> PojoEvent manageParticipants(long eventId,List<T> participantList, BiFunction<Event, List<T>, Boolean> participantFunction) {
         var event = getService().findById(eventId).orElseThrow(() -> new NotFoundException("Aucun événement trouvé."));
 
-        var hasChanged = participantFunction.apply(event, participantList.get());
+        var hasChanged = participantFunction.apply(event, participantList);
         if(!hasChanged) {
             return getTransform().toPojo(event);
         }
@@ -114,8 +112,7 @@ public class EventService extends AbstractService<Event, PojoEvent, DtoEventServ
         }
 
         var event = getService().findById(eventId).orElseThrow(() -> new NotFoundException("Aucun événement trouvé."));
-        var discordMemberList = findAllMembers(lightPojoTodoEntry.getParticipants());
-        event.addTodo(lightPojoTodoEntry.getName(), lightPojoTodoEntry.getTodo(), discordMemberList);
+        event.addTodo(lightPojoTodoEntry.getName(), lightPojoTodoEntry.getTodo(), lightPojoTodoEntry.getParticipants());
 
         return getTransform().toPojo(getService().save(event));
     }
@@ -138,19 +135,19 @@ public class EventService extends AbstractService<Event, PojoEvent, DtoEventServ
 
     @Transactional
     @Override
-    public PojoEvent addTodoMembers(long eventId, String todoName, List<Long> discordMemberIds) {
-        return manageTodoMember(eventId, todoName, () -> findAllMembers(discordMemberIds), TodoEntry::addDiscordMembers);
+    public PojoEvent addTodoUsers(long eventId, String todoName, List<UUID> userIds) {
+        return manageTodoMember(eventId, todoName, userIds, TodoEntry::addUserIds);
     }
 
     @Transactional
     @Override
-    public PojoEvent removeTodoMembers(long eventId, String todoName, List<Long> discordMemberIds) {
-        return manageTodoMember(eventId, todoName, () -> discordMemberIds, TodoEntry::removeDiscordMember);
+    public PojoEvent removeTodoUsers(long eventId, String todoName, List<UUID> userIds) {
+        return manageTodoMember(eventId, todoName, userIds, TodoEntry::removeUserIds);
     }
 
     @Transactional
-    private <T> PojoEvent manageTodoMember(long eventId, String todoName, Supplier<T> discordMemberList, BiFunction<TodoEntry, T, Boolean> memberFunction) {
-        return updateTodoInfo(eventId, todoName, todo -> memberFunction.apply(todo, discordMemberList.get()));
+    private <T> PojoEvent manageTodoMember(long eventId, String todoName, T userList, BiFunction<TodoEntry, T, Boolean> memberFunction) {
+        return updateTodoInfo(eventId, todoName, todo -> memberFunction.apply(todo, userList));
     }
 
     @Transactional
@@ -165,35 +162,6 @@ public class EventService extends AbstractService<Event, PojoEvent, DtoEventServ
     @Override
     public PojoEvent updateTodoStatus(long eventId, String todoName, boolean isDone) {
         return updateTodoInfo(eventId, todoName, todo -> todo.setDone(isDone));
-    }
-
-    /**
-     *
-     * @param discordMemberIdList
-     * @throws NotFoundException Si certains utilisateurs n'ont pas été trouvés, une {@link NotFoundException} est levée indiquant quels utilisateurs n'ont pas été récupérés.
-     * @return
-     */
-    private List<DiscordMember> findAllMembers(List<Long> discordMemberIdList) throws NotFoundException {
-        if(discordMemberIdList == null) {
-            discordMemberIdList = new ArrayList<>();
-        }
-        var result = this.findMembers(discordMemberIdList);
-
-        if(result.size() != discordMemberIdList.size()) {
-            var newDiscordMemberIds = new ArrayList<>(discordMemberIdList);
-            newDiscordMemberIds.removeAll(result.stream().map(DiscordMember::getId).toList());
-            throw new NotFoundException("les ids de membres suivants n'ont pas été trouvé : " + newDiscordMemberIds + ".");
-        }
-
-        return result;
-    }
-
-    private List<DiscordMember> findMembers(List<Long> discordMemberIdList) {
-        if(discordMemberIdList == null || discordMemberIdList.isEmpty()) {
-            return new ArrayList<>();
-        }
-
-        return discordMemberService.findByDiscordId(discordMemberIdList);
     }
 
     private PojoEvent updateTodoInfo(long eventId, String todoName, Function<TodoEntry, Boolean> todoFunction) {

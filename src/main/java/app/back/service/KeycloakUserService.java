@@ -3,6 +3,7 @@ package app.back.service;
 import app.back.dto.KeycloakUser;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -10,9 +11,9 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import tools.jackson.databind.ObjectMapper;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @Service
 public class KeycloakUserService {
@@ -102,15 +103,26 @@ public class KeycloakUserService {
 
     public List<KeycloakUser> getUsers() {
         var route = getBaseURL() + "/admin/realms/" + keycloakRealmValue + "/users";
+        return requestWithToken(route, HttpMethod.GET, null, new ParameterizedTypeReference<>() {});
+    }
 
+    public KeycloakUser getUserById(UUID userId) {
+        var route = getBaseURL() + "/admin/realms/" + keycloakRealmValue + "/users/" + userId;
+        return requestWithToken(route, HttpMethod.GET, null, new ParameterizedTypeReference<>() {});
+    }
+
+    private <T> T requestWithToken(String route, HttpMethod method, MultiValueMap<String, String> body, ParameterizedTypeReference<T> type) {
+        var headers = getTokenHeaders();
+        var entity = new HttpEntity<>(body, headers);
+        return restTemplate.exchange(route, method, entity, type).getBody();
+    }
+
+    private HttpHeaders getTokenHeaders() {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("Authorization", "Bearer " + getToken());
-        HttpEntity<String> entity = new HttpEntity<>(headers);
 
-        var response = restTemplate.exchange(route, HttpMethod.GET, entity, KeycloakUser[].class);
-        assert response.getBody() != null;
-        return Arrays.asList(response.getBody());
+        return headers;
     }
 
     private String getBaseURL() {

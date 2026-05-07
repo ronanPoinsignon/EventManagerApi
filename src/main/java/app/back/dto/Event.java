@@ -43,14 +43,7 @@ public class Event extends AbstractEntity {
 
     private transient boolean shouldUpdateParticipants;
 
-    @ManyToMany
-    @JoinTable(
-            name = "discord_member_id",
-            joinColumns = @JoinColumn(name = "participant_id"),
-            inverseJoinColumns = @JoinColumn(name = "event_id"),
-            uniqueConstraints = @UniqueConstraint(columnNames = {"participant_id", "event_id"}, name = Contrainte.EVENT_DUPLICATE_PARTICIPANT)
-    )
-    private final Set<DiscordMember> participants = new HashSet<>();
+private final Set<UUID> participants = new HashSet<>();
 
     private transient boolean shouldUpdateTodos;
 
@@ -82,24 +75,24 @@ public class Event extends AbstractEntity {
                 .findFirst();
     }
 
-    public TodoEntry addTodo(String name, String todo, Collection<DiscordMember> discordMemberCollection) {
-        if(discordMemberCollection == null) {
-            discordMemberCollection = new ArrayList<>();
+    public TodoEntry addTodo(String name, String todo, Collection<UUID> userIdCollection) {
+        if(userIdCollection == null) {
+            userIdCollection = new ArrayList<>();
         }
 
         var todoEntry = addTodo(name, todo);
-        var result = todoEntry.addDiscordMembers(discordMemberCollection);
+        var result = todoEntry.addUserIds(userIdCollection);
         shouldUpdateTodos |= result;
         return todoEntry;
     }
 
-    public TodoEntry addTodo(String name, String todo, DiscordMember discordMember) {
-        if(discordMember == null) {
-            throw new BackBadRequestException("Le champ discordMember ne peut être null");
+    public TodoEntry addTodo(String name, String todo, UUID userId) {
+        if(userId == null) {
+            throw new BackBadRequestException("Le userId ne peut être null");
         }
 
         var todoEntry = addTodo(name, todo);
-        var result = todoEntry.addDiscordMember(discordMember);
+        var result = todoEntry.addUserId(userId);
         shouldUpdateTodos |= result;
         return todoEntry;
     }
@@ -141,7 +134,7 @@ public class Event extends AbstractEntity {
             todoListEntries = new ArrayList<>();
         }
         this.todoListEntries.clear();
-        todoListEntries.forEach(todo -> addTodo(todo.getTodoName(), todo.getTodoValue(), todo.getDiscordMembers()));
+        todoListEntries.forEach(todo -> addTodo(todo.getTodoName(), todo.getTodoValue(), todo.getuserIds()));
     }
 
     public TodoEntry findTodoEntryByName(String name) {
@@ -155,48 +148,48 @@ public class Event extends AbstractEntity {
         return shouldUpdateParticipants;
     }
 
-    public Set<DiscordMember> getParticipants() {
+    public Set<UUID> getParticipants() {
         return Collections.unmodifiableSet(participants);
     }
 
-    public boolean addParticipant(DiscordMember discordMember) {
-        if(discordMember == null) {
-            throw new BackBadRequestException("Le discordMember ne peut être null");
+    public boolean addParticipant(UUID userId) {
+        if(userId == null) {
+            throw new BackBadRequestException("Le userId ne peut être null");
         }
 
-        var result = this.participants.add(discordMember);
+        var result = this.participants.add(userId);
         shouldUpdateParticipants |= result;
         return result;
     }
 
-    public boolean addParticipants(Collection<DiscordMember> discordMemberCollection) {
-        if(discordMemberCollection == null) {
-            discordMemberCollection = new ArrayList<>();
+    public boolean addParticipants(Collection<UUID> userIdCollection) {
+        if(userIdCollection == null) {
+            userIdCollection = new ArrayList<>();
         }
-        var result = this.participants.addAll(discordMemberCollection);
+        var result = this.participants.addAll(userIdCollection);
         shouldUpdateParticipants |= result;
         return result;
     }
 
-    public boolean removeParticipant(long discordMemberId) {
-        return removeParticipants(List.of(discordMemberId));
+    public boolean removeParticipant(UUID userId) {
+        return removeParticipants(List.of(userId));
     }
 
-    public boolean removeParticipants(Collection<Long> discordMemberIdCollection) {
-        if(discordMemberIdCollection == null) {
-            discordMemberIdCollection = new ArrayList<>();
+    public boolean removeParticipants(Collection<UUID> userIdCollection) {
+        if(userIdCollection == null) {
+            userIdCollection = new ArrayList<>();
         }
-        var temp = new ArrayList<>(discordMemberIdCollection);
-        var result = this.participants.removeIf(participant -> temp.contains(participant.getId()));
+        var temp = new ArrayList<>(userIdCollection);
+        var result = this.participants.removeIf(temp::contains);
         shouldUpdateParticipants |= result;
         return result;
     }
 
-    public void setParticipants(Collection<DiscordMember> participants) {
-        if(participants == null) {
-            participants = new ArrayList<>();
+    public void setParticipants(Collection<UUID> userIdCollection) {
+        if(userIdCollection == null) {
+            userIdCollection = new ArrayList<>();
         }
-        var temp = new ArrayList<>(participants);
+        var temp = new ArrayList<>(userIdCollection);
         this.participants.clear();
         this.participants.addAll(temp);
         shouldUpdateParticipants = true;

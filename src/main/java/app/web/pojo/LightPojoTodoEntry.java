@@ -2,12 +2,13 @@ package app.web.pojo;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class LightPojoTodoEntry {
 
     private String name;
     private String todo;
-    private List<Long> participants = new ArrayList<>();
+    private List<UUID> participants = new ArrayList<>();
 
     public String getName() {
         return name;
@@ -25,11 +26,11 @@ public class LightPojoTodoEntry {
         this.todo = todo;
     }
 
-    public List<Long> getParticipants() {
+    public List<UUID> getParticipants() {
         return participants;
     }
 
-    public void setParticipants(List<Long> participants) {
+    public void setParticipants(List<UUID> participants) {
         this.participants = participants;
     }
 }

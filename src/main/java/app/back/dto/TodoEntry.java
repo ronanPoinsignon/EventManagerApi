@@ -20,13 +20,7 @@ public class TodoEntry extends AbstractEntity {
     @JoinColumn(name = "event_id", nullable = false)
     private Event event;
 
-    @ManyToMany
-    @JoinTable(
-            name = "todo_participants",
-            joinColumns = @JoinColumn(name = "todo_id"),
-            inverseJoinColumns = @JoinColumn(name = "discord_member_id")
-    )
-    private final Set<DiscordMember> discordMemberSet = new HashSet<>();
+    private final Set<UUID> userIdSet = new HashSet<>();
 
     @Column(name = "wasDone")
     private boolean isDone;
@@ -35,17 +29,17 @@ public class TodoEntry extends AbstractEntity {
 
     }
 
-    public TodoEntry(String todoName, String todoValue, Collection<DiscordMember> discordMemberSet) {
-        if(discordMemberSet == null) {
-            discordMemberSet = new ArrayList<>();
+    public TodoEntry(String todoName, String todoValue, Collection<UUID> userIdSet) {
+        if(userIdSet == null) {
+            userIdSet = new ArrayList<>();
         }
         this.todoName = todoName;
         this.todoValue = todoValue;
-        this.discordMemberSet.addAll(discordMemberSet);
+        this.userIdSet.addAll(userIdSet);
     }
 
-    public TodoEntry(String todoName, String todoValue, DiscordMember discordMember) {
-        this(todoName, todoValue, Set.of(discordMember));
+    public TodoEntry(String todoName, String todoValue, UUID userId) {
+        this(todoName, todoValue, Set.of(userId));
     }
 
     public TodoEntry(String todoName, String todoValue) {
@@ -68,34 +62,45 @@ public class TodoEntry extends AbstractEntity {
         this.todoValue = todoValue;
     }
 
-    public Set<DiscordMember> getDiscordMembers() {
-        return Collections.unmodifiableSet(discordMemberSet);
+    public Set<UUID> getuserIds() {
+        return Collections.unmodifiableSet(userIdSet);
     }
 
-    public boolean addDiscordMember(DiscordMember member) {
-        return this.discordMemberSet.add(member);
+    public boolean addUserId(UUID userId) {
+        return this.userIdSet.add(userId);
     }
 
-    public boolean addDiscordMembers(Collection<DiscordMember> discordMemberCollection) {
-        return this.discordMemberSet.addAll(discordMemberCollection);
-    }
-
-    public boolean removeDiscordMember(long discordMemberId) {
-        return removeDiscordMember(List.of(discordMemberId));
-    }
-
-    public boolean removeDiscordMember(Collection<Long> discordMemberIdCollection) {
-        if(discordMemberIdCollection == null) {
-            discordMemberIdCollection = new ArrayList<>();
+    public boolean addUserIds(Collection<UUID> userIdCollection) {
+        if(userIdCollection == null) {
+            return false;
         }
 
-        var temp = new ArrayList<>(discordMemberIdCollection);
-        return this.discordMemberSet.removeIf(member -> temp.contains(member.getId()));
+        return this.userIdSet.addAll(userIdCollection);
     }
 
-    public void setDiscordMemberSet(Collection<DiscordMember> discordMemberSet) {
-        this.discordMemberSet.clear();
-        this.discordMemberSet.addAll(discordMemberSet);
+    public boolean removeUserId(UUID userId) {
+        if(userId == null) {
+            return false;
+        }
+
+        return removeUserIds(List.of(userId));
+    }
+
+    public boolean removeUserIds(Collection<UUID> userIdCollection) {
+        if(userIdCollection == null) {
+            return false;
+        }
+
+        var temp = new ArrayList<>(userIdCollection);
+        return this.userIdSet.removeIf(temp::contains);
+    }
+
+    public void setUserIdSet(Collection<UUID> userIdSet) {
+        if(userIdSet == null) {
+            userIdSet = new ArrayList<>();
+        }
+        this.userIdSet.clear();
+        this.userIdSet.addAll(userIdSet);
     }
 
     public Event getEvent() {

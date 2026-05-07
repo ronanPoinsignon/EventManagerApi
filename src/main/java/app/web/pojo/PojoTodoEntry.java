@@ -2,13 +2,16 @@ package app.web.pojo;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 public class PojoTodoEntry extends PojoEntity {
 
     private String name;
     private String todoValue;
-    private List<PojoDiscordMember> discordMembers;
+    private List<UUID> userIds;
     @JsonIgnore
     private PojoEvent event;
     private boolean isDone;
@@ -29,12 +32,12 @@ public class PojoTodoEntry extends PojoEntity {
         this.todoValue = todoValue;
     }
 
-    public List<PojoDiscordMember> getDiscordMembers() {
-        return discordMembers;
+    public List<UUID> getUserIds() {
+        return userIds;
     }
 
-    public void setDiscordMembers(List<PojoDiscordMember> discordMembers) {
-        this.discordMembers = discordMembers;
+    public void setUserIds(Collection<UUID> userIds) {
+        this.userIds = new ArrayList<>(userIds);
     }
 
     public PojoEvent getEvent() {

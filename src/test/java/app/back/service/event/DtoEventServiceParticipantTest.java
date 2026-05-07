@@ -1,9 +1,8 @@
 package app.back.service.event;
 
 import app.back.exception.BackBadRequestException;
-import app.back.service.DtoEventService;
-import app.utils.DiscordMemberUtils;
 import app.utils.EventUtils;
+import app.utils.UuidUtils;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,24 +16,22 @@ import java.util.List;
 public class DtoEventServiceParticipantTest {
 
     private final EventUtils eventUtils;
-    private final DtoEventService dtoService;
-    private final DiscordMemberUtils discordMemberUtils;
+    private final UuidUtils uuidUtils;
 
-    public DtoEventServiceParticipantTest(@Autowired DtoEventService dtoService, @Autowired EventUtils eventUtils, @Autowired DiscordMemberUtils discordMemberUtils) {
-        this.dtoService = dtoService;
+    public DtoEventServiceParticipantTest(@Autowired EventUtils eventUtils, @Autowired UuidUtils uuidUtils) {
         this.eventUtils = eventUtils;
-        this.discordMemberUtils = discordMemberUtils;
+        this.uuidUtils = uuidUtils;
     }
 
     @Test
     @Order(1)
     void testRemoveParticipant() {
         var event = eventUtils.createBasicEntity();
-        var member1 = eventUtils.addDiscordMember(event);
-        var member2 = eventUtils.addDiscordMember(event);
+        var user1 = eventUtils.addUserId(event);
+        var user2 = eventUtils.addUserId(event);
         Assertions.assertEquals(2, event.getParticipants().size());
 
-        event.removeParticipant(member1.getId());
+        event.removeParticipant(user1);
         Assertions.assertEquals(1, event.getParticipants().size());
     }
 
@@ -42,10 +39,10 @@ public class DtoEventServiceParticipantTest {
     @Order(2)
     void testAddParticipants() {
         var event = eventUtils.createBasicEntity();
-        var member1 = discordMemberUtils.createBasicEntity();
-        var member2 = discordMemberUtils.createBasicEntity();
+        var user1 = uuidUtils.generate();
+        var user2 = uuidUtils.generate();
 
-        event.addParticipants(List.of(member1, member2));
+        event.addParticipants(List.of(user1, user2));
         Assertions.assertEquals(2, event.getParticipants().size());
     }
 
@@ -53,15 +50,15 @@ public class DtoEventServiceParticipantTest {
     @Order(3)
     void testSetParticipants() {
         var event = eventUtils.createBasicEntity();
-        var member1 = discordMemberUtils.createBasicEntity();
-        var member2 = discordMemberUtils.createBasicEntity();
-        var member3 = discordMemberUtils.createBasicEntity();
+        var user1 = uuidUtils.generate();
+        var user2 = uuidUtils.generate();;
+        var user3 = uuidUtils.generate();;
 
-        event.addParticipant(member1);
-        var memberList = List.of(member2, member3);
-        event.setParticipants(memberList);
+        event.addParticipant(user1);
+        var userList = List.of(user2, user3);
+        event.setParticipants(userList);
         Assertions.assertEquals(2, event.getParticipants().size());
-        var result = memberList.containsAll(event.getParticipants());
+        var result = userList.containsAll(event.getParticipants());
         Assertions.assertTrue(result);
     }
 
@@ -88,9 +85,9 @@ public class DtoEventServiceParticipantTest {
     @Order(6)
     void testSetParticipantsNull() {
         var event = eventUtils.createBasicEntity();
-        var member = discordMemberUtils.createBasicEntity();
+        var userId = uuidUtils.generate();;
 
-        event.addParticipant(member);
+        event.addParticipant(userId);
         event.setParticipants(null);
         Assertions.assertEquals(0, event.getParticipants().size());
     }

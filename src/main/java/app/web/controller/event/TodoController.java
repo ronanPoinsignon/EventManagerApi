@@ -6,6 +6,7 @@ import app.web.pojo.PojoEvent;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/events/todos")
@@ -27,14 +28,14 @@ public class TodoController {
         return eventService.removeTodo(eventId, todoName);
     }
 
-    @PostMapping("/addMembers")
-    public PojoEvent addTodoMember(@RequestParam(value = "eventId") long eventId, @RequestParam("todoName") String todoName, @RequestParam(value = "discordMemberIds", required = false) List<Long> discordMemberIds) {
-        return eventService.addTodoMembers(eventId, todoName, discordMemberIds);
+    @PostMapping("/addUsers")
+    public PojoEvent addTodoUsers(@RequestParam(value = "eventId") long eventId, @RequestParam("todoName") String todoName, @RequestParam(value = "userMemberIds", required = false) List<UUID> userIdList) {
+        return eventService.addTodoUsers(eventId, todoName, userIdList);
     }
 
-    @PostMapping("/removeMembers")
-    public PojoEvent removeTodoMember(@RequestParam(value = "eventId") long eventId, @RequestParam("todoName") String todoName, @RequestParam(value = "discordMemberIds", required = false) List<Long> discordMemberIds) {
-        return eventService.removeTodoMembers(eventId, todoName, discordMemberIds);
+    @PostMapping("/removeUsers")
+    public PojoEvent removeTodoUsers(@RequestParam(value = "eventId") long eventId, @RequestParam("todoName") String todoName, @RequestParam(value = "discordMemberIds", required = false) List<UUID> userIdList) {
+        return eventService.removeTodoUsers(eventId, todoName, userIdList);
     }
 
     @PostMapping("/updateStatus")

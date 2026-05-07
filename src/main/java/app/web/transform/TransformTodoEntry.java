@@ -14,17 +14,13 @@ public class TransformTodoEntry extends AbstractTransform<TodoEntry, PojoTodoEnt
     @Lazy
     private TransformEvent transformEvent;
 
-    @Autowired
-    @Lazy
-    private TransformMember transformMember;
-
     @Override
     protected PojoTodoEntry from(@Nonnull TodoEntry dto) {
         var pojo = super.from(dto);
         pojo.setName(dto.getTodoName());
         pojo.setTodoValue(dto.getTodoValue());
         pojo.setEvent(transformEvent.toPojo(dto.getEvent()));
-        pojo.setDiscordMembers(transformMember.toPojo(dto.getDiscordMembers()));
+        pojo.setUserIds(dto.getuserIds());
         pojo.setDone(dto.isDone());
 
         return pojo;
@@ -36,7 +32,7 @@ public class TransformTodoEntry extends AbstractTransform<TodoEntry, PojoTodoEnt
         entity.setTodoName(pojo.getName());
         entity.setTodoValue(pojo.getTodoValue());
         entity.setEvent(transformEvent.toDto(pojo.getEvent()));
-        entity.setDiscordMemberSet(transformMember.toDto(pojo.getDiscordMembers()));
+        entity.setUserIdSet(pojo.getUserIds());
 
         return entity;
     }

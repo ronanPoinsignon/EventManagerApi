@@ -1,10 +1,8 @@
 package app.utils;
 
-import app.back.dto.DiscordMember;
 import app.back.dto.TodoEntry;
-import app.back.service.DtoDiscordMemberService;
+import app.back.service.DtoUserAttributesService;
 import app.web.pojo.LightPojoTodoEntry;
-import app.web.pojo.PojoDiscordMember;
 import app.web.pojo.PojoTodoEntry;
 import app.web.transform.TransformMember;
 import org.junit.jupiter.api.Assertions;
@@ -13,6 +11,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -26,14 +25,17 @@ public class TodoEntryUtils {
 
     @Autowired
     @Lazy
-    private DtoDiscordMemberService discordMemberService;
+    private DtoUserAttributesService discordMemberService;
+    @Autowired
+    @Lazy
+    private UuidUtils uuidUtils;
     @Autowired
     @Lazy
     private TransformMember transformMember;
 
     @Autowired
     @Lazy
-    private DiscordMemberUtils discordMemberUtils;
+    private UserAttributesUtils discordMemberUtils;
     public TodoEntryUtils() {
         playCounter();
     }
@@ -54,26 +56,26 @@ public class TodoEntryUtils {
         counterStrategy = counter::incrementAndGet;
     }
 
-    public DiscordMember addDiscordMember(TodoEntry todoEntry) {
-        var discordMember = discordMemberService.save(discordMemberUtils.createBasicEntity());
-        todoEntry.addDiscordMember(discordMember);
-        return discordMember;
+    public UUID addUser(TodoEntry todoEntry) {
+        var user = uuidUtils.generate();
+        todoEntry.addUserId(user);
+        return user;
     }
 
-    public DiscordMember addDiscordMember(LightPojoTodoEntry todoEntry) {
-        var discordMember = discordMemberService.save(discordMemberUtils.createBasicEntity());
-        todoEntry.getParticipants().add(discordMember.getId());
-        return discordMember;
+    public UUID addUser(LightPojoTodoEntry todoEntry) {
+        var user = uuidUtils.generate();
+        todoEntry.getParticipants().add(user);
+        return user;
     }
 
-    public PojoDiscordMember addDiscordMember(PojoTodoEntry todoEntry) {
-        var discordMember = transformMember.toPojo(discordMemberService.save(discordMemberUtils.createBasicEntity()));
-        if(todoEntry.getDiscordMembers() == null) {
-            todoEntry.setDiscordMembers(new ArrayList<>());
+    public UUID addUser(PojoTodoEntry todoEntry) {
+        var user = uuidUtils.generate();
+        if(todoEntry.getUserIds() == null) {
+            todoEntry.setUserIds(new ArrayList<>());
         }
-        todoEntry.getDiscordMembers().add(discordMember);
+        todoEntry.getUserIds().add(user);
 
-        return discordMember;
+        return user;
     }
 
     public LightPojoTodoEntry createBasicLightTodoEntry() {
@@ -91,7 +93,7 @@ public class TodoEntryUtils {
         todo.setName("name_" + counterStrategy.get());
         todo.setParticipants(new ArrayList<>());
 
-        addDiscordMember(todo);
+        addUser(todo);
 
         return todo;
     }
@@ -100,6 +102,7 @@ public class TodoEntryUtils {
         var todo = new PojoTodoEntry();
         todo.setTodoValue("todo_" + counterStrategy.get());
         todo.setName("name_" + counterStrategy.get());
+        todo.setUserIds(new ArrayList<>());
 
         return todo;
     }
@@ -109,7 +112,7 @@ public class TodoEntryUtils {
         todo.setTodoValue("todo_" + counterStrategy.get());
         todo.setName("name_" + counterStrategy.get());
 
-        addDiscordMember(todo);
+        addUser(todo);
 
         return todo;
     }
@@ -122,11 +125,11 @@ public class TodoEntryUtils {
             Assertions.assertEquals(base.getEvent().getId(), result.getEvent().getId());
         }
         Assertions.assertEquals(base.isDone(), result.isDone());
-        var baseDiscordMemberList = new ArrayList<>(base.getDiscordMembers());
-        var resultDiscordMemberMap = result.getDiscordMembers().stream().collect(Collectors.toMap(PojoDiscordMember::getDiscordId, Function.identity()));
-        for(int i = 0; i < base.getDiscordMembers().size(); i++) {
-            var member = baseDiscordMemberList.get(i);
-            DiscordMemberUtils.compare(baseDiscordMemberList.get(i), resultDiscordMemberMap.get(member.getDiscordId()));
+        var baseDiscordMemberList = new ArrayList<>(base.getuserIds());
+        var resultDiscordMemberMap = result.getUserIds().stream().collect(Collectors.toMap(Function.identity(), Function.identity()));
+        for(int i = 0; i < base.getuserIds().size(); i++) {
+            var userId = baseDiscordMemberList.get(i);
+            Assertions.assertEquals(baseDiscordMemberList.get(i), resultDiscordMemberMap.get(userId));
         }
     }
 
@@ -138,9 +141,9 @@ public class TodoEntryUtils {
             Assertions.assertEquals(base.getEvent().getId(), result.getEvent().getId());
         }
         Assertions.assertEquals(base.isDone(), result.isDone());
-        var resultDiscordMemberMap = result.getDiscordMembers().stream().collect(Collectors.toMap(DiscordMember::getDiscordId, Function.identity()));
-        for(var member : base.getDiscordMembers()) {
-            DiscordMemberUtils.compare(member, resultDiscordMemberMap.get(member.getDiscordId()));
+        var resultDiscordMemberMap = result.getuserIds().stream().collect(Collectors.toMap(Function.identity(), Function.identity()));
+        for(var userId : base.getuserIds()) {
+            Assertions.assertEquals(userId, resultDiscordMemberMap.get(userId));
         }
     }
 
@@ -152,10 +155,10 @@ public class TodoEntryUtils {
             Assertions.assertEquals(base.getEvent().getId(), result.getEvent().getId());
         }
         Assertions.assertEquals(base.isDone(), result.isDone());
-        var resultDiscordMemberMap = result.getDiscordMembers().stream().collect(Collectors.toMap(DiscordMember::getDiscordId, Function.identity()));
-        if(base.getDiscordMembers() != null) {
-            for(var member : base.getDiscordMembers()) {
-                DiscordMemberUtils.compare(member, resultDiscordMemberMap.get(member.getDiscordId()));
+        var resultDiscordMemberMap = result.getuserIds().stream().collect(Collectors.toMap(Function.identity(), Function.identity()));
+        if(base.getUserIds() != null) {
+            for(var userid : base.getUserIds()) {
+                Assertions.assertEquals(userid, resultDiscordMemberMap.get(userid));
             }
         }
     }
@@ -168,10 +171,10 @@ public class TodoEntryUtils {
             Assertions.assertEquals(base.getEvent().getId(), result.getEvent().getId());
         }
         Assertions.assertEquals(base.isDone(), result.isDone());
-        var resultDiscordMemberMap = result.getDiscordMembers().stream().collect(Collectors.toMap(PojoDiscordMember::getDiscordId, Function.identity()));
-        if(base.getDiscordMembers() != null) {
-            for(var member : base.getDiscordMembers()) {
-                DiscordMemberUtils.compare(member, resultDiscordMemberMap.get(member.getDiscordId()));
+        var resultDiscordMemberMap = result.getUserIds().stream().collect(Collectors.toMap(Function.identity(), Function.identity()));
+        if(base.getUserIds() != null) {
+            for(var userid : base.getUserIds()) {
+                Assertions.assertEquals(userid, resultDiscordMemberMap.get(userid));
             }
         }
     }

@@ -30,7 +30,7 @@ public class ContrainteUtiles {
         Map<String, Supplier<? extends BackConstraintException>> discordMemberMap = new HashMap<>();
 
         CONTRAINTE_EXCEPTION_MAP.put(EntityTable.EVENT, Collections.unmodifiableMap(eventMap));
-        CONTRAINTE_EXCEPTION_MAP.put(EntityTable.DISCORD_MEMBER, Collections.unmodifiableMap(discordMemberMap));
+        CONTRAINTE_EXCEPTION_MAP.put(EntityTable.USER_ATTRIBUTES, Collections.unmodifiableMap(discordMemberMap));
         CONTRAINTE_EXCEPTION_MAP.put(EntityTable.TODO_ENTRY, Collections.unmodifiableMap(todoMap));
     }
 

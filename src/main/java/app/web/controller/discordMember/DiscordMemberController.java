@@ -1,7 +1,7 @@
 package app.web.controller.discordMember;
 
 import app.web.api.DiscordMemberServiceApi;
-import app.web.pojo.PojoDiscordMember;
+import app.web.pojo.PojoUserAttributes;
 import app.web.pojo.PojoEntity;
 import app.web.service.DiscordMemberService;
 import org.springframework.web.bind.annotation.*;
@@ -17,18 +17,13 @@ public class DiscordMemberController {
     }
 
     @PostMapping("/save")
-    public PojoDiscordMember create(@RequestBody PojoDiscordMember pojoDiscordMember) {
-        return discordMemberService.save(pojoDiscordMember);
+    public PojoUserAttributes create(@RequestBody PojoUserAttributes pojoUserAttributes) {
+        return discordMemberService.save(pojoUserAttributes);
     }
 
     @GetMapping("/findById")
-    public PojoDiscordMember findById(@RequestParam("id") Long id) {
+    public PojoUserAttributes findById(@RequestParam("id") Long id) {
         return discordMemberService.findOne(id);
-    }
-
-    @GetMapping("/findByNickname")
-    public PojoEntity findByNickname(@RequestParam("nickname") String nickname) {
-        return discordMemberService.findByNickname(nickname);
     }
 
     @GetMapping("/findByDiscordId")

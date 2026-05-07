@@ -1,12 +1,12 @@
 package app.back.service.event;
 
-import app.back.dto.DiscordMember;
 import app.back.dto.Event;
 import app.back.dto.TodoEntry;
 import app.back.exception.BackBadRequestException;
 import app.back.exception.duplicate.todo.BackDuplicateTodoNameException;
 import app.back.service.DtoEventService;
 import app.utils.EventUtils;
+import app.utils.UuidUtils;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -23,10 +24,12 @@ public class DtoEventServiceTodoTest {
 
     private final EventUtils eventUtils;
     private final DtoEventService dtoService;
+    private final UuidUtils uuidUtils;
 
-    public DtoEventServiceTodoTest(@Autowired EventUtils eventUtils, @Autowired DtoEventService dtoService) {
+    public DtoEventServiceTodoTest(@Autowired EventUtils eventUtils, @Autowired DtoEventService dtoService, @Autowired UuidUtils uuidUtils) {
         this.eventUtils = eventUtils;
         this.dtoService = dtoService;
+        this.uuidUtils = uuidUtils;
     }
 
 
@@ -39,7 +42,7 @@ public class DtoEventServiceTodoTest {
         Assertions.assertEquals(1, event.getTodoList().size());
         Assertions.assertEquals("test", event.getTodoList().getFirst().getTodoName());
         Assertions.assertEquals("todo", event.getTodoList().getFirst().getTodoValue());
-        Assertions.assertTrue(event.getTodoList().getFirst().getDiscordMembers().isEmpty());
+        Assertions.assertTrue(event.getTodoList().getFirst().getuserIds().isEmpty());
     }
 
     @Test
@@ -71,56 +74,56 @@ public class DtoEventServiceTodoTest {
 
     @Test
     @Order(5)
-    void testAddTodoWithMember() {
+    void testAddTodoWithUser() {
         var event = new Event();
-        event.addTodo("test", "todo", new DiscordMember());
+        event.addTodo("test", "todo", uuidUtils.generate());
         Assertions.assertEquals(1, event.getTodoList().size());
         Assertions.assertEquals("test", event.getTodoList().getFirst().getTodoName());
         Assertions.assertEquals("todo", event.getTodoList().getFirst().getTodoValue());
-        Assertions.assertEquals(1, event.getTodoList().getFirst().getDiscordMembers().size());
+        Assertions.assertEquals(1, event.getTodoList().getFirst().getuserIds().size());
     }
 
     @Test
     @Order(6)
-    void testAddTodoWithMemberNull() {
+    void testAddTodoWithUserNull() {
         var event = new Event();
-        Assertions.assertThrows(BackBadRequestException.class, () -> event.addTodo("test", "todo", (DiscordMember) null));
+        Assertions.assertThrows(BackBadRequestException.class, () -> event.addTodo("test", "todo", (UUID) null));
         Assertions.assertEquals(0, event.getTodoList().size());
     }
 
     @Test
     @Order(7)
-    void testAddTodoWithMemberList() {
+    void testAddTodoWithUserList() {
         var event = new Event();
-        event.addTodo("test", "todo", List.of(new DiscordMember(), new DiscordMember()));
+        event.addTodo("test", "todo", List.of(uuidUtils.generate(), uuidUtils.generate()));
         Assertions.assertEquals(1, event.getTodoList().size());
         Assertions.assertEquals("test", event.getTodoList().getFirst().getTodoName());
         Assertions.assertEquals("todo", event.getTodoList().getFirst().getTodoValue());
-        Assertions.assertEquals(2, event.getTodoList().getFirst().getDiscordMembers().size());
+        Assertions.assertEquals(2, event.getTodoList().getFirst().getuserIds().size());
     }
 
     @Test
     @Order(8)
-    void testAddTodoWithMemberListNull() {
+    void testAddTodoWithUserListNull() {
         var event = new Event();
-        event.addTodo("test", "todo", (List<DiscordMember>) null);
+        event.addTodo("test", "todo", (List<UUID>) null);
         Assertions.assertEquals(1, event.getTodoList().size());
         Assertions.assertEquals("test", event.getTodoList().getFirst().getTodoName());
         Assertions.assertEquals("todo", event.getTodoList().getFirst().getTodoValue());
         Assertions.assertEquals(1, event.getTodoList().size());
-        Assertions.assertTrue(event.getTodoList().getFirst().getDiscordMembers().isEmpty());
+        Assertions.assertTrue(event.getTodoList().getFirst().getuserIds().isEmpty());
     }
 
     @Test
     @Order(9)
-    void testAddExistedTodoWithMemberList() {
+    void testAddExistedTodoWithUserList() {
         var event = new Event();
-        event.addTodo("test", "todo", List.of(new DiscordMember(), new DiscordMember()));
-        event.addTodo("test", "todo2", List.of(new DiscordMember(), new DiscordMember()));
+        event.addTodo("test", "todo", List.of(uuidUtils.generate(), uuidUtils.generate()));
+        event.addTodo("test", "todo2", List.of(uuidUtils.generate(), uuidUtils.generate()));
         Assertions.assertEquals(1, event.getTodoList().size());
         Assertions.assertEquals("test", event.getTodoList().getFirst().getTodoName());
         Assertions.assertEquals("todo2", event.getTodoList().getFirst().getTodoValue());
-        Assertions.assertEquals(4, event.getTodoList().getFirst().getDiscordMembers().size());
+        Assertions.assertEquals(4, event.getTodoList().getFirst().getuserIds().size());
     }
 
     @Test
@@ -178,33 +181,30 @@ public class DtoEventServiceTodoTest {
         var event = new Event();
         event.addTodo("test", "todo");
         event.setTodoList(List.of(
-                new TodoEntry("name2", "todo1", new DiscordMember()),
+                new TodoEntry("name2", "todo1", uuidUtils.generate()),
                 new TodoEntry("name2", "todo2"),
-                new TodoEntry("name2", "todo3", List.of(new DiscordMember(), new DiscordMember())),
-                new TodoEntry("name2", "todo4", (List<DiscordMember>) null)
+                new TodoEntry("name2", "todo3", List.of(uuidUtils.generate(), uuidUtils.generate())),
+                new TodoEntry("name2", "todo4", (List<UUID>) null)
         ));
         Assertions.assertEquals(1, event.getTodoList().size());
         Assertions.assertEquals("name2", event.getTodoList().getFirst().getTodoName());
         Assertions.assertEquals("todo4", event.getTodoList().getFirst().getTodoValue());
-        Assertions.assertEquals(3, event.getTodoList().getFirst().getDiscordMembers().size());
+        Assertions.assertEquals(3, event.getTodoList().getFirst().getuserIds().size());
     }
 
     @Test
     @Order(13)
-    void testRemoveMember() {
+    void testRemoveUser() {
         var event = new Event();
         Assertions.assertTrue(event.getTodoList().isEmpty());
-        var member1 = new DiscordMember();
-        member1.setId(1L);
-        var member2 = new DiscordMember();
-        member2.setId(2L);
-        var member3 = new DiscordMember();
-        member3.setId(3L);
-        event.addTodo("test", "todo", List.of(member1, member2, member3));
+        var user1 = uuidUtils.generate();
+        var user2 = uuidUtils.generate();
+        var user3 = uuidUtils.generate();
+        event.addTodo("test", "todo", List.of(user1, user2, user3));
 
-        event.getTodoList().getFirst().removeDiscordMember(member2.getId());
-        Assertions.assertEquals(2, event.getTodoList().getFirst().getDiscordMembers().size());
-        var result = List.of(member1, member3).containsAll(event.getTodoList().getFirst().getDiscordMembers());
+        event.getTodoList().getFirst().removeUserId(user2);
+        Assertions.assertEquals(2, event.getTodoList().getFirst().getuserIds().size());
+        var result = List.of(user1, user3).containsAll(event.getTodoList().getFirst().getuserIds());
         Assertions.assertTrue(result);
     }
 
@@ -246,30 +246,26 @@ public class DtoEventServiceTodoTest {
 
     @Test
     @Order(15)
-    void testRemoveMemberListNull() {
+    void testRemoveUserListNull() {
         var event = eventUtils.createBasicEntity();
         var todo = eventUtils.addTodo(event);
-        var member1 = new DiscordMember();
-        member1.setId(1L);
-        var member2 = new DiscordMember();
-        member2.setId(2L);
-        todo.addDiscordMembers(List.of(member1, member2));
-        todo.removeDiscordMember(null);
-        Assertions.assertEquals(2, todo.getDiscordMembers().size());
+        var user1 = uuidUtils.generate();
+        var user2 = uuidUtils.generate();
+        todo.addUserIds(List.of(user1, user2));
+        todo.removeUserId(null);
+        Assertions.assertEquals(2, todo.getuserIds().size());
     }
 
     @Test
     @Order(16)
-    void testRemoveMemberListNullValue() {
+    void testRemoveUserListNullValue() {
         var event = eventUtils.createBasicEntity();
         var todo = eventUtils.addTodo(event);
-        var member1 = new DiscordMember();
-        member1.setId(1L);
-        var member2 = new DiscordMember();
-        member2.setId(2L);
-        todo.addDiscordMembers(List.of(member1, member2));
-        todo.removeDiscordMember(Collections.singletonList(null));
-        Assertions.assertEquals(2, todo.getDiscordMembers().size());
+        var user1 = uuidUtils.generate();
+        var user2 = uuidUtils.generate();
+        todo.addUserIds(List.of(user1, user2));
+        todo.removeUserIds(Collections.singletonList(null));
+        Assertions.assertEquals(2, todo.getuserIds().size());
     }
 
 }

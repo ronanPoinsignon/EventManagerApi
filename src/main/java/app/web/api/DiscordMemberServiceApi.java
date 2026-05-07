@@ -1,11 +1,9 @@
 package app.web.api;
 
-import app.web.pojo.PojoDiscordMember;
+import app.web.pojo.PojoUserAttributes;
 
-public interface DiscordMemberServiceApi extends AbstractServiceApi<PojoDiscordMember> {
+public interface DiscordMemberServiceApi extends AbstractServiceApi<PojoUserAttributes> {
 
-    PojoDiscordMember findByNickname(String nickname);
-
-    PojoDiscordMember findByDiscordId(long discordId);
+    PojoUserAttributes findByDiscordId(long discordId);
 
 }
