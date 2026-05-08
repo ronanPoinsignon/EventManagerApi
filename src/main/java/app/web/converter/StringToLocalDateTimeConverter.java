@@ -13,6 +13,9 @@ import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.time.temporal.ChronoField.*;
+import static java.time.temporal.ChronoField.NANO_OF_SECOND;
+
 public class StringToLocalDateTimeConverter implements StringConverter<LocalDateTime> {
 
     private static final String[] LOCAL8DATE_TIME_STRING_FORMAT = new String[] {
@@ -32,6 +35,19 @@ public class StringToLocalDateTimeConverter implements StringConverter<LocalDate
                     .append(basicFormat)
                     .appendLiteral('T')
                     .append(DateTimeFormatter.ISO_LOCAL_TIME);
+            var zPattern = new DateTimeFormatterBuilder()
+                    .append(basicFormat)
+                    .appendLiteral('T')
+                    .appendValue(HOUR_OF_DAY, 2)
+                    .appendLiteral(':')
+                    .appendValue(MINUTE_OF_HOUR, 2)
+                    .optionalStart()
+                    .appendLiteral(':')
+                    .appendValue(SECOND_OF_MINUTE, 2)
+                    .optionalStart()
+                    .appendFraction(NANO_OF_SECOND, 0, 9, true)
+                    .appendLiteral('Z');
+            formatters.add(zPattern.toFormatter());
             formatters.add(pattern.toFormatter());
             formatters.add(DateTimeFormatter.ofPattern(format));
         }
