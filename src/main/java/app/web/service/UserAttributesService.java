@@ -26,16 +26,6 @@ public class UserAttributesService extends AbstractService<UserAttributes, PojoU
     }
 
     @Override
-    public PojoUserAttributes save(PojoUserAttributes pojo) {
-        if(pojo == null) {
-            return null;
-        }
-
-        var result = getTransform().toDto(pojo);
-        return getTransform().toPojo(result);
-    }
-
-    @Override
     public PojoUserAttributes linkDiscordId(long id) {
         var userId = userService.getUser().getUserId();
         var attributes = getService().findByKeycloakId(userId).orElseGet(() -> {
