@@ -35,7 +35,7 @@ public abstract class DtoAbstractEntityService<T extends AbstractEntity, U exten
 
         var dbEntity = this.findById(entity.getId()).orElseThrow(() -> new BackNotFoundException("Aucun élément trouvé."));
         update(entity, dbEntity);
-        return saveInternal(entity);
+        return saveInternal(dbEntity);
     }
 
     private T saveInternal(T entity) {
