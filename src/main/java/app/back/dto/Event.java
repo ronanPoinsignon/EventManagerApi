@@ -142,9 +142,12 @@ public class Event extends AbstractEntity {
     }
 
     public void setTodoList(List<TodoEntry> todoListEntries) {
-        if(todoListEntries == null) {
-            todoListEntries = new ArrayList<>();
+        if(todoListEntries == null || todoListEntries.isEmpty()) {
+            this.shouldUpdateTodos = !this.todoListEntries.isEmpty();
+            this.todoListEntries.clear();
+            return;
         }
+        
         this.todoListEntries.clear();
         todoListEntries.forEach(todo -> addTodo(todo.getTodoName(), todo.getTodoValue(), todo.getuserIds()));
     }
@@ -175,9 +178,10 @@ public class Event extends AbstractEntity {
     }
 
     public boolean addParticipants(Collection<UUID> userIdCollection) {
-        if(userIdCollection == null) {
-            userIdCollection = new ArrayList<>();
+        if(userIdCollection == null || userIdCollection.isEmpty()) {
+            return false;
         }
+
         var result = this.participants.addAll(userIdCollection);
         shouldUpdateParticipants |= result;
         return result;
@@ -188,9 +192,10 @@ public class Event extends AbstractEntity {
     }
 
     public boolean removeParticipants(Collection<UUID> userIdCollection) {
-        if(userIdCollection == null) {
-            userIdCollection = new ArrayList<>();
+        if(userIdCollection == null || userIdCollection.isEmpty()) {
+            return false;
         }
+
         var temp = new ArrayList<>(userIdCollection);
         var result = this.participants.removeIf(temp::contains);
         shouldUpdateParticipants |= result;
@@ -198,9 +203,12 @@ public class Event extends AbstractEntity {
     }
 
     public void setParticipants(Collection<UUID> userIdCollection) {
-        if(userIdCollection == null) {
-            userIdCollection = new ArrayList<>();
+        if(userIdCollection == null || userIdCollection.isEmpty()) {
+            shouldUpdateParticipants = !this.participants.isEmpty();
+            this.participants.clear();
+            return;
         }
+
         var temp = new ArrayList<>(userIdCollection);
         this.participants.clear();
         this.participants.addAll(temp);
@@ -247,8 +255,10 @@ public class Event extends AbstractEntity {
     }
 
     public void setSubEvents(List<Event> subEvents) {
-        if(subEvents == null) {
-            subEvents = new ArrayList<>();
+        if(subEvents == null || subEvents.isEmpty()) {
+            shouldUpdateSubEvents = !this.subEvents.isEmpty();
+            this.subEvents.clear();
+            return;
         }
 
         var temp = new ArrayList<>(subEvents);
