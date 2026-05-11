@@ -28,7 +28,7 @@ public class ParticipantController {
 
     @PostMapping("/remove")
     public PojoEvent removeTo(@RequestParam(value = "eventId") long eventId,
-                              @RequestParam(value = "userids", required = false) List<UUID> userIds) {
+                              @RequestParam(value = "userIds", required = false) List<UUID> userIds) {
         return eventService.removeTo(eventId, userIds);
     }
 

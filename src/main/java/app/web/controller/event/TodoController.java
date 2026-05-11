@@ -29,12 +29,12 @@ public class TodoController {
     }
 
     @PostMapping("/addUsers")
-    public PojoEvent addTodoUsers(@RequestParam(value = "eventId") long eventId, @RequestParam("todoName") String todoName, @RequestParam(value = "userMemberIds", required = false) List<UUID> userIdList) {
+    public PojoEvent addTodoUsers(@RequestParam(value = "eventId") long eventId, @RequestParam("todoName") String todoName, @RequestParam(value = "userIds", required = false) List<UUID> userIdList) {
         return eventService.addTodoUsers(eventId, todoName, userIdList);
     }
 
     @PostMapping("/removeUsers")
-    public PojoEvent removeTodoUsers(@RequestParam(value = "eventId") long eventId, @RequestParam("todoName") String todoName, @RequestParam(value = "discordMemberIds", required = false) List<UUID> userIdList) {
+    public PojoEvent removeTodoUsers(@RequestParam(value = "eventId") long eventId, @RequestParam("todoName") String todoName, @RequestParam(value = "userIds", required = false) List<UUID> userIdList) {
         return eventService.removeTodoUsers(eventId, todoName, userIdList);
     }
 
