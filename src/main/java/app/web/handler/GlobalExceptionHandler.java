@@ -1,5 +1,6 @@
 package app.web.handler;
 
+import app.back.exception.*;
 import app.web.exception.WebException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
@@ -13,8 +14,8 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.server.ResponseStatusException;
 
 import java.net.URI;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -45,8 +46,14 @@ public class GlobalExceptionHandler {
         problem.setTitle(HttpStatus.valueOf(ex.getStatusCode().value()).getReasonPhrase());
         problem.setInstance(URI.create(request.getRequest().getRequestURI()));
 
+        var message = ex.getReason();
+        if(message == null || message.isBlank()) {
+            logger.error("Aucun message pour l'exception courante.", ex);
+            message = "Une erreur est survenue.";
+        }
+
         Map<String, Object> error = Map.of(
-                "message", Objects.requireNonNull(ex.getReason())
+                "message", message
         );
         problem.setProperty("error", error);
 
@@ -66,26 +73,77 @@ public class GlobalExceptionHandler {
                 : "unknown";
 
         var value = ex.getValue();
-        if(value == null) {
-            value = "";
-        }
 
         var exceptionMessage = ex.getMostSpecificCause() instanceof ResponseStatusException ?
                 ((ResponseStatusException) ex.getMostSpecificCause()).getReason() :
                 ex.getMostSpecificCause().getMessage();
         if(exceptionMessage == null) {
-            exceptionMessage = "";
+            logger.error("Aucun message pour l'exception courante.", ex);
+            exceptionMessage = "Impossible de mapper l'élément correctement.";
         }
 
         Map<String, Object> error = Map.of(
-                "parameter", Map.of(
-                        "name", ex.getName(),
-                        "value", value,
-                        "expectedType", expectedType
-                ),
+                "parameter", new HashMap<>(){
+                    {
+                        put("name", ex.getName());
+                        put("value", value != null ? value.toString() : null);
+                        put("expectedType", expectedType);
+                    }
+                },
                 "message", exceptionMessage
         );
 
+        problem.setProperty("error", error);
+
+        return problem;
+    }
+
+    @ExceptionHandler(BackResourceAccessException.class)
+    public ProblemDetail handleBackResourceAccessException(BackResourceAccessException ex, ServletWebRequest request) {
+        ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+
+        problem.setTitle(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
+        problem.setInstance(URI.create(request.getRequest().getRequestURI()));
+
+        Map<String, Object> error = Map.of(
+                "message", "Un problème interne est survenu."
+        );
+        problem.setProperty("error", error);
+
+        return problem;
+    }
+
+    @ExceptionHandler(BackException.class)
+    public ProblemDetail handleBadRequestException(BackException ex, ServletWebRequest request) {
+        return handleBackException(ex, request);
+    }
+
+    private ProblemDetail handleBackException(BackException exception, ServletWebRequest request) {
+        HttpStatus status;
+        switch(exception) {
+            case BackBadRequestException _ -> status = HttpStatus.BAD_REQUEST;
+            case BackNotFoundException _ -> status = HttpStatus.NOT_FOUND;
+            case BackForbiddenException _ -> status = HttpStatus.FORBIDDEN;
+            default -> {
+                logger.error("Aucune définition pour la classe d'exception : {}", exception.getClass());
+                throw new IllegalStateException("Unexpected value: " + exception);
+            }
+        }
+
+        ProblemDetail problem = ProblemDetail.forStatus(status);
+
+        problem.setTitle(status.getReasonPhrase());
+        problem.setInstance(URI.create(request.getRequest().getRequestURI()));
+
+        var message = exception.getMessage();
+        if(message == null || message.isBlank()) {
+            logger.error("Aucun message pour l'exception courante.", exception);
+            message = "Une erreur est survenue.";
+        }
+
+        Map<String, Object> error = Map.of(
+                "message", message
+        );
         problem.setProperty("error", error);
 
         return problem;
