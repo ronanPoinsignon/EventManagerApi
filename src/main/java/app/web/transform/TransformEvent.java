@@ -61,7 +61,7 @@ public class TransformEvent extends AbstractTransform<Event, PojoEvent> {
             event.setParticipants(pojo.getParticipants().stream().map(PojoUser::getId).toList());
         }
         if(pojo.getTodoList() != null) {
-            pojo.getTodoList().stream().map(pojoTodo -> {
+            event.setTodoList(pojo.getTodoList().stream().map(pojoTodo -> {
                 var pojoTodoEvent = pojoTodo.getEvent();
                 pojoTodo.setEvent(null);
                 var todo = transformTodoEntry.toDto(pojoTodo);
@@ -69,7 +69,7 @@ public class TransformEvent extends AbstractTransform<Event, PojoEvent> {
                 todo.setEvent(event);
 
                 return todo;
-            }).forEach(todo -> event.addTodo(todo.getTodoName(), todo.getTodoValue(), todo.getuserIds()));
+            }).toList());
         }
         event.setTricountUrl(pojo.getTricountUrl());
 
