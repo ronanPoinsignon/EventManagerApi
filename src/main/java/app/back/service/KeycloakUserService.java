@@ -1,16 +1,19 @@
 package app.back.service;
 
+import app.RestTemplateConfiguration;
 import app.back.api.KeycloakServiceApi;
 import app.back.dto.KeycloakUser;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestTemplate;
 import tools.jackson.databind.ObjectMapper;
 
 import java.util.List;
@@ -36,13 +39,13 @@ public class KeycloakUserService implements KeycloakServiceApi {
     private String keycloakAdminPassword;
 
     private final ObjectMapper mapper;
-    private final RestTemplate restTemplate;
+    private final RestTemplateConfiguration.WebRequester webRequester;
 
     private String clientSecret;
 
-    public KeycloakUserService(ObjectMapper mapper, RestTemplate restTemplate) {
+    public KeycloakUserService(ObjectMapper mapper, RestTemplateConfiguration.WebRequester webRequester) {
         this.mapper = mapper;
-        this.restTemplate = restTemplate;
+        this.webRequester = webRequester;
     }
 
     @PostConstruct
@@ -59,10 +62,9 @@ public class KeycloakUserService implements KeycloakServiceApi {
         headers.set("Authorization", "Bearer "+ accessToken);
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
-        var response = restTemplate.exchange(route, HttpMethod.GET, entity, String.class);
-        var body = response.getBody();
+        var response = webRequester.get(route, entity, String.class);
 
-        var root = mapper.readTree(body);
+        var root = mapper.readTree(response);
         var result = root.get(0);
         return result.get("secret").asString();
     }
@@ -81,9 +83,10 @@ public class KeycloakUserService implements KeycloakServiceApi {
         HttpEntity<MultiValueMap<String, String>> request =
                 new HttpEntity<>(body, headers);
 
-        ResponseEntity<Map> response = restTemplate.postForEntity(url, request, Map.class);
+        var response = webRequester.post(url, request, new ParameterizedTypeReference<Map<String, String>>() {
+        });
 
-        return response.getBody().get("access_token").toString();
+        return response.get("access_token");
     }
 
     private String getToken() {
@@ -99,9 +102,10 @@ public class KeycloakUserService implements KeycloakServiceApi {
         HttpEntity<MultiValueMap<String, String>> request =
                 new HttpEntity<>(body, headers);
 
-        ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.POST, request, Map.class);
+        var response = webRequester.<Map<String, String>>post(url, request, new ParameterizedTypeReference<>() {
+        });
 
-        return response.getBody().get("access_token").toString();
+        return response.get("access_token");
     }
 
     @Override
@@ -121,7 +125,7 @@ public class KeycloakUserService implements KeycloakServiceApi {
     private <T> T requestWithToken(String route, HttpMethod method, MultiValueMap<String, String> body, ParameterizedTypeReference<T> type) {
         var headers = getTokenHeaders();
         var entity = new HttpEntity<>(body, headers);
-        return restTemplate.exchange(route, method, entity, type).getBody();
+        return webRequester.request(route, method, entity, type);
     }
 
     private HttpHeaders getTokenHeaders() {
