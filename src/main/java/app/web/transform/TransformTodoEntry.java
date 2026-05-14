@@ -32,7 +32,7 @@ public class TransformTodoEntry extends AbstractTransform<TodoEntry, PojoTodoEnt
         pojo.setName(dto.getTodoName());
         pojo.setTodoValue(dto.getTodoValue());
         pojo.setEvent(transformEvent.toPojo(dto.getEvent()));
-        pojo.setUsers(dto.getuserIds().stream()
+        pojo.setParticipants(dto.getuserIds().stream()
                 .map(keycloakUserService::getUserById)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
@@ -49,8 +49,8 @@ public class TransformTodoEntry extends AbstractTransform<TodoEntry, PojoTodoEnt
         entity.setTodoName(pojo.getName());
         entity.setTodoValue(pojo.getTodoValue());
         entity.setEvent(transformEvent.toDto(pojo.getEvent()));
-        if(pojo.getUsers() != null) {
-            entity.setUserIdSet(pojo.getUsers().stream().map(PojoUser::getId).toList());
+        if(pojo.getParticipants() != null) {
+            entity.setUserIdSet(pojo.getParticipants().stream().map(PojoUser::getId).toList());
         }
 
         return entity;

@@ -10,7 +10,7 @@ public class PojoTodoEntry extends PojoEntity {
 
     private String name;
     private String todoValue;
-    private List<PojoUser> users;
+    private List<PojoUser> participants;
     @JsonIgnore
     private PojoEvent event;
     private boolean isDone;
@@ -31,12 +31,12 @@ public class PojoTodoEntry extends PojoEntity {
         this.todoValue = todoValue;
     }
 
-    public List<PojoUser> getUsers() {
-        return users;
+    public List<PojoUser> getParticipants() {
+        return participants;
     }
 
-    public void setUsers(Collection<? extends PojoUser> users) {
-        this.users = new ArrayList<>(users);
+    public void setParticipants(Collection<? extends PojoUser> participants) {
+        this.participants = new ArrayList<>(participants);
     }
 
     public PojoEvent getEvent() {
