@@ -26,4 +26,11 @@ echo "Ajout des rôles au user"
   --rolename query-clients \
   --rolename view-clients \
 
+echo "ajout de la gestion des self-registrations"
+
+/opt/keycloak/bin/kcadm.sh update realms/"$KEYCLOAK_REALM" \
+  -s registrationAllowed=true \
+  -s rememberMe=true \
+  -s resetPasswordAllowed=true
+
 echo "Fin de traitement"
