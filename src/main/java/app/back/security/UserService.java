@@ -12,17 +12,17 @@ public class UserService implements UserServiceApi {
 
     @Override
     public User getUser() {
-        var jswtUser = (Jwt) Objects.requireNonNull(SecurityContextHolder.getContext()
+        var jwt = (Jwt) Objects.requireNonNull(SecurityContextHolder.getContext()
                         .getAuthentication())
                 .getPrincipal();
 
-        if(jswtUser == null || jswtUser.getId() == null || jswtUser.getId().isBlank()) {
+        if(jwt == null || jwt.getId() == null || jwt.getId().isBlank()) {
             throw new BackForbiddenException("Utilisateur non connecté");
         }
 
         var user = new User();
-        user.setUserId(UUID.fromString(jswtUser.getSubject()));
-        var claims = jswtUser.getClaims();
+        user.setUserId(UUID.fromString(jwt.getSubject()));
+        var claims = jwt.getClaims();
         user.setPrenom((String) claims.get("given_name"));
         user.setNom((String) claims.get("family_name"));
         if(claims.containsKey("realm_access")) {
