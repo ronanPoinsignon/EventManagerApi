@@ -2,7 +2,7 @@ package app.web.service;
 
 import app.back.api.DtoUserAttributesServiceApi;
 import app.back.dto.UserAttributes;
-import app.back.security.UserService;
+import app.back.security.UserServiceApi;
 import app.web.api.UserAttributesServiceApi;
 import app.web.pojo.PojoUserAttributes;
 import app.web.transform.TransformMember;
