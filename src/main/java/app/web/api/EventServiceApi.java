@@ -35,4 +35,7 @@ public interface EventServiceApi extends AbstractServiceApi<PojoEvent> {
 
     PojoEvent delete(long eventId);
 
+    PojoEvent addDiscordTo(String eventName, String parentName, List<Long> userIds);
+
+    PojoEvent removeDiscordTo(String eventName, String parentName, List<Long> userIds);
 }

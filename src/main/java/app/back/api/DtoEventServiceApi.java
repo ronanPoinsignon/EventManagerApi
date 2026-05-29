@@ -12,6 +12,8 @@ public interface DtoEventServiceApi extends AbstractDtoServiceApi<Event> {
 
     Optional<Event> findByEventName(long parentId, String name);
 
+    Optional<Event> findByEventName(String parentName, String name);
+
     List<Event> findAllBeforeEnd(LocalDateTime date);
 
     Optional<Event> getLast();

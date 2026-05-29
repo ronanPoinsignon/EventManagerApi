@@ -32,4 +32,18 @@ public class ParticipantController {
         return eventService.removeTo(eventId, userIds);
     }
 
+    @PostMapping("/discord/add")
+    public PojoEvent addDiscordTo(@RequestParam(value = "eventName") String eventName,
+                                  @RequestParam(value = "parentName", required = false) String parentName,
+                                  @RequestParam(value = "userIds", required = false) List<Long> userIds) {
+        return eventService.addDiscordTo(eventName, parentName, userIds);
+    }
+
+    @PostMapping("/discord/remove")
+    public PojoEvent removeDiscordTo(@RequestParam(value = "eventName") String eventName,
+                                     @RequestParam(value = "parentName", required = false) String parentName,
+                                     @RequestParam(value = "userIds", required = false) List<Long> userIds) {
+        return eventService.removeDiscordTo(eventName, parentName, userIds);
+    }
+
 }

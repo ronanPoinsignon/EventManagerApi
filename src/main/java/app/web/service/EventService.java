@@ -1,7 +1,6 @@
 package app.web.service;
 
 import app.back.api.DtoEventServiceApi;
-import app.back.api.DtoUserAttributesServiceApi;
 import app.back.dto.Event;
 import app.back.dto.TodoEntry;
 import app.web.api.EventServiceApi;
@@ -9,15 +8,19 @@ import app.web.exception.BadRequestException;
 import app.web.exception.NotFoundException;
 import app.web.pojo.LightPojoTodoEntry;
 import app.web.pojo.PojoEvent;
+import app.web.pojo.PojoUserAttributes;
 import app.web.transform.TransformEvent;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 @Service
 public class EventService extends AbstractService<Event, PojoEvent, DtoEventServiceApi> implements EventServiceApi {
@@ -84,17 +87,17 @@ public class EventService extends AbstractService<Event, PojoEvent, DtoEventServ
     @Transactional
     @Override
     public PojoEvent addTo(long eventId, List<UUID> userIds) {
-        return manageParticipants(eventId, userIds, Event::addParticipants);
+        return manageParticipants(() -> getService().findById(eventId), userIds, Event::addParticipants);
     }
 
     @Transactional
     @Override
     public PojoEvent removeTo(long eventId, List<UUID> userIdList) {
-        return manageParticipants(eventId, userIdList, Event::removeParticipants);
+        return manageParticipants(() -> getService().findById(eventId), userIdList, Event::removeParticipants);
     }
 
-    private <T> PojoEvent manageParticipants(long eventId,List<T> participantList, BiFunction<Event, List<T>, Boolean> participantFunction) {
-        var event = getService().findById(eventId).orElseThrow(() -> new NotFoundException("Aucun événement trouvé."));
+    private <T> PojoEvent manageParticipants(Supplier<Optional<Event>> eventSupplier, List<T> participantList, BiFunction<Event, List<T>, Boolean> participantFunction) {
+        var event = eventSupplier.get().orElseThrow(() -> new NotFoundException("Aucun événement trouvé."));
 
         var hasChanged = participantFunction.apply(event, participantList);
         if(!hasChanged) {
@@ -114,7 +117,8 @@ public class EventService extends AbstractService<Event, PojoEvent, DtoEventServ
         var event = getService().findById(eventId).orElseThrow(() -> new NotFoundException("Aucun événement trouvé."));
         event.addTodo(lightPojoTodoEntry.getName(), lightPojoTodoEntry.getTodo(), lightPojoTodoEntry.getParticipants());
 
-        return getTransform().toPojo(getService().save(event));
+        var result = getService().save(event);
+        return getTransform().toPojo(result);
     }
 
     @Transactional
@@ -156,6 +160,59 @@ public class EventService extends AbstractService<Event, PojoEvent, DtoEventServ
         return getService().findAndDelete(eventId)
                 .map(getTransform()::toPojo)
                 .orElse(null);
+    }
+
+    @Override
+    public PojoEvent addDiscordTo(String eventName, String parentName, List<Long> userIds) {
+        return manageParticipants(supplyEvent(eventName, parentName), findAllKeycloakUserIds(userIds), Event::addParticipants);
+    }
+
+    @Override
+    public PojoEvent removeDiscordTo(String eventName, String parentName, List<Long> userIds) {
+        return manageParticipants(supplyEvent(eventName, parentName), findAllKeycloakUserIds(userIds), Event::removeParticipants);
+    }
+
+    private Supplier<Optional<Event>> supplyEvent(String eventName, String parentName) {
+        return parentName != null ?
+                () -> getService().findByEventName(eventName, parentName) :
+                () -> getService().findByEventName(eventName);
+    }
+
+    /**
+     *
+     * @param discordUserIdList
+     * @throws NotFoundException Si certains utilisateurs n'ont pas été trouvés, une {@link NotFoundException} est levée indiquant quels utilisateurs n'ont pas été récupérés.
+     * @return
+     */
+    private List<UUID> findAllKeycloakUserIds(List<Long> discordUserIdList) throws NotFoundException {
+        if(discordUserIdList == null) {
+            discordUserIdList = new ArrayList<>();
+        }
+        var result = this.findKeycloakUserIds(discordUserIdList);
+
+        if(result.size() != discordUserIdList.size()) {
+            var newDiscordMemberIds = new ArrayList<>(discordUserIdList);
+            for(int i = 0; i < discordUserIdList.size(); i++) {
+                if(result.get(i) == null) {
+                    newDiscordMemberIds.remove(discordUserIdList.get(i));
+                }
+            }
+            throw new NotFoundException("les ids de membres suivants n'ont pas été trouvé : " + newDiscordMemberIds + ".");
+        }
+
+        return result;
+    }
+
+    private List<UUID> findKeycloakUserIds(List<Long> discordUserIdList) {
+        if(discordUserIdList == null || discordUserIdList.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        return discordUserIdList.stream()
+                .map(userAttributesService::findByDiscordId)
+                .map(PojoUserAttributes::getKeycloakUserId)
+                .map(UUID::fromString)
+                .toList();
     }
 
     @Transactional

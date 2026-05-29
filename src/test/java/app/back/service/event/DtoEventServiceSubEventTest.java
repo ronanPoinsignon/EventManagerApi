@@ -141,13 +141,26 @@ public class DtoEventServiceSubEventTest {
 
     @Test
     @Order(9)
+    void testFindSubEventWithEventNameAndParentName() {
+        var parent = eventUtils.createBasicEntity();
+        var subEvent1 = eventUtils.addSubEvent(parent);
+
+        dtoService.save(parent);
+
+        var result = dtoService.findByEventName(parent.getEventName(), subEvent1.getEventName());
+        Assertions.assertTrue(result.isPresent());
+        Assertions.assertEquals(subEvent1, result.get());
+    }
+
+    @Test
+    @Order(10)
     void testAddSubEventNull() {
         var parent = eventUtils.createFullEntity();
         Assertions.assertThrows(BackBadRequestException.class, () -> parent.addSubEvent(null));
     }
 
     @Test
-    @Order(10)
+    @Order(11)
     void testSetSubEventNull() {
         var parent = eventUtils.createFullEntity();
         Assertions.assertEquals(1, parent.getSubEvents().size());
@@ -157,7 +170,7 @@ public class DtoEventServiceSubEventTest {
     }
 
     @Test
-    @Order(11)
+    @Order(12)
     void testMoveSubEvent() {
         var parent1 = eventUtils.createBasicEntity();
         parent1.setId(1L);
@@ -171,7 +184,7 @@ public class DtoEventServiceSubEventTest {
     }
 
     @Test
-    @Order(12)
+    @Order(13)
     void testAddRecursivity() {
         var event1 = eventUtils.createBasicEntity();
         var event2 = eventUtils.createBasicEntity();
