@@ -1,6 +1,6 @@
 package app.web.controller.user;
 
-import app.back.service.KeycloakUserService;
+import app.back.api.KeycloakUserServiceApi;
 import app.web.pojo.PojoUser;
 import app.web.transform.TransformKeycloakUser;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,10 +13,10 @@ import java.util.List;
 @RequestMapping("/users")
 public class UserController {
 
-    private final KeycloakUserService keycloakUserService;
+    private final KeycloakUserServiceApi keycloakUserService;
     private final TransformKeycloakUser transformKeycloakUser;
 
-    public UserController(KeycloakUserService keycloakUserService, TransformKeycloakUser transformKeycloakUser) {
+    public UserController(KeycloakUserServiceApi keycloakUserService, TransformKeycloakUser transformKeycloakUser) {
         this.keycloakUserService = keycloakUserService;
         this.transformKeycloakUser = transformKeycloakUser;
     }
