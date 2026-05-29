@@ -2,7 +2,6 @@ package app.web.transform;
 
 import app.back.api.KeycloakUserServiceApi;
 import app.back.dto.TodoEntry;
-import app.back.service.KeycloakUserService;
 import app.web.pojo.PojoTodoEntry;
 import app.web.pojo.PojoUser;
 import jakarta.annotation.Nonnull;
@@ -29,10 +28,13 @@ public class TransformTodoEntry extends AbstractTransform<TodoEntry, PojoTodoEnt
 
     @Override
     protected PojoTodoEntry from(@Nonnull TodoEntry dto) {
+        return from(dto, true);
+    }
+
+    protected PojoTodoEntry from(@Nonnull TodoEntry dto, boolean shouldTransformEvent) {
         var pojo = super.from(dto);
         pojo.setName(dto.getTodoName());
         pojo.setTodoValue(dto.getTodoValue());
-        pojo.setEvent(transformEvent.toPojo(dto.getEvent()));
         pojo.setParticipants(dto.getuserIds().stream()
                 .map(keycloakUserService::getUserById)
                 .filter(Optional::isPresent)
@@ -41,7 +43,19 @@ public class TransformTodoEntry extends AbstractTransform<TodoEntry, PojoTodoEnt
                 .toList());
         pojo.setDone(dto.isDone());
 
+        if(shouldTransformEvent) {
+            pojo.setEvent(transformEvent.toPojo(dto.getEvent()));
+        }
+
         return pojo;
+    }
+
+    public PojoTodoEntry toPojo(TodoEntry dto, boolean shouldTransformEvent) {
+        if(dto == null) {
+            return null;
+        }
+
+        return from(dto, shouldTransformEvent);
     }
 
     @Override

@@ -118,10 +118,7 @@ public class TransformEvent extends AbstractTransform<Event, PojoEvent> {
                 .map(transformKeycloakUser::toPojoWithAttributes)
                 .toList());
         pojoEvent.setTodoList(dto.getTodoList().stream().map(todo -> {
-            var todoEvent = todo.getEvent();
-            todo.setEvent(null);
-            var pojo = transformTodoEntry.toPojo(todo);
-            todo.setEvent(todoEvent);
+            var pojo = transformTodoEntry.toPojo(todo, false);
             pojo.setEvent(pojoEvent);
 
             return pojo;
