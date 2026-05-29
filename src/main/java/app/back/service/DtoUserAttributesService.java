@@ -2,6 +2,7 @@ package app.back.service;
 
 import app.back.api.DtoUserAttributesServiceApi;
 import app.back.dto.UserAttributes;
+import app.back.entityname.EntityTable;
 import app.back.exception.BackBadRequestException;
 import app.back.repository.UserAttributesRepository;
 import org.jspecify.annotations.NonNull;
@@ -17,6 +18,11 @@ public class DtoUserAttributesService extends DtoAbstractEntityService<UserAttri
 
     protected DtoUserAttributesService(UserAttributesRepository repository) {
         super(repository);
+    }
+
+    @Override
+    public String getTableName() {
+        return EntityTable.USER_ATTRIBUTES;
     }
 
     @Override

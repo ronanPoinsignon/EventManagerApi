@@ -2,6 +2,7 @@ package app.back.service;
 
 import app.back.api.DtoEventServiceApi;
 import app.back.dto.Event;
+import app.back.entityname.EntityTable;
 import app.back.exception.BackBadRequestException;
 import app.back.exception.duplicate.event.BackDuplicateEventNameException;
 import app.back.repository.EventRepository;
@@ -23,6 +24,11 @@ public class DtoEventService extends DtoAbstractEntityService<Event, @NonNull Ev
     protected DtoEventService(@NonNull EventRepository repository, UserServiceApi userService) {
         super(repository);
         this.userService = userService;
+    }
+
+    @Override
+    public String getTableName() {
+        return EntityTable.EVENT;
     }
 
     @EntityGraph(attributePaths = {

@@ -1,6 +1,7 @@
 package app.back.service;
 
 import app.back.dto.TodoEntry;
+import app.back.entityname.EntityTable;
 import app.back.repository.TodoEntryRepository;
 import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
@@ -9,6 +10,11 @@ import org.springframework.stereotype.Service;
 public class DtoTodoEntryService extends DtoAbstractEntityService<TodoEntry, @NonNull TodoEntryRepository> {
     protected DtoTodoEntryService(@NonNull TodoEntryRepository repository) {
         super(repository);
+    }
+
+    @Override
+    public String getTableName() {
+        return EntityTable.TODO_ENTRY;
     }
 
     @Override

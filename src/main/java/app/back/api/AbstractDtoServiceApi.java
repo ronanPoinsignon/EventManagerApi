@@ -6,6 +6,7 @@ import java.util.Optional;
 
 public interface AbstractDtoServiceApi<T extends AbstractEntity> {
 
+    String getTableName();
     T save(T entity);
     Optional<T> findById(Long id);
     void delete(Long id);

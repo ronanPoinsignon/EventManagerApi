@@ -14,15 +14,15 @@ import java.util.*;
 public class Event extends AbstractEntity {
 
     @Basic
-    @Column(name = "eventName", nullable = false)
+    @Column(name = Contrainte.EVENT_NAME, nullable = false)
     private String eventName;
 
     @Basic
-    @Column(name = "owner", nullable = false)
+    @Column(name = Contrainte.EVENT_OWNER, nullable = false)
     private UUID ownerUserId;
 
     @Basic
-    @Column(name = "creationDate", nullable = false)
+    @Column(name = Contrainte.EVENT_CREATION_DATE, nullable = false)
     private LocalDateTime creationDate = LocalDateTime.now();
 
     @Basic

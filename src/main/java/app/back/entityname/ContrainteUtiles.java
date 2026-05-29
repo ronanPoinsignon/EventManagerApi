@@ -1,6 +1,7 @@
 package app.back.entityname;
 
 import app.back.exception.duplicate.BackConstraintException;
+import app.back.exception.duplicate.BackUniqueEntityAttribute;
 import app.back.exception.duplicate.event.BackDuplicateEventNameException;
 import app.back.exception.duplicate.event.BackDuplicateEventParticipant;
 import app.back.exception.duplicate.todo.BackDuplicateTodoNameException;
@@ -23,14 +24,17 @@ public class ContrainteUtiles {
         Map<String, Supplier<? extends BackConstraintException>> eventMap = new HashMap<>();
         eventMap.put(Contrainte.EVENT_DUPLICATE_NAME, BackDuplicateEventNameException::new);
         eventMap.put(Contrainte.EVENT_DUPLICATE_PARTICIPANT, BackDuplicateEventParticipant::new);
+        Contrainte.EVENT_UNIQUE_ATTRIBUTES.forEach(uniqueContrainte -> eventMap.put(uniqueContrainte, () -> new BackUniqueEntityAttribute(uniqueContrainte)));
 
         Map<String, Supplier<? extends BackConstraintException>> todoMap = new HashMap<>();
         todoMap.put(Contrainte.TODO_DUPLICATE_NAME, BackDuplicateTodoNameException::new);
+        Contrainte.TODO_UNIQUE_ATTRIBUTES.forEach(uniqueContrainte -> todoMap.put(uniqueContrainte, () -> new BackUniqueEntityAttribute(uniqueContrainte)));
 
-        Map<String, Supplier<? extends BackConstraintException>> discordMemberMap = new HashMap<>();
+        Map<String, Supplier<? extends BackConstraintException>> userAttributesMap = new HashMap<>();
+        Contrainte.USER_ATTRIBUTES_UNIQUE_ATTRIBUTES.forEach(uniqueContrainte -> userAttributesMap.put(uniqueContrainte, () -> new BackUniqueEntityAttribute(uniqueContrainte)));
 
         CONTRAINTE_EXCEPTION_MAP.put(EntityTable.EVENT, Collections.unmodifiableMap(eventMap));
-        CONTRAINTE_EXCEPTION_MAP.put(EntityTable.USER_ATTRIBUTES, Collections.unmodifiableMap(discordMemberMap));
+        CONTRAINTE_EXCEPTION_MAP.put(EntityTable.USER_ATTRIBUTES, Collections.unmodifiableMap(userAttributesMap));
         CONTRAINTE_EXCEPTION_MAP.put(EntityTable.TODO_ENTRY, Collections.unmodifiableMap(todoMap));
     }
 

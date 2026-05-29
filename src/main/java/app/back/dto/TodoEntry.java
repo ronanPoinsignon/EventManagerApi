@@ -10,14 +10,14 @@ import java.util.*;
 @Table(name = EntityTable.TODO_ENTRY, uniqueConstraints = @UniqueConstraint(columnNames = {"name", "event_id"}, name = Contrainte.TODO_DUPLICATE_NAME))
 public class TodoEntry extends AbstractEntity {
 
-    @Column(name = "name", nullable = false)
+    @Column(name = Contrainte.TODO_NAME, nullable = false)
     private String todoName;
 
-    @Column(name = "todo", nullable = false)
+    @Column(name = Contrainte.TODO_VALUE, nullable = false)
     private String todoValue;
 
     @ManyToOne
-    @JoinColumn(name = "event_id", nullable = false)
+    @JoinColumn(name = Contrainte.TODO_EVENT_ID, nullable = false)
     private Event event;
 
     private final Set<UUID> userIdSet = new HashSet<>();

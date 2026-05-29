@@ -1,5 +1,6 @@
 package app.back.dto;
 
+import app.back.entityname.Contrainte;
 import app.back.entityname.EntityTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -11,9 +12,9 @@ import java.util.UUID;
 @Table(name = EntityTable.USER_ATTRIBUTES)
 public class UserAttributes extends AbstractEntity {
 
-    @Column(name = "discordId", nullable = false, unique = true)
+    @Column(name = Contrainte.USER_ATTRIBUTES_DISCORD_ID, nullable = false, unique = true)
     private Long discordId;
-    @Column(name = "keycloakUserId", nullable = false, unique = true)
+    @Column(name = Contrainte.USER_ATTRIBUTE_KEYCLOAK_USER_ID, nullable = false, unique = true)
     private UUID keycloakUserId;
 
     public Long getDiscordId() {
