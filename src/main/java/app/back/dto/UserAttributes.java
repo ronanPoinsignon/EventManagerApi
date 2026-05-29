@@ -6,8 +6,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 
-import java.util.UUID;
-
 @Entity
 @Table(name = EntityTable.USER_ATTRIBUTES)
 public class UserAttributes extends AbstractEntity {
@@ -15,7 +13,7 @@ public class UserAttributes extends AbstractEntity {
     @Column(name = Contrainte.USER_ATTRIBUTES_DISCORD_ID, nullable = false, unique = true)
     private Long discordId;
     @Column(name = Contrainte.USER_ATTRIBUTE_KEYCLOAK_USER_ID, nullable = false, unique = true)
-    private UUID keycloakUserId;
+    private String keycloakUserId;
 
     public Long getDiscordId() {
         return discordId;
@@ -25,11 +23,11 @@ public class UserAttributes extends AbstractEntity {
         this.discordId = discordId;
     }
 
-    public UUID getKeycloakUserId() {
+    public String getKeycloakUserId() {
         return keycloakUserId;
     }
 
-    public void setKeycloakUserId(UUID keycloakUserId) {
+    public void setKeycloakUserId(String keycloakUserId) {
         this.keycloakUserId = keycloakUserId;
     }
 }

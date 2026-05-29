@@ -30,7 +30,7 @@ public class UserAttributesService extends AbstractService<UserAttributes, PojoU
         var userId = userService.getUser().getUserId();
         var attributes = getService().findByKeycloakId(userId).orElseGet(() -> {
             var userAttributes = new UserAttributes();
-            userAttributes.setKeycloakUserId(userId);
+            userAttributes.setKeycloakUserId(userId.toString());
 
             return userAttributes;
         });

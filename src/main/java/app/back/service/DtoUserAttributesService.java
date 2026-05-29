@@ -63,12 +63,20 @@ public class DtoUserAttributesService extends DtoAbstractEntityService<UserAttri
 
     @Override
     public Optional<UserAttributes> findByKeycloakId(UUID userId) {
-        return repository.findByKeycloakUserId(userId);
+        if(userId == null) {
+            return Optional.empty();
+        }
+
+        return repository.findByKeycloakUserId(userId.toString());
     }
 
     @Override
     public List<UserAttributes> findByKeycloakIds(List<UUID> userIds) {
-        return repository.findByKeycloakUserIds(userIds);
+        if(userIds == null) {
+            return new ArrayList<>();
+        }
+
+        return repository.findByKeycloakUserIds(userIds.stream().map(UUID::toString).toList());
     }
 
 }

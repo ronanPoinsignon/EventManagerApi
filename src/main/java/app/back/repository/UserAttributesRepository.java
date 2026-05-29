@@ -18,8 +18,9 @@ public interface UserAttributesRepository extends AbstractEntityRepository<UserA
     List<UserAttributes> findByDiscordId(List<Long> discordId);
 
     Optional<UserAttributes> findByKeycloakUserId(UUID keycloakUserId);
+    Optional<UserAttributes> findByKeycloakUserId(String keycloakUserId);
 
     @NativeQuery("select * from " +  EntityTable.USER_ATTRIBUTES + " where keycloakUserId in ?1")
-    List<UserAttributes> findByKeycloakUserIds(List<UUID> keycloakUserIds);
+    List<UserAttributes> findByKeycloakUserIds(List<String> keycloakUserIds);
 
 }
