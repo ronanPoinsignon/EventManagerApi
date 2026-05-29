@@ -9,8 +9,8 @@ public interface Contrainte {
     String TODO_DUPLICATE_NAME = "duplicate_todo_name";
 
     String EVENT_OWNER = "owner";
-    String EVENT_NAME = "eventName";
-    String EVENT_CREATION_DATE = "creationDate";
+    String EVENT_NAME = "event_name";
+    String EVENT_CREATION_DATE = "creation_date";
     List<String> EVENT_UNIQUE_ATTRIBUTES = List.of(EVENT_OWNER, EVENT_NAME, EVENT_CREATION_DATE);
 
     String TODO_NAME = "name";

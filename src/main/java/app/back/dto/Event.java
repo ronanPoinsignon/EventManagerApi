@@ -26,11 +26,11 @@ public class Event extends AbstractEntity {
     private LocalDateTime creationDate = LocalDateTime.now();
 
     @Basic
-    @Column(name = "startDate")
+    @Column(name = "start_date")
     private LocalDateTime startDate;
 
     @Basic
-    @Column(name = "endDate")
+    @Column(name = "end_date")
     private LocalDateTime endDate;
 
     @Basic
