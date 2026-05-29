@@ -11,7 +11,7 @@ until /opt/keycloak/bin/kcadm.sh config credentials \
   sleep 2
 done
 
-echo "Ajout des rôles au user"
+echo "Ajout des rôles au user $KEYCLOAK_CLIENT_ID"
 
 /opt/keycloak/bin/kcadm.sh add-roles \
   -r "$KEYCLOAK_REALM" \
@@ -25,12 +25,41 @@ echo "Ajout des rôles au user"
   --rolename manage-clients \
   --rolename query-clients \
   --rolename view-clients \
+  --rolename impersonation \
 
-echo "ajout de la gestion des self-registrations"
+echo "Ajout de la gestion des self-registrations"
 
 /opt/keycloak/bin/kcadm.sh update realms/"$KEYCLOAK_REALM" \
   -s registrationAllowed=true \
   -s rememberMe=true \
   -s resetPasswordAllowed=true
+
+echo "Mise à jour du client secret ${KEYCLOAK_CLIENT_ID}"
+
+CLIENT_UUID=$(
+  /opt/keycloak/bin/kcadm.sh get clients \
+    -r "${KEYCLOAK_REALM}" \
+    -q clientId="${KEYCLOAK_CLIENT_ID}" \
+  | sed -n 's/.*"id"[ ]*:[ ]*"\([^"]*\)".*/\1/p' \
+  | head -n 1
+)
+
+/opt/keycloak/bin/kcadm.sh update clients/"$CLIENT_UUID" \
+  -r "$KEYCLOAK_REALM" \
+  -s secret="$KEYCLOAK_CLIENT_SECRET"
+
+echo "Mise à jour du client secret ${DISCORD_CLIENT_ID}"
+
+CLIENT_UUID=$(
+  /opt/keycloak/bin/kcadm.sh get clients \
+    -r "${KEYCLOAK_REALM}" \
+    -q clientId="${DISCORD_CLIENT_ID}" \
+  | sed -n 's/.*"id"[ ]*:[ ]*"\([^"]*\)".*/\1/p' \
+  | head -n 1
+)
+
+/opt/keycloak/bin/kcadm.sh update clients/"$CLIENT_UUID" \
+  -r "$KEYCLOAK_REALM" \
+  -s secret="$DISCORD_CLIENT_SECRET"
 
 echo "Fin de traitement"

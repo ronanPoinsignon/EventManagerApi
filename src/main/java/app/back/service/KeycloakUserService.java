@@ -3,7 +3,6 @@ package app.back.service;
 import app.RestTemplateConfiguration;
 import app.back.api.KeycloakUserServiceApi;
 import app.back.dto.KeycloakUser;
-import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.ParameterizedTypeReference;
@@ -14,12 +13,8 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import tools.jackson.databind.ObjectMapper;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class KeycloakUserService implements KeycloakUserServiceApi {
@@ -32,41 +27,18 @@ public class KeycloakUserService implements KeycloakUserServiceApi {
 
     @Value("${KEYCLOAK_CLIENT_ID}")
     private String clientId;
+    @Value("${KEYCLOAK_CLIENT_SECRET}")
+    private String clientSecret;
 
     @Value("${KEYCLOAK_USER}")
     private String keycloakAdminUser;
     @Value("${KEYCLOAK_PASSWORD}")
     private String keycloakAdminPassword;
 
-    private final ObjectMapper mapper;
     private final RestTemplateConfiguration.WebRequester webRequester;
 
-    private String clientSecret;
-
-    public KeycloakUserService(ObjectMapper mapper, RestTemplateConfiguration.WebRequester webRequester) {
-        this.mapper = mapper;
+    public KeycloakUserService(RestTemplateConfiguration.WebRequester webRequester) {
         this.webRequester = webRequester;
-    }
-
-    @PostConstruct
-    private void init() {
-        clientSecret = getClientSecret();
-    }
-
-    private String getClientSecret() {
-        var accessToken = getAdminToken();
-        var route = getBaseURL() + "/admin/realms/event_organizer/clients?clientId=" + clientId;
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", "Bearer "+ accessToken);
-        HttpEntity<String> entity = new HttpEntity<>(headers);
-
-        var response = webRequester.get(route, entity, String.class);
-
-        var root = mapper.readTree(response);
-        var result = root.get(0);
-        return result.get("secret").asString();
     }
 
     private String getAdminToken() {
@@ -120,6 +92,27 @@ public class KeycloakUserService implements KeycloakUserServiceApi {
         var route = getBaseURL() + "/admin/realms/" + keycloakRealmValue + "/users/" + userId;
         var result = requestWithToken(route, HttpMethod.GET, null, new ParameterizedTypeReference<KeycloakUser>() {});
         return Optional.ofNullable(result);
+    }
+
+    @Override
+    public LinkedHashMap<String, String> impersonate(String keycloakUserId) {
+        var url = getRealmURL() + "/protocol/openid-connect/token";
+        System.out.println("url");
+        System.out.println(url);
+        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+        body.add("grant_type", "urn:ietf:params:oauth:grant-type:token-exchange");
+        body.add("client_id", clientId);
+        body.add("client_secret", clientSecret);
+        body.add("subject_token", getToken());
+        body.add("requested_subject", keycloakUserId);
+        body.add("requested_token_type", "urn:ietf:params:oauth:token-type:access_token");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
+
+        return webRequester.post(url, request, new ParameterizedTypeReference<>() {});
     }
 
     private <T> T requestWithToken(String route, HttpMethod method, MultiValueMap<String, String> body, ParameterizedTypeReference<T> type) {
