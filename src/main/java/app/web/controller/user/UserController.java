@@ -1,7 +1,7 @@
 package app.web.controller.user;
 
 import app.back.api.KeycloakUserServiceApi;
-import app.web.pojo.PojoUser;
+import app.web.pojo.PojoKeycloakUserAttributes;
 import app.web.transform.TransformKeycloakUser;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,8 +22,8 @@ public class UserController {
     }
 
     @GetMapping("/")
-    public List<PojoUser> findUsers() {
-        return keycloakUserService.getUsers().stream().map(transformKeycloakUser::toPojo).toList();
+    public List<PojoKeycloakUserAttributes> findUsers() {
+        return keycloakUserService.getUsers().stream().map(transformKeycloakUser::toPojoWithAttributes).toList();
     }
 
 }
