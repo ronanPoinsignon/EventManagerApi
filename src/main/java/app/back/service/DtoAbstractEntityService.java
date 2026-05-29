@@ -57,9 +57,13 @@ public abstract class DtoAbstractEntityService<T extends AbstractEntity, U exten
         }
 
         var split = contraintName.split("\\.");
-        if(split.length != 2) {
+        if(split.length > 2) {
             logger.error("La clé de la contrainte ne correspond pas au format voulu : {}", contraintName);
             throw constraintException;
+        }
+
+        if(split.length == 1) {
+            split = new String[]{ this.getTableName(), split[0] };
         }
 
         var table = split[0];
