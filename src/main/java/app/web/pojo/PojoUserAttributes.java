@@ -1,11 +1,9 @@
 package app.web.pojo;
 
-import java.util.UUID;
-
 public class PojoUserAttributes extends PojoEntity {
 
     private long discordId;
-    private UUID keycloakUserId;
+    private String keycloakUserId;
 
     public long getDiscordId() {
         return discordId;
@@ -15,11 +13,11 @@ public class PojoUserAttributes extends PojoEntity {
         this.discordId = discordId;
     }
 
-    public UUID getKeycloakUserId() {
+    public String getKeycloakUserId() {
         return keycloakUserId;
     }
 
-    public void setKeycloakUserId(UUID keycloakUserId) {
+    public void setKeycloakUserId(String keycloakUserId) {
         this.keycloakUserId = keycloakUserId;
     }
 }
