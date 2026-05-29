@@ -15,6 +15,7 @@ public class UserServiceTest implements UserServiceApi {
 
     UserServiceTest() {
         testUser = new User();
+        testUser.setUserId(UUID.randomUUID());
         testUser.setNom("test nom");
         testUser.setPrenom("test prenom");
         testUser.setUserId(UUID.randomUUID());

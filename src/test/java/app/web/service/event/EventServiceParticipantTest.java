@@ -1,6 +1,7 @@
 package app.web.service.event;
 
 import app.back.dto.Event;
+import app.serviceprimary.KeycloakUserServiceTest;
 import app.utils.EventUtils;
 import app.utils.UuidUtils;
 import app.web.api.EventServiceApi;
@@ -20,11 +21,13 @@ public class EventServiceParticipantTest {
     private final EventServiceApi service;
     private final EventUtils eventUtils;
     private final UuidUtils uuidUtils;
+    private final KeycloakUserServiceTest keycloakUserServiceTest;
 
-    protected EventServiceParticipantTest(@Autowired EventServiceApi service, @Autowired EventUtils eventUtils, @Autowired UuidUtils uuidUtils) {
+    protected EventServiceParticipantTest(@Autowired EventServiceApi service, @Autowired EventUtils eventUtils, @Autowired UuidUtils uuidUtils, @Autowired KeycloakUserServiceTest keycloakUserServiceTest) {
         this.service = service;
         this.eventUtils = eventUtils;
         this.uuidUtils = uuidUtils;
+        this.keycloakUserServiceTest = keycloakUserServiceTest;
     }
 
     @Test
@@ -33,10 +36,11 @@ public class EventServiceParticipantTest {
         var event = eventUtils.createBasicPojo();
         event = service.save(event);
         var user = uuidUtils.generate();
+        keycloakUserServiceTest.addNewUser(user, "", "");
 
         event = service.addTo(event.getId(), List.of(user));
         Assertions.assertEquals(1, event.getParticipants().size());
-        Assertions.assertEquals(user, event.getParticipants().getFirst());
+        Assertions.assertEquals(user, event.getParticipants().getFirst().getId());
     }
 
     @Test
@@ -46,7 +50,10 @@ public class EventServiceParticipantTest {
         event = service.save(event);
 
         app.web.pojo.PojoEvent finalEvent = event;
-        event = service.addTo(finalEvent.getId(), List.of(uuidUtils.generate()));
+        var userId = uuidUtils.generate();
+        keycloakUserServiceTest.addNewUser(userId, "", "");
+
+        event = service.addTo(finalEvent.getId(), List.of(userId));
         Assertions.assertEquals(1, event.getParticipants().size());
     }
 
@@ -113,7 +120,7 @@ public class EventServiceParticipantTest {
 
         event = service.removeTo(event.getId(), null);
         Assertions.assertEquals(1, event.getParticipants().size());
-        Assertions.assertEquals(user, event.getParticipants().getFirst());
+        Assertions.assertEquals(user, event.getParticipants().getFirst().getId());
     }
 
 }

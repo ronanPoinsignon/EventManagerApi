@@ -2,8 +2,10 @@ package app.utils;
 
 import app.back.dto.TodoEntry;
 import app.back.service.DtoUserAttributesService;
+import app.serviceprimary.KeycloakUserServiceTest;
 import app.web.pojo.LightPojoTodoEntry;
 import app.web.pojo.PojoTodoEntry;
+import app.web.pojo.PojoUser;
 import app.web.transform.TransformMember;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,10 +34,13 @@ public class TodoEntryUtils {
     @Autowired
     @Lazy
     private TransformMember transformMember;
-
+    @Autowired
+    @Lazy
+    private KeycloakUserServiceTest keycloakUserServiceTest;
     @Autowired
     @Lazy
     private UserAttributesUtils discordMemberUtils;
+
     public TodoEntryUtils() {
         playCounter();
     }
@@ -65,17 +70,25 @@ public class TodoEntryUtils {
     public UUID addUser(LightPojoTodoEntry todoEntry) {
         var user = uuidUtils.generate();
         todoEntry.getParticipants().add(user);
+
+        keycloakUserServiceTest.addNewUser(user, "", "");
+
         return user;
     }
 
     public UUID addUser(PojoTodoEntry todoEntry) {
-        var user = uuidUtils.generate();
+        var userId = uuidUtils.generate();
         if(todoEntry.getParticipants() == null) {
             todoEntry.setParticipants(new ArrayList<>());
         }
-        todoEntry.getParticipants().add(user);
 
-        return user;
+        var pojo = new PojoUser();
+        pojo.setId(userId);
+        todoEntry.getParticipants().add(pojo);
+
+        keycloakUserServiceTest.addNewUser(userId, "", "");
+
+        return userId;
     }
 
     public LightPojoTodoEntry createBasicLightTodoEntry() {

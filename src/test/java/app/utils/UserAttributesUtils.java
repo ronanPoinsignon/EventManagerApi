@@ -42,7 +42,7 @@ public class UserAttributesUtils {
     public UserAttributes createBasicEntity() {
         var userAttributes = new UserAttributes();
         userAttributes.setDiscordId(counterStrategy.get());
-        userAttributes.setKeycloakUserId(uuidUtils.generate());
+        userAttributes.setKeycloakUserId(uuidUtils.generate().toString());
 
         return userAttributes;
     }
@@ -50,7 +50,7 @@ public class UserAttributesUtils {
     public PojoUserAttributes createBasicPojo() {
         var userAttributes = new PojoUserAttributes();
         userAttributes.setDiscordId(counterStrategy.get());
-        userAttributes.setKeycloakUserId(uuidUtils.generate());
+        userAttributes.setKeycloakUserId(uuidUtils.generate().toString());
 
         return userAttributes;
     }

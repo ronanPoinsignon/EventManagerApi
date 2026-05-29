@@ -2,9 +2,12 @@ package app.utils;
 
 import app.back.dto.Event;
 import app.back.dto.TodoEntry;
+import app.back.security.UserServiceApi;
 import app.back.service.DtoUserAttributesService;
+import app.serviceprimary.KeycloakUserServiceTest;
 import app.web.pojo.PojoEvent;
 import app.web.pojo.PojoTodoEntry;
+import app.web.pojo.PojoUser;
 import app.web.transform.TransformMember;
 import app.web.transform.TransformTodoEntry;
 import org.junit.jupiter.api.Assertions;
@@ -53,6 +56,14 @@ public class EventUtils {
     @Lazy
     private TodoEntryUtils todoEntryUtils;
 
+    @Autowired
+    @Lazy
+    private UserServiceApi userServiceApi;
+
+    @Autowired
+    @Lazy
+    private KeycloakUserServiceTest keycloakUserServiceTest;
+
     public EventUtils() {
         now = LocalDateTime.now();
         playCounter();
@@ -92,6 +103,7 @@ public class EventUtils {
         event.setTricountUrl("tricount_test_" + counterStrategy.get());
         event.setStartDate(dateStrategy.get().plusDays(counterStrategy.get()));
         event.setEndDate(dateStrategy.get().plusDays(counterStrategy.get()));
+        event.setOwnerUserId(userServiceApi.getUser().getUserId());
 
         return event;
     }
@@ -120,6 +132,8 @@ public class EventUtils {
         }
         event.addParticipant(userId);
 
+        keycloakUserServiceTest.addNewUser(userId, "", "");
+
         return userId;
     }
 
@@ -130,6 +144,7 @@ public class EventUtils {
     private Event createSubEvent(Event parent) {
         var event = new Event();
         event.setEventName("eventName_test_" + counterStrategy.get());
+        event.setOwnerUserId(userServiceApi.getUser().getUserId());
 
         parent.addSubEvent(event);
         return event;
@@ -171,7 +186,11 @@ public class EventUtils {
             event.setParticipants(new ArrayList<>());
         }
 
-        event.getParticipants().add(userId);
+        var pojo = new PojoUser();
+        pojo.setId(userId);
+        event.getParticipants().add(pojo);
+
+        keycloakUserServiceTest.addNewUser(userId, "", "");
 
         return userId;
     }
@@ -214,7 +233,7 @@ public class EventUtils {
             for(int i = 0; i < base.getParticipants().size(); i++) {
                 var participantList = new ArrayList<>(base.getParticipants());
                 var resultParticipantList = new ArrayList<>(result.getParticipants());
-                Assertions.assertEquals(participantList.get(i), resultParticipantList.get(i));
+                Assertions.assertEquals(participantList.get(i), resultParticipantList.get(i).getId());
             }
         }
         if(base.getTodoList() != null) {
@@ -261,7 +280,7 @@ public class EventUtils {
             for(int i = 0; i < base.getParticipants().size(); i++) {
                 var baseParticipantList = new ArrayList<>(base.getParticipants());
                 var resultParticipantList = new ArrayList<>(result.getParticipants());
-                Assertions.assertEquals(baseParticipantList.get(i), resultParticipantList.get(i));
+                Assertions.assertEquals(baseParticipantList.get(i).getId(), resultParticipantList.get(i));
             }
         }
         if(base.getTodoList() != null) {
