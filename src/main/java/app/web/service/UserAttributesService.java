@@ -11,9 +11,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserAttributesService extends AbstractService<UserAttributes, PojoUserAttributes, DtoUserAttributesServiceApi> implements UserAttributesServiceApi {
 
-    private final UserService userService;
+    private final UserServiceApi userService;
 
-    public UserAttributesService(DtoUserAttributesServiceApi service, TransformMember transformMember, UserService userService) {
+    public UserAttributesService(DtoUserAttributesServiceApi service, TransformMember transformMember, UserServiceApi userService) {
         super(service, transformMember);
         this.userService = userService;
     }

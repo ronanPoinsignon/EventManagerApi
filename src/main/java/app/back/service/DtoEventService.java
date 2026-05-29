@@ -5,7 +5,7 @@ import app.back.dto.Event;
 import app.back.exception.BackBadRequestException;
 import app.back.exception.duplicate.event.BackDuplicateEventNameException;
 import app.back.repository.EventRepository;
-import app.back.security.UserService;
+import app.back.security.UserServiceApi;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.stereotype.Service;
@@ -18,9 +18,9 @@ import java.util.Optional;
 @Service
 public class DtoEventService extends DtoAbstractEntityService<Event, @NonNull EventRepository> implements DtoEventServiceApi {
 
-    private final UserService userService;
+    private final UserServiceApi userService;
 
-    protected DtoEventService(@NonNull EventRepository repository, UserService userService) {
+    protected DtoEventService(@NonNull EventRepository repository, UserServiceApi userService) {
         super(repository);
         this.userService = userService;
     }

@@ -1,5 +1,6 @@
 package app.web.transform;
 
+import app.back.api.KeycloakUserServiceApi;
 import app.back.dto.TodoEntry;
 import app.back.service.KeycloakUserService;
 import app.web.pojo.PojoTodoEntry;
@@ -20,7 +21,7 @@ public class TransformTodoEntry extends AbstractTransform<TodoEntry, PojoTodoEnt
 
     @Autowired
     @Lazy
-    private KeycloakUserService keycloakUserService;
+    private KeycloakUserServiceApi keycloakUserService;
 
     @Autowired
     @Lazy

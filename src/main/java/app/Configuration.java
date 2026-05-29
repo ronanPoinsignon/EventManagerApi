@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
 @org.springframework.context.annotation.Configuration
 @ComponentScan
 @EnableJpaRepositories
-@Import({ CacheConfiguration.class, RestTemplateConfiguration.class })
+@Import({ CacheConfiguration.class, RestTemplateConfiguration.class, KeycloakConfiguration.class })
 public class Configuration implements WebMvcConfigurer {
 
     @Bean

@@ -1,7 +1,7 @@
 package app.back.service;
 
 import app.RestTemplateConfiguration;
-import app.back.api.KeycloakServiceApi;
+import app.back.api.KeycloakUserServiceApi;
 import app.back.dto.KeycloakUser;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,7 +22,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
-public class KeycloakUserService implements KeycloakServiceApi {
+public class KeycloakUserService implements KeycloakUserServiceApi {
 
     @Value("${KEYCLOAK_REALM}")
     private String keycloakRealmValue;

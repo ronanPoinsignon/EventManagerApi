@@ -1,6 +1,6 @@
 package app;
 
-import app.back.service.KeycloakUserService;
+import app.back.api.KeycloakUserServiceApi;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,9 +23,9 @@ public class CacheConfiguration {
     private static final int CACHE_DURATION = 5;
     private static final int CACHE_SIZE = 10000;
 
-    private final KeycloakUserService keycloakUserService;
+    private final KeycloakUserServiceApi keycloakUserService;
 
-    public CacheConfiguration(KeycloakUserService keycloakUserService) {
+    public CacheConfiguration(KeycloakUserServiceApi keycloakUserService) {
         this.keycloakUserService = keycloakUserService;
     }
 
