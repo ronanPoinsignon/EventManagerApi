@@ -7,7 +7,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Repository
 public interface UserAttributesRepository extends AbstractEntityRepository<UserAttributes> {
@@ -17,10 +16,10 @@ public interface UserAttributesRepository extends AbstractEntityRepository<UserA
     @NativeQuery("select * from " + EntityTable.USER_ATTRIBUTES + " where id in (?1)")
     List<UserAttributes> findByDiscordId(List<Long> discordId);
 
-    Optional<UserAttributes> findByKeycloakUserId(UUID keycloakUserId);
+    @NativeQuery("select * from " +  EntityTable.USER_ATTRIBUTES + " where keycloak_user_id = ?1")
     Optional<UserAttributes> findByKeycloakUserId(String keycloakUserId);
 
-    @NativeQuery("select * from " +  EntityTable.USER_ATTRIBUTES + " where keycloakUserId in ?1")
+    @NativeQuery("select * from " +  EntityTable.USER_ATTRIBUTES + " where keycloak_user_id in ?1")
     List<UserAttributes> findByKeycloakUserIds(List<String> keycloakUserIds);
 
 }
