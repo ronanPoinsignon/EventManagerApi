@@ -98,7 +98,7 @@ public class DtoEventService extends DtoAbstractEntityService<Event, @NonNull Ev
     @Override
     public List<Event> findAllBeforeEnd(LocalDateTime date) {
         if(date == null) {
-            date = LocalDateTime.now();
+            date = LocalDateTime.of(LocalDate.now(), LocalTime.of(23, 59, 59));
         }
         return repository.findAllBeforeEnd(date);
     }
