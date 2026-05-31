@@ -97,8 +97,6 @@ public class KeycloakUserService implements KeycloakUserServiceApi {
     @Override
     public LinkedHashMap<String, String> impersonate(String keycloakUserId) {
         var url = getRealmURL() + "/protocol/openid-connect/token";
-        System.out.println("url");
-        System.out.println(url);
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "urn:ietf:params:oauth:grant-type:token-exchange");
         body.add("client_id", clientId);
