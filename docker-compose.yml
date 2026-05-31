@@ -37,7 +37,7 @@ services:
     ports:
       - ${KEYCLOAK_PORT}:8080
     volumes:
-      - keycloak_data:/opt/keycloak/data
+      - keycloak-data:/opt/keycloak/data
       - ./keycloak-realm.json:/opt/keycloak/data/import/keycloak-realm.json
     healthcheck:
       test: ["CMD", "/opt/keycloak/bin/kcadm.sh", "get", "realms/master", "--server", "http://localhost:8080"]
@@ -87,7 +87,9 @@ services:
 
 volumes:
   mysql-data:
-  keycloak_data:
+    name: event-organizer-mysql-data
+  keycloak-data:
+    name: event-organizer-keycloak-data
 networks:
   pladonf_api:
     driver: bridge
