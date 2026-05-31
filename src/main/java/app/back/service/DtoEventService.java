@@ -68,7 +68,6 @@ public class DtoEventService extends DtoAbstractEntityService<Event, @NonNull Ev
         dbEntity.setTricountUrl(entityToSave.getTricountUrl());
         dbEntity.setStartDate(entityToSave.getStartDate());
         dbEntity.setEndDate(entityToSave.getEndDate());
-        dbEntity.setOwnerUserId(entityToSave.getOwnerUserId());
         if(entityToSave.shouldUpdateSubEvents()) {
             dbEntity.setSubEvents(entityToSave.getSubEvents());
         }
