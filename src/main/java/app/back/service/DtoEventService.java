@@ -11,7 +11,9 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -103,7 +105,40 @@ public class DtoEventService extends DtoAbstractEntityService<Event, @NonNull Ev
     }
 
     @Override
+    public List<Event> findAll() {
+        return repository.findAll();
+    }
+
+    @Override
     public Optional<Event> getLast() {
         return repository.getLast();
+    }
+
+    @Override
+    public Optional<Event> findEventFromTodoId(long todoId) {
+        return repository.findEventFromTodoId(todoId);
+    }
+
+    @Override
+    public Optional<Event> findAndDelete(Long id) {
+        if(id == null) {
+            return Optional.empty();
+        }
+
+        var resultOptional = repository.findById(id);
+        if(resultOptional.isEmpty()) {
+            return Optional.empty();
+        }
+
+        var event = resultOptional.get();
+        var parentEvent = event.getParentEvent();
+        if(parentEvent == null) {
+            this.delete(event);
+            return Optional.of(event);
+        }
+
+        parentEvent.removeSubEvent(event);
+        this.save(parentEvent);
+        return Optional.of(event);
     }
 }

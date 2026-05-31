@@ -34,10 +34,33 @@ public class EventService extends AbstractService<Event, PojoEvent, DtoEventServ
 
     @Transactional
     @Override
+    public PojoEvent discordSave(PojoEvent event, String parentEventName) {
+        var eventName = event.getEventName();
+        if(parentEventName != null) {
+            getService().findByEventName(parentEventName, eventName).ifPresent(evt -> event.setId(evt.getId()));
+        } else {
+            getService().findByEventName(eventName).ifPresent(evt -> event.setId(evt.getId()));
+        }
+        return this.save(event);
+    }
+
+    @Transactional
+    @Override
     public PojoEvent findByEventName(String name) {
         var result =  getService().findByEventName(name)
                 .orElseThrow(() -> new NotFoundException("Aucun événement trouvé pour le nom " + name + "."));
         return getTransform().toPojo(result);
+    }
+
+    @Override
+    public PojoEvent findByEventName(String parentName, String name) {
+        if(parentName == null) {
+            return this.findByEventName(name);
+        }
+
+        var event = getService().findByEventName(parentName, name)
+                .orElseThrow(() -> new NotFoundException("Aucun programme trouvé pour le nom " + name + "."));
+        return getTransform().toPojo(event);
     }
 
     @Override
@@ -47,13 +70,7 @@ public class EventService extends AbstractService<Event, PojoEvent, DtoEventServ
             throw new BadRequestException("Aucun événement donné.");
         }
 
-        var parentEvent = getService().findById(parentEventId).orElseThrow(() -> new NotFoundException("Aucun parent trouvé."));
-        var dtoEvent = getTransform().toDto(event);
-        parentEvent.addSubEvent(dtoEvent);
-        getService().save(dtoEvent);
-
-        parentEvent = getService().save(parentEvent);
-        return getTransform().toPojo(parentEvent);
+        return addSubEvent(eventSupplierById(parentEventId), event);
     }
 
     @Override
@@ -63,7 +80,26 @@ public class EventService extends AbstractService<Event, PojoEvent, DtoEventServ
             throw new BadRequestException("le nom du sous événement ne peut être null.");
         }
 
-        var event = getService().findById(parentEventId).orElseThrow(() -> new NotFoundException("Aucun événement trouvé."));
+        return removeSubEvent(eventSupplierById(parentEventId), subEventName);
+    }
+
+    private PojoEvent addSubEvent(Supplier<Optional<Event>> eventSupplier, PojoEvent event) {
+        var parentEvent = eventSupplier.get().orElseThrow(() -> new NotFoundException("Aucun parent trouvé."));
+        var dtoEvent = getTransform().toDto(event);
+        parentEvent.addSubEvent(dtoEvent);
+        getService().save(dtoEvent);
+        dtoEvent.setParticipants(parentEvent.getParticipants());
+
+        parentEvent = getService().save(parentEvent);
+        return getTransform().toPojo(parentEvent);
+    }
+
+    public PojoEvent removeSubEvent(Supplier<Optional<Event>> eventSupplier, String subEventName) {
+        if(subEventName == null || subEventName.isBlank()) {
+            throw new BadRequestException("le nom du sous événement ne peut être null.");
+        }
+
+        var event = eventSupplier.get().orElseThrow(() -> new NotFoundException("Aucun événement trouvé."));
         var subEvent = event.getSubEvents().stream().filter(subevent -> subevent.getEventName().equals(subEventName)).findFirst().orElseThrow(() -> new NotFoundException("Aucun sous événement trouvé pour ce nom"));
         event.removeSubEvent(subEvent);
         getService().delete(subEvent.getId());
@@ -75,6 +111,11 @@ public class EventService extends AbstractService<Event, PojoEvent, DtoEventServ
     @Override
     public List<PojoEvent> findAllBeforeEnd(LocalDateTime date) {
         return getService().findAllBeforeEnd(date).stream().map(getTransform()::toPojo).toList();
+    }
+
+    @Override
+    public List<PojoEvent> findAll() {
+        return getService().findAll().stream().map(getTransform()::toPojo).toList();
     }
 
     @Transactional
@@ -109,16 +150,12 @@ public class EventService extends AbstractService<Event, PojoEvent, DtoEventServ
 
     @Transactional
     @Override
-    public PojoEvent addTodo(long eventId, LightPojoTodoEntry lightPojoTodoEntry) {
+    public PojoEvent addTodo(long eventId, LightPojoTodoEntry lightPojoTodoEntry, List<UUID> userIds, boolean isDone) {
         if(lightPojoTodoEntry == null) {
             throw new BadRequestException("Document d'information manquant.");
         }
 
-        var event = getService().findById(eventId).orElseThrow(() -> new NotFoundException("Aucun événement trouvé."));
-        event.addTodo(lightPojoTodoEntry.getName(), lightPojoTodoEntry.getTodo(), lightPojoTodoEntry.getParticipants());
-
-        var result = getService().save(event);
-        return getTransform().toPojo(result);
+        return addTodo(eventSupplierById(eventId), lightPojoTodoEntry, userIds, isDone);
     }
 
     @Transactional
@@ -128,7 +165,29 @@ public class EventService extends AbstractService<Event, PojoEvent, DtoEventServ
             throw new BadRequestException("Le nom est obligatoire.");
         }
 
-        var event = getService().findById(eventId).orElseThrow(() -> new NotFoundException("Aucun événement trouvé."));
+        return removeTodo(() -> getService().findById(eventId), name);
+    }
+
+    private PojoEvent addTodo(Supplier<Optional<Event>> eventSupplier, LightPojoTodoEntry lightPojoTodoEntry, List<UUID> userIds, boolean isDone) {
+        if(lightPojoTodoEntry == null) {
+            throw new BadRequestException("Document d'information manquant.");
+        }
+
+        var event = eventSupplier.get().orElseThrow(() -> new NotFoundException("Aucun événement trouvé."));
+        var todo = event.addTodo(lightPojoTodoEntry.getName(), lightPojoTodoEntry.getTodo(), lightPojoTodoEntry.getParticipants());
+        todo.setUserIdSet(userIds);
+        todo.setDone(isDone);
+
+        var result = getService().save(event);
+        return getTransform().toPojo(result);
+    }
+
+    private PojoEvent removeTodo(Supplier<Optional<Event>> eventSupplier, String name) {
+        if(name == null || name.isBlank()) {
+            throw new BadRequestException("Le nom est obligatoire.");
+        }
+
+        var event = eventSupplier.get().orElseThrow(() -> new NotFoundException("Aucun événement trouvé."));
         var result = event.removeTodo(name);
         if(!result) {
             return getTransform().toPojo(event);
@@ -140,18 +199,18 @@ public class EventService extends AbstractService<Event, PojoEvent, DtoEventServ
     @Transactional
     @Override
     public PojoEvent addTodoUsers(long eventId, String todoName, List<UUID> userIds) {
-        return manageTodoMember(eventId, todoName, userIds, TodoEntry::addUserIds);
+        return manageTodoMember(eventSupplierById(eventId), todoName, userIds, TodoEntry::addUserIds);
     }
 
     @Transactional
     @Override
     public PojoEvent removeTodoUsers(long eventId, String todoName, List<UUID> userIds) {
-        return manageTodoMember(eventId, todoName, userIds, TodoEntry::removeUserIds);
+        return manageTodoMember(eventSupplierById(eventId), todoName, userIds, TodoEntry::removeUserIds);
     }
 
     @Transactional
-    private <T> PojoEvent manageTodoMember(long eventId, String todoName, T userList, BiFunction<TodoEntry, T, Boolean> memberFunction) {
-        return updateTodoInfo(eventId, todoName, todo -> memberFunction.apply(todo, userList));
+    private <T> PojoEvent manageTodoMember(Supplier<Optional<Event>> eventSupplier, String todoName, T userList, BiFunction<TodoEntry, T, Boolean> memberFunction) {
+        return updateTodoInfo(eventSupplier, todoName, todo -> memberFunction.apply(todo, userList));
     }
 
     @Transactional
@@ -162,19 +221,21 @@ public class EventService extends AbstractService<Event, PojoEvent, DtoEventServ
                 .orElse(null);
     }
 
+    @Transactional
     @Override
-    public PojoEvent addDiscordTo(String eventName, String parentName, List<Long> userIds) {
-        return manageParticipants(supplyEvent(eventName, parentName), findAllKeycloakUserIds(userIds), Event::addParticipants);
+    public PojoEvent setParticipant(long eventId, List<UUID> userIds) {
+        return manageParticipants(eventSupplierById(eventId), userIds, Event::setParticipants);
     }
 
     @Override
-    public PojoEvent removeDiscordTo(String eventName, String parentName, List<Long> userIds) {
-        return manageParticipants(supplyEvent(eventName, parentName), findAllKeycloakUserIds(userIds), Event::removeParticipants);
+    public PojoEvent findEventFromTodoId(long todoId) {
+        var event = getService().findEventFromTodoId(todoId).orElseThrow(() -> new NotFoundException("Aucun événement rattaché au todo d'id " + todoId + "."));
+        return getTransform().toPojo(event);
     }
 
     private Supplier<Optional<Event>> supplyEvent(String eventName, String parentName) {
         return parentName != null ?
-                () -> getService().findByEventName(eventName, parentName) :
+                () -> getService().findByEventName(parentName, eventName) :
                 () -> getService().findByEventName(eventName);
     }
 
@@ -218,15 +279,23 @@ public class EventService extends AbstractService<Event, PojoEvent, DtoEventServ
     @Transactional
     @Override
     public PojoEvent updateTodoStatus(long eventId, String todoName, boolean isDone) {
-        return updateTodoInfo(eventId, todoName, todo -> todo.setDone(isDone));
+        return updateTodoInfo(eventSupplierById(eventId), todoName, todo -> todo.setDone(isDone));
     }
 
-    private PojoEvent updateTodoInfo(long eventId, String todoName, Function<TodoEntry, Boolean> todoFunction) {
+    private Supplier<Optional<Event>> eventSupplierById(long eventId) {
+        return () -> getService().findById(eventId);
+    }
+
+    private Supplier<Optional<Event>> eventSupplierByName(String eventName, String parentName) {
+        return parentName != null ? () -> this.getService().findByEventName(parentName, eventName) : () -> this.getService().findByEventName(eventName);
+    }
+
+    private PojoEvent updateTodoInfo(Supplier<Optional<Event>> eventSupplier, String todoName, Function<TodoEntry, Boolean> todoFunction) {
         if(todoName == null || todoName.isBlank()) {
             throw new BadRequestException("Le nom est obligatoire.");
         }
 
-        var event = getService().findById(eventId).orElseThrow(() -> new NotFoundException("Aucun événement trouvé."));
+        var event = eventSupplier.get().orElseThrow(() -> new NotFoundException("Aucun événement trouvé."));
         var todo = event.findTodoEntryByName(todoName);
         if(todo == null) {
             throw new NotFoundException("Aucun todo enregistré avec ce nom pour l'événement " + event.getEventName() + ".");

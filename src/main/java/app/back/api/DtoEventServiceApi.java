@@ -16,6 +16,9 @@ public interface DtoEventServiceApi extends AbstractDtoServiceApi<Event> {
 
     List<Event> findAllBeforeEnd(LocalDateTime date);
 
+    List<Event> findAll();
+
     Optional<Event> getLast();
 
+    Optional<Event> findEventFromTodoId(long todoId);
 }

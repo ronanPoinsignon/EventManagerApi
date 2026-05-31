@@ -9,9 +9,15 @@ import java.util.UUID;
 
 public interface EventServiceApi extends AbstractServiceApi<PojoEvent> {
 
+    PojoEvent discordSave(PojoEvent event, String parentEventName);
+
     PojoEvent findByEventName(String name);
 
+    PojoEvent findByEventName(String parentName, String name);
+
     List<PojoEvent> findAllBeforeEnd(LocalDateTime date);
+
+    List<PojoEvent> findAll();
 
     PojoEvent getLast();
 
@@ -23,7 +29,7 @@ public interface EventServiceApi extends AbstractServiceApi<PojoEvent> {
 
     PojoEvent removeTo(long eventId, List<UUID> userIdList);
 
-    PojoEvent addTodo(long eventId, LightPojoTodoEntry lightPojoTodoEntry);
+    PojoEvent addTodo(long eventId, LightPojoTodoEntry lightPojoTodoEntry, List<UUID> userIds, boolean isDone);
 
     PojoEvent removeTodo(long eventId, String name);
 
@@ -35,7 +41,7 @@ public interface EventServiceApi extends AbstractServiceApi<PojoEvent> {
 
     PojoEvent delete(long eventId);
 
-    PojoEvent addDiscordTo(String eventName, String parentName, List<Long> userIds);
+    PojoEvent setParticipant(long eventId, List<UUID> userIds);
 
-    PojoEvent removeDiscordTo(String eventName, String parentName, List<Long> userIds);
+    PojoEvent findEventFromTodoId(long todoId);
 }

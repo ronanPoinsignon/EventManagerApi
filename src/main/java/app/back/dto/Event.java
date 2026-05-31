@@ -202,17 +202,20 @@ public class Event extends AbstractEntity {
         return result;
     }
 
-    public void setParticipants(Collection<UUID> userIdCollection) {
+    public boolean setParticipants(Collection<UUID> userIdCollection) {
+        var shouldChange = false;
         if(userIdCollection == null || userIdCollection.isEmpty()) {
-            shouldUpdateParticipants = !this.participants.isEmpty();
+            shouldChange = !this.participants.isEmpty();
+            shouldUpdateParticipants = shouldChange;
             this.participants.clear();
-            return;
+            return shouldChange;
         }
 
         var temp = new ArrayList<>(userIdCollection);
         this.participants.clear();
         this.participants.addAll(temp);
         shouldUpdateParticipants = true;
+        return true;
     }
 
     public boolean shouldUpdateSubEvents() {

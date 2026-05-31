@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -44,7 +45,7 @@ public class EventServiceTodoTest {
         var event = eventUtils.createBasicPojo();
         event = service.save(event);
         var todo = todoEntryUtils.createFullLightTodoEntry();
-        event = service.addTodo(event.getId(), todo);
+        event = service.addTodo(event.getId(), todo, new ArrayList<>(), false);
 
         Assertions.assertEquals(1, event.getTodoList().size());
         Assertions.assertEquals(event, event.getTodoList().getFirst().getEvent());
@@ -59,14 +60,14 @@ public class EventServiceTodoTest {
         var event = eventUtils.createBasicPojo();
         event = service.save(event);
         app.web.pojo.PojoEvent finalEvent = event;
-        Assertions.assertThrows(BadRequestException.class, () -> service.addTodo(finalEvent.getId(), null));
+        Assertions.assertThrows(BadRequestException.class, () -> service.addTodo(finalEvent.getId(), null, new ArrayList<>(), false));
         Assertions.assertTrue(event.getTodoList().isEmpty());
     }
 
     @Test
     @Order(3)
     void testAddTodoEventNotFound() {
-        Assertions.assertThrows(NotFoundException.class, () -> service.addTodo(2L, todoEntryUtils.createBasicLightTodoEntry()));
+        Assertions.assertThrows(NotFoundException.class, () -> service.addTodo(2L, todoEntryUtils.createBasicLightTodoEntry(), new ArrayList<>(), false));
     }
 
     @Test
@@ -78,7 +79,7 @@ public class EventServiceTodoTest {
         todo.getParticipants().add(uuidUtils.generate());
 
         app.web.pojo.PojoEvent finalEvent = event;
-        event = service.addTodo(finalEvent.getId(), todo);
+        event = service.addTodo(finalEvent.getId(), todo, new ArrayList<>(), false);
 
         Assertions.assertEquals(1, event.getTodoList().size());
     }
