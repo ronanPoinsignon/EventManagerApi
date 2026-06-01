@@ -6,6 +6,8 @@ services:
       dockerfile: Dockerfile.java
     ports:
       - ${SPRING_PORT}:8000
+    volumes:
+      - app-data:/var/lib/data
     depends_on:
       mysqldb:
         condition: service_healthy
@@ -86,6 +88,8 @@ services:
       - pladonf_auth
 
 volumes:
+  app-data:
+    name: event-organizer-app-data
   mysql-data:
     name: event-organizer-mysql-data
   keycloak-data:

@@ -1,2 +1,4 @@
 keycloak:
   server-url: http://localhost:${KEYCLOAK_PORT}
+storage:
+  path: D:\eventOrganizerFiles

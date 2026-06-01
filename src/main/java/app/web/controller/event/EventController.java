@@ -2,7 +2,9 @@ package app.web.controller.event;
 
 import app.web.api.EventServiceApi;
 import app.web.pojo.PojoEvent;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -56,6 +58,17 @@ public class EventController {
     @DeleteMapping("/delete")
     public PojoEvent delete(@RequestParam("eventId") long eventId) {
         return eventService.delete(eventId);
+    }
+
+    @PostMapping("/uploadEventFile")
+    public InputStreamResource uploadEventFile(@RequestParam("eventId") long eventId,
+                                       @RequestParam("eventFile") MultipartFile eventFile) {
+        return eventService.uploadEventImageFile(eventId, eventFile);
+    }
+
+    @GetMapping("/downloadImage")
+    public InputStreamResource downloadImage(@RequestParam("eventId") long eventId) {
+        return eventService.downloadEventImageFile(eventId);
     }
 
 }

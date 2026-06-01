@@ -2,6 +2,8 @@ package app.web.api;
 
 import app.web.pojo.LightPojoTodoEntry;
 import app.web.pojo.PojoEvent;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -44,4 +46,8 @@ public interface EventServiceApi extends AbstractServiceApi<PojoEvent> {
     PojoEvent setParticipant(long eventId, List<UUID> userIds);
 
     PojoEvent findEventFromTodoId(long todoId);
+
+    InputStreamResource uploadEventImageFile(long eventId, MultipartFile eventFile);
+
+    InputStreamResource downloadEventImageFile(long eventId);
 }

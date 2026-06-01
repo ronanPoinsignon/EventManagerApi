@@ -3,18 +3,19 @@ package app.web.service;
 import app.back.api.DtoEventServiceApi;
 import app.back.dto.Event;
 import app.back.dto.TodoEntry;
+import app.utils.FileService;
 import app.web.api.EventServiceApi;
 import app.web.exception.BadRequestException;
 import app.web.exception.NotFoundException;
 import app.web.pojo.LightPojoTodoEntry;
 import app.web.pojo.PojoEvent;
-import app.web.pojo.PojoUserAttributes;
 import app.web.transform.TransformEvent;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -26,10 +27,12 @@ import java.util.function.Supplier;
 public class EventService extends AbstractService<Event, PojoEvent, DtoEventServiceApi> implements EventServiceApi {
 
     private final UserAttributesService userAttributesService;
+    private final FileService fileService;
 
-    public EventService(DtoEventServiceApi eventService, TransformEvent transformEvent, UserAttributesService userAttributesService) {
+    public EventService(DtoEventServiceApi eventService, TransformEvent transformEvent, UserAttributesService userAttributesService, FileService fileService) {
         super(eventService, transformEvent);
         this.userAttributesService = userAttributesService;
+        this.fileService = fileService;
     }
 
     @Transactional
@@ -233,47 +236,24 @@ public class EventService extends AbstractService<Event, PojoEvent, DtoEventServ
         return getTransform().toPojo(event);
     }
 
-    private Supplier<Optional<Event>> supplyEvent(String eventName, String parentName) {
-        return parentName != null ?
-                () -> getService().findByEventName(parentName, eventName) :
-                () -> getService().findByEventName(eventName);
+    @Override
+    public InputStreamResource uploadEventImageFile(long eventId, MultipartFile eventFile) {
+        if (eventFile.getContentType() == null || !eventFile.getContentType().equals("image/png")) {
+            throw new BadRequestException("Seuls les PNG sont autorisés.");
+        }
+
+        var result =  fileService.storeFile("/events", eventFile, eventId + ".png");
+        return new InputStreamResource(result);
     }
 
-    /**
-     *
-     * @param discordUserIdList
-     * @throws NotFoundException Si certains utilisateurs n'ont pas été trouvés, une {@link NotFoundException} est levée indiquant quels utilisateurs n'ont pas été récupérés.
-     * @return
-     */
-    private List<UUID> findAllKeycloakUserIds(List<Long> discordUserIdList) throws NotFoundException {
-        if(discordUserIdList == null) {
-            discordUserIdList = new ArrayList<>();
-        }
-        var result = this.findKeycloakUserIds(discordUserIdList);
-
-        if(result.size() != discordUserIdList.size()) {
-            var newDiscordMemberIds = new ArrayList<>(discordUserIdList);
-            for(int i = 0; i < discordUserIdList.size(); i++) {
-                if(result.get(i) == null) {
-                    newDiscordMemberIds.remove(discordUserIdList.get(i));
-                }
-            }
-            throw new NotFoundException("les ids de membres suivants n'ont pas été trouvé : " + newDiscordMemberIds + ".");
+    @Override
+    public InputStreamResource downloadEventImageFile(long eventId) {
+        var fileInputStream = fileService.getFileInputStream("/events", eventId + ".png");
+        if(fileInputStream == null) {
+            return null;
         }
 
-        return result;
-    }
-
-    private List<UUID> findKeycloakUserIds(List<Long> discordUserIdList) {
-        if(discordUserIdList == null || discordUserIdList.isEmpty()) {
-            return new ArrayList<>();
-        }
-
-        return discordUserIdList.stream()
-                .map(userAttributesService::findByDiscordId)
-                .map(PojoUserAttributes::getKeycloakUserId)
-                .map(UUID::fromString)
-                .toList();
+        return new InputStreamResource(fileInputStream);
     }
 
     @Transactional

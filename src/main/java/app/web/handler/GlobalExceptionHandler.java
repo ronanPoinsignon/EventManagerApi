@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.net.URI;
@@ -32,7 +33,7 @@ public class GlobalExceptionHandler {
         problem.setInstance(URI.create(request.getRequest().getRequestURI()));
 
         Map<String, Object> error = Map.of(
-                "message", ex.getMessage()
+                "message", "Une erreur est survenue."
         );
         problem.setProperty("error", error);
 
@@ -143,6 +144,21 @@ public class GlobalExceptionHandler {
 
         Map<String, Object> error = Map.of(
                 "message", message
+        );
+        problem.setProperty("error", error);
+
+        return problem;
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ProblemDetail handleMaxUploadSizeExceededException(MaxUploadSizeExceededException ex, ServletWebRequest request) {
+        ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+
+        problem.setTitle(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
+        problem.setInstance(URI.create(request.getRequest().getRequestURI()));
+
+        Map<String, Object> error = Map.of(
+                "message", "La taille du fichier dépasse la limite autorisée."
         );
         problem.setProperty("error", error);
 
