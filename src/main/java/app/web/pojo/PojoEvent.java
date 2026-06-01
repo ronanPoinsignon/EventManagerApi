@@ -16,7 +16,7 @@ public class PojoEvent extends PojoEntity {
     private LocalDateTime endDate;
     private String location;
     private List<PojoEvent> subEvents;
-    @JsonIgnoreProperties("subEvents")
+    @JsonIgnoreProperties(value = "subEvents", allowSetters = true)
     private PojoEvent parentEvent;
     private List<PojoUser> participants;
     private List<PojoTodoEntry> todoList;
