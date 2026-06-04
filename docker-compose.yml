@@ -1,5 +1,5 @@
 services:
-  app:
+  backend-api:
     container_name: back_end_pladonf
     build:
       context: .
@@ -96,6 +96,6 @@ volumes:
     name: event-organizer-keycloak-data
 networks:
   pladonf_api:
-    driver: bridge
+    name: pladonf_api
   pladonf_auth:
-    driver: bridge
+    name: pladonf_auth
