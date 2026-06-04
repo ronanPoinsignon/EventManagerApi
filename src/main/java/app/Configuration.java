@@ -1,6 +1,8 @@
 package app;
 
+import app.web.converter.StringToInstantConverter;
 import app.web.converter.StringToLocalDateTimeConverter;
+import app.web.deserializer.InstantDeserializer;
 import app.web.deserializer.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.context.annotation.Bean;
@@ -15,6 +17,7 @@ import tools.jackson.databind.SerializationFeature;
 import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.databind.module.SimpleModule;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 @org.springframework.context.annotation.Configuration
@@ -29,6 +32,7 @@ public class Configuration implements WebMvcConfigurer {
 
         var timeModule = new SimpleModule();
         timeModule.addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer());
+        timeModule.addDeserializer(Instant.class, new InstantDeserializer());
 
         builder.changeDefaultPropertyInclusion(include -> include.withValueInclusion(JsonInclude.Include.NON_NULL))
                 .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
@@ -53,6 +57,7 @@ public class Configuration implements WebMvcConfigurer {
     @Override
     public void addFormatters(FormatterRegistry registry) {
         registry.addConverter(new StringToLocalDateTimeConverter());
+        registry.addConverter(new StringToInstantConverter());
     }
 
 }

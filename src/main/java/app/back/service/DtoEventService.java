@@ -52,6 +52,9 @@ public class DtoEventService extends DtoAbstractEntityService<Event, @NonNull Ev
                 throw new BackDuplicateEventNameException("Un événement de nom " + entity.getEventName() + " est déjà existant.");
             }
         }
+        if(entity.getEndDate() != null && entity.getStartDate().isAfter(entity.getEndDate())) {
+            throw new BackBadRequestException("La date de fin d'événement est antérieure à sa date de début.");
+        }
 
         if(entity.getId() == null) {
             var user = userService.getUser();
