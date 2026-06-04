@@ -1,6 +1,7 @@
 package app.utils;
 
 import app.back.exception.BackInternalException;
+import app.back.exception.BackNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -55,7 +56,7 @@ public class FileService {
         var filePath = storagePath + folderName + "/" + fileName;
         Path path = Paths.get(filePath);
         if(!Files.exists(path)) {
-            return null;
+            throw new BackNotFoundException("Aucune image trouvée.");
         }
 
         try {
