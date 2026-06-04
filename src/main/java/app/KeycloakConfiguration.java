@@ -17,8 +17,8 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 public class KeycloakConfiguration {
 
-    @Value("${KEYCLOAK_PORT}")
-    private String keycloakPort;
+    @Value("${keycloak.internal-server-url}")
+    private String keycloakInternalUrl;
     @Value("${KEYCLOAK_REALM}")
     private String keycloakRealmValue;
 
@@ -42,7 +42,7 @@ public class KeycloakConfiguration {
 
     @Bean
     public JwtDecoder jwtDecoder() {
-        return NimbusJwtDecoder.withJwkSetUri("http://localhost:" + keycloakPort + "/realms/" + keycloakRealmValue + "/protocol/openid-connect/certs").build();
+        return NimbusJwtDecoder.withJwkSetUri(keycloakInternalUrl + "/realms/" + keycloakRealmValue + "/protocol/openid-connect/certs").build();
     }
 
 }

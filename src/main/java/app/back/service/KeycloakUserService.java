@@ -22,43 +22,18 @@ public class KeycloakUserService implements KeycloakUserServiceApi {
     @Value("${KEYCLOAK_REALM}")
     private String keycloakRealmValue;
 
-    @Value("${keycloak.server-url}")
-    private String keycloakBaseUrl;
+    @Value("${keycloak.internal-server-url}")
+    private String keycloakInternalBaseUrl;
 
     @Value("${KEYCLOAK_CLIENT_ID}")
     private String clientId;
     @Value("${KEYCLOAK_CLIENT_SECRET}")
     private String clientSecret;
 
-    @Value("${KEYCLOAK_USER}")
-    private String keycloakAdminUser;
-    @Value("${KEYCLOAK_PASSWORD}")
-    private String keycloakAdminPassword;
-
     private final RestTemplateConfiguration.WebRequester webRequester;
 
     public KeycloakUserService(RestTemplateConfiguration.WebRequester webRequester) {
         this.webRequester = webRequester;
-    }
-
-    private String getAdminToken() {
-        var url = getBaseURL() + "/realms/master/protocol/openid-connect/token";
-        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
-        body.add("username", keycloakAdminUser);
-        body.add("password", keycloakAdminPassword);
-        body.add("grant_type", "password");
-        body.add("client_id", "admin-cli");
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-
-        HttpEntity<MultiValueMap<String, String>> request =
-                new HttpEntity<>(body, headers);
-
-        var response = webRequester.post(url, request, new ParameterizedTypeReference<Map<String, String>>() {
-        });
-
-        return response.get("access_token");
     }
 
     private String getToken() {
@@ -128,7 +103,8 @@ public class KeycloakUserService implements KeycloakUserServiceApi {
     }
 
     private String getBaseURL() {
-        return keycloakBaseUrl;
+        System.out.println("BASE URL : " + keycloakInternalBaseUrl);
+        return keycloakInternalBaseUrl;
     }
 
     private String getRealmURL() {

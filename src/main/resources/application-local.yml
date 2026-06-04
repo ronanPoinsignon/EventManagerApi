@@ -1,4 +1,5 @@
 keycloak:
-  server-url: http://localhost:${KEYCLOAK_PORT}
+  internal-server-url: http://localhost:${KEYCLOAK_PORT}
+  external-server-url: http://localhost:${KEYCLOAK_PORT}
 storage:
   path: D:\eventOrganizerFiles
