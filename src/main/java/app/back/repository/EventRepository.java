@@ -6,7 +6,7 @@ import app.back.entityname.EntityTable;
 import org.springframework.data.jpa.repository.NativeQuery;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,7 +23,7 @@ public interface EventRepository extends AbstractEntityRepository<Event> {
     Optional<Event> findByEventName(String parentName, String eventName);
 
     @NativeQuery("select * from " + EntityTable.EVENT + " where ((end_date is null AND start_date >= DATE_SUB(?1, INTERVAL 1 DAY)) OR end_date >= ?1) and parent_event_id is null")
-    List<Event> findAllBeforeEnd(LocalDateTime date);
+    List<Event> findAllBeforeEnd(Instant date);
 
     @NativeQuery("select * from " + EntityTable.EVENT + " where parent_event_id is null order by creation_date desc limit 1")
     Optional<Event> getLast();

@@ -11,9 +11,7 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -97,9 +95,9 @@ public class DtoEventService extends DtoAbstractEntityService<Event, @NonNull Ev
     }
 
     @Override
-    public List<Event> findAllBeforeEnd(LocalDateTime date) {
+    public List<Event> findAllBeforeEnd(Instant date) {
         if(date == null) {
-            date = LocalDateTime.of(LocalDate.now(), LocalTime.of(23, 59, 59));
+            date =  LocalDateTime.of(LocalDate.now(), LocalTime.of(23, 59, 59)).toInstant(ZoneOffset.UTC);
         }
         return repository.findAllBeforeEnd(date);
     }

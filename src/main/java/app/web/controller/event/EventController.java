@@ -6,7 +6,7 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
 @RestController
@@ -41,7 +41,7 @@ public class EventController {
     }
 
     @GetMapping("/findActive")
-    public List<PojoEvent> findAllBeforeEnd(@RequestParam(name = "date", required = false) LocalDateTime date) {
+    public List<PojoEvent> findAllBeforeEnd(@RequestParam(name = "date", required = false) Instant date) {
         return eventService.findAllBeforeEnd(date);
     }
 

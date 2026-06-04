@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -112,7 +112,7 @@ public class EventService extends AbstractService<Event, PojoEvent, DtoEventServ
 
     @Transactional
     @Override
-    public List<PojoEvent> findAllBeforeEnd(LocalDateTime date) {
+    public List<PojoEvent> findAllBeforeEnd(Instant date) {
         return getService().findAllBeforeEnd(date).stream().map(getTransform()::toPojo).toList();
     }
 

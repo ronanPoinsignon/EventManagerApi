@@ -35,19 +35,23 @@ public class StringToLocalDateTimeConverter implements StringConverter<LocalDate
                     .append(basicFormat)
                     .appendLiteral('T')
                     .append(DateTimeFormatter.ISO_LOCAL_TIME);
-            var zPattern = new DateTimeFormatterBuilder()
+            var nanoPattern = new DateTimeFormatterBuilder()
                     .append(basicFormat)
                     .appendLiteral('T')
                     .appendValue(HOUR_OF_DAY, 2)
                     .appendLiteral(':')
                     .appendValue(MINUTE_OF_HOUR, 2)
                     .optionalStart()
-                    .appendLiteral(':')
-                    .appendValue(SECOND_OF_MINUTE, 2)
-                    .optionalStart()
-                    .appendFraction(NANO_OF_SECOND, 0, 9, true)
+                        .appendLiteral(':')
+                        .appendValue(SECOND_OF_MINUTE, 2)
+                        .optionalStart()
+                            .appendFraction(NANO_OF_SECOND, 0, 9, true)
+                        .optionalEnd()
+                    .optionalEnd();
+            var zPattern = nanoPattern
                     .appendLiteral('Z');
             formatters.add(zPattern.toFormatter());
+            formatters.add(nanoPattern.toFormatter());
             formatters.add(pattern.toFormatter());
             formatters.add(DateTimeFormatter.ofPattern(format));
         }
@@ -71,7 +75,7 @@ public class StringToLocalDateTimeConverter implements StringConverter<LocalDate
             return parse(date);
         }
 
-        throw new BadRequestException("Aucun format de date correspondant.");
+        throw new BadRequestException("Aucun format de date correspondant pour " + source + ".");
     }
 
     private TemporalAccessor checkIfPatternMatches(String value, DateTimeFormatter pattern) {
@@ -86,7 +90,7 @@ public class StringToLocalDateTimeConverter implements StringConverter<LocalDate
     }
 
     private LocalDateTime parse(TemporalAccessor temporalAccessor) {
-        var milli = getTemporalAccessor(temporalAccessor, ChronoField.MILLI_OF_SECOND);
+        var nano = getTemporalAccessor(temporalAccessor, NANO_OF_SECOND);
         var second = getTemporalAccessor(temporalAccessor, ChronoField.SECOND_OF_MINUTE);
         var minute = getTemporalAccessor(temporalAccessor, ChronoField.MINUTE_OF_HOUR);
         var hour = getTemporalAccessor(temporalAccessor, ChronoField.HOUR_OF_DAY);
@@ -98,7 +102,7 @@ public class StringToLocalDateTimeConverter implements StringConverter<LocalDate
         }
 
         try {
-            return LocalDateTime.of(year, month, day, hour, minute, second, milli);
+            return LocalDateTime.of(year, month, day, hour, minute, second, nano);
         } catch(DateTimeException e) {
             throw new BadRequestException("La date n'est pas valide.");
         }

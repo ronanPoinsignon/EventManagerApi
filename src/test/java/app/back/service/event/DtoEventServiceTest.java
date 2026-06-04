@@ -4,14 +4,15 @@ import app.back.dto.Event;
 import app.back.exception.BackBadRequestException;
 import app.back.service.BasicDtoTestService;
 import app.back.service.DtoEventService;
-import app.utils.UserAttributesUtils;
 import app.utils.EventUtils;
+import app.utils.UserAttributesUtils;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -137,19 +138,19 @@ public class DtoEventServiceTest extends BasicDtoTestService<Event, DtoEventServ
     @Test
     @Order(9)
     void testFindBeforeEndWithStart() {
-        var start = LocalDateTime.now();
+        var start = Instant.now();
 
         var event1 = createBasicObject();
-        event1.setStartDate(start.minusDays(1));
+        event1.setStartDate(start.minus(1, ChronoUnit.DAYS));
         event1.setEndDate(null);
         dtoService.save(event1);
 
         var event2 = createBasicObject();
-        event2.setStartDate(start.minusDays(2));
+        event2.setStartDate(start.minus(2, ChronoUnit.DAYS));
         event2.setEndDate(null);
         dtoService.save(event2);
 
-        var result = dtoService.findAllBeforeEnd(start.minusDays(1));
+        var result = dtoService.findAllBeforeEnd(start.minus(2, ChronoUnit.DAYS));
         Assertions.assertEquals(1, result.size());
         Assertions.assertEquals(event1.getId(), result.getFirst().getId());
     }
@@ -157,24 +158,24 @@ public class DtoEventServiceTest extends BasicDtoTestService<Event, DtoEventServ
     @Test
     @Order(10)
     void testFindBeforeEndWithEnd() {
-        var start = LocalDateTime.now();
+        var start = Instant.now();
 
         var event1 = createBasicObject();
-        event1.setStartDate(start.minusDays(1));
-        event1.setEndDate(start.plusDays(1));
+        event1.setStartDate(start.minus(1, ChronoUnit.DAYS));
+        event1.setEndDate(start.plus(1, ChronoUnit.DAYS));
         dtoService.save(event1);
 
         var event2 = createBasicObject();
-        event2.setStartDate(start.minusDays(2));
-        event2.setEndDate(start.plusDays(2));
+        event2.setStartDate(start.minus(2, ChronoUnit.DAYS));
+        event2.setEndDate(start.plus(2, ChronoUnit.DAYS));
         dtoService.save(event2);
 
         var event3 = createBasicObject();
-        event3.setStartDate(start.minusDays(3));
-        event3.setEndDate(start.plusDays(3));
+        event3.setStartDate(start.minus(3, ChronoUnit.DAYS));
+        event3.setEndDate(start.plus(3, ChronoUnit.DAYS));
         dtoService.save(event3);
 
-        var result = dtoService.findAllBeforeEnd(start.plusDays(2));
+        var result = dtoService.findAllBeforeEnd(start.plus(2, ChronoUnit.DAYS));
         Assertions.assertEquals(2, result.size());
         var match = result.stream().map(Event::getId).allMatch(List.of(event2.getId(), event3.getId())::contains);
         Assertions.assertTrue(match);
@@ -183,29 +184,29 @@ public class DtoEventServiceTest extends BasicDtoTestService<Event, DtoEventServ
     @Test
     @Order(11)
     void testFindBeforeEndWithStartAndEnd() {
-        var start = LocalDateTime.now();
+        var start = Instant.now();
 
         var event1 = createBasicObject();
-        event1.setStartDate(start.plusDays(3));
+        event1.setStartDate(start.plus(3, ChronoUnit.DAYS));
         event1.setEndDate(null);
         dtoService.save(event1);
 
         var event2 = createBasicObject();
-        event2.setStartDate(start.minusDays(2));
-        event2.setEndDate(start.plusDays(2));
+        event2.setStartDate(start.minus(2, ChronoUnit.DAYS));
+        event2.setEndDate(start.plus(2, ChronoUnit.DAYS));
         dtoService.save(event2);
 
         var event3 = createBasicObject();
-        event3.setStartDate(start.minusDays(3));
-        event3.setEndDate(start.plusDays(4));
+        event3.setStartDate(start.minus(3, ChronoUnit.DAYS));
+        event3.setEndDate(start.plus(4, ChronoUnit.DAYS));
         dtoService.save(event3);
 
         var event4 = createBasicObject();
-        event4.setStartDate(start.minusDays(3));
-        event4.setEndDate(start.plusDays(1));
+        event4.setStartDate(start.minus(3, ChronoUnit.DAYS));
+        event4.setEndDate(start.plus(1, ChronoUnit.DAYS));
         dtoService.save(event4);
 
-        var result = dtoService.findAllBeforeEnd(start.plusDays(2));
+        var result = dtoService.findAllBeforeEnd(start.plus(2, ChronoUnit.DAYS));
         Assertions.assertEquals(3, result.size());
         var match = result.stream().map(Event::getId).allMatch(List.of(event1.getId(), event2.getId(), event3.getId())::contains);
         Assertions.assertTrue(match);
@@ -214,21 +215,21 @@ public class DtoEventServiceTest extends BasicDtoTestService<Event, DtoEventServ
     @Test
     @Order(12)
     void testFindBeforeEndNullDate() {
-        var start = LocalDateTime.now();
+        var start = Instant.now();
 
         var event1 = createBasicObject();
-        event1.setStartDate(start.plusDays(3));
+        event1.setStartDate(start.plus(3, ChronoUnit.DAYS));
         event1.setEndDate(null);
         dtoService.save(event1);
 
         var event2 = createBasicObject();
-        event2.setStartDate(start.minusDays(2));
+        event2.setStartDate(start.minus(2, ChronoUnit.DAYS));
         event2.setEndDate(null);
         dtoService.save(event2);
 
         var event3 = createBasicObject();
-        event3.setStartDate(start.minusDays(3));
-        event3.setEndDate(start.plusDays(4));
+        event3.setStartDate(start.minus(3, ChronoUnit.DAYS));
+        event3.setEndDate(start.plus(3, ChronoUnit.DAYS));
         dtoService.save(event3);
 
         var result = dtoService.findAllBeforeEnd(null);
@@ -242,11 +243,11 @@ public class DtoEventServiceTest extends BasicDtoTestService<Event, DtoEventServ
     void testLastEventCreated() {
         var event1 = createBasicObject();
         // obligé de set en dur la différence pour ne pas que les deux événements ne se créent à la même date
-        event1.setCreationDate(event1.getCreationDate().plusDays(1));
+        event1.setCreationDate(event1.getCreationDate().plus(1, ChronoUnit.DAYS));
         dtoService.save(event1);
 
         var event2 = createBasicObject();
-        event2.setCreationDate(event2.getCreationDate().plusDays(5));
+        event2.setCreationDate(event2.getCreationDate().plus(5, ChronoUnit.DAYS));
         dtoService.save(event2);
 
         var event3 = createBasicObject();

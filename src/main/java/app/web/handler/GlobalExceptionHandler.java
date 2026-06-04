@@ -41,7 +41,11 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(WebException.class)
-    public ProblemDetail handleBadRequestException(WebException ex, ServletWebRequest request) {
+    public ProblemDetail handleWebRequestException(WebException ex, ServletWebRequest request) {
+        return handleWebException(ex, request);
+    }
+
+    public ProblemDetail handleWebException(WebException ex, ServletWebRequest request) {
         ProblemDetail problem = ProblemDetail.forStatus(ex.getStatusCode());
 
         problem.setTitle(HttpStatus.valueOf(ex.getStatusCode().value()).getReasonPhrase());
@@ -116,6 +120,12 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BackException.class)
     public ProblemDetail handleBadRequestException(BackException ex, ServletWebRequest request) {
+        return handleBackException(ex, request);
+    }
+
+    @ExceptionHandler(BackInternalException.class)
+    public ProblemDetail handleBackInternalException(BackException ex, ServletWebRequest request) {
+        logger.error(ex.getMessage(), ex);
         return handleBackException(ex, request);
     }
 

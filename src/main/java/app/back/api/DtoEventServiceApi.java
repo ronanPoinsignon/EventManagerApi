@@ -2,7 +2,7 @@ package app.back.api;
 
 import app.back.dto.Event;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,7 +14,7 @@ public interface DtoEventServiceApi extends AbstractDtoServiceApi<Event> {
 
     Optional<Event> findByEventName(String parentName, String name);
 
-    List<Event> findAllBeforeEnd(LocalDateTime date);
+    List<Event> findAllBeforeEnd(Instant date);
 
     List<Event> findAll();
 

@@ -6,7 +6,7 @@ import app.back.exception.BackBadRequestException;
 import app.back.exception.BackForbiddenException;
 import jakarta.persistence.*;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.*;
 
 @Entity
@@ -23,15 +23,15 @@ public class Event extends AbstractEntity {
 
     @Basic
     @Column(name = Contrainte.EVENT_CREATION_DATE, nullable = false)
-    private LocalDateTime creationDate = LocalDateTime.now();
+    private Instant creationDate = Instant.now();
 
     @Basic
     @Column(name = "start_date")
-    private LocalDateTime startDate;
+    private Instant startDate;
 
     @Basic
     @Column(name = "end_date")
-    private LocalDateTime endDate;
+    private Instant endDate;
 
     @Basic
     @Column(name = "location")
@@ -291,27 +291,27 @@ public class Event extends AbstractEntity {
         this.location = location;
     }
 
-    public LocalDateTime getEndDate() {
+    public Instant getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(LocalDateTime endDate) {
+    public void setEndDate(Instant endDate) {
         this.endDate = endDate;
     }
 
-    public LocalDateTime getStartDate() {
+    public Instant getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(LocalDateTime startDate) {
+    public void setStartDate(Instant startDate) {
         this.startDate = startDate;
     }
 
-    public LocalDateTime getCreationDate() {
+    public Instant getCreationDate() {
         return creationDate;
     }
 
-    public void setCreationDate(LocalDateTime creationDate) {
+    public void setCreationDate(Instant creationDate) {
         this.creationDate = creationDate;
     }
 

@@ -5,7 +5,7 @@ import app.web.pojo.PojoEvent;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -17,7 +17,7 @@ public interface EventServiceApi extends AbstractServiceApi<PojoEvent> {
 
     PojoEvent findByEventName(String parentName, String name);
 
-    List<PojoEvent> findAllBeforeEnd(LocalDateTime date);
+    List<PojoEvent> findAllBeforeEnd(Instant date);
 
     List<PojoEvent> findAll();
 

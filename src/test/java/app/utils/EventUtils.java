@@ -15,7 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
@@ -28,9 +29,9 @@ public class EventUtils {
 
     private static final AtomicLong counter = new AtomicLong();
     private Supplier<Long> counterStrategy;
-    private Supplier<LocalDateTime> dateStrategy;
+    private Supplier<Instant> dateStrategy;
 
-    private LocalDateTime now;
+    private Instant now;
 
     @Autowired
     @Lazy
@@ -65,7 +66,7 @@ public class EventUtils {
     private KeycloakUserServiceTest keycloakUserServiceTest;
 
     public EventUtils() {
-        now = LocalDateTime.now();
+        now = Instant.now();
         playCounter();
         playDate();
     }
@@ -93,7 +94,7 @@ public class EventUtils {
     }
 
     public void playDate() {
-        dateStrategy = LocalDateTime::now;
+        dateStrategy = Instant::now;
     }
 
     public Event createBasicEntity() {
@@ -101,8 +102,8 @@ public class EventUtils {
         event.setEventName("eventName_test_" + counterStrategy.get());
         event.setLocation("location_test_" + counterStrategy.get());
         event.setTricountUrl("tricount_test_" + counterStrategy.get());
-        event.setStartDate(dateStrategy.get().plusDays(counterStrategy.get()));
-        event.setEndDate(dateStrategy.get().plusDays(counterStrategy.get()));
+        event.setStartDate(dateStrategy.get().plus(counterStrategy.get(), ChronoUnit.DAYS));
+        event.setEndDate(dateStrategy.get().plus(counterStrategy.get(), ChronoUnit.DAYS));
         event.setOwnerUserId(userServiceApi.getUser().getUserId());
 
         return event;
@@ -155,8 +156,8 @@ public class EventUtils {
         event.setEventName("eventName_test_" + counterStrategy.get());
         event.setLocation("location_test_" + counterStrategy.get());
         event.setTricountUrl("tricount_test_" + counterStrategy.get());
-        event.setStartDate(dateStrategy.get().plusDays(counterStrategy.get()));
-        event.setEndDate(dateStrategy.get().plusDays(counterStrategy.get()));
+        event.setStartDate(dateStrategy.get().plus(counterStrategy.get(), ChronoUnit.DAYS));
+        event.setEndDate(dateStrategy.get().plus(counterStrategy.get(), ChronoUnit.DAYS));
 
         return event;
     }
@@ -209,7 +210,7 @@ public class EventUtils {
         var event = new PojoEvent();
         event.setParentEvent(parent);
         event.setEventName("eventName_" + counterStrategy.get());
-        event.setStartDate(dateStrategy.get().plusDays(counterStrategy.get()));
+        event.setStartDate(dateStrategy.get().plus(counterStrategy.get(), ChronoUnit.DAYS));
 
         return event;
     }

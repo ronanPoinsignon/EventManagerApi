@@ -2,7 +2,7 @@ package app.web.pojo;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -11,9 +11,9 @@ public class PojoEvent extends PojoEntity {
 
     private String eventName;
     private PojoUser ownerUser;
-    private LocalDateTime creationDate;
-    private LocalDateTime startDate;
-    private LocalDateTime endDate;
+    private Instant creationDate;
+    private Instant startDate;
+    private Instant endDate;
     private String location;
     private List<PojoEvent> subEvents;
     @JsonIgnoreProperties(value = "subEvents", allowSetters = true)
@@ -38,27 +38,27 @@ public class PojoEvent extends PojoEntity {
         this.ownerUser = ownerUser;
     }
 
-    public LocalDateTime getCreationDate() {
+    public Instant getCreationDate() {
         return creationDate;
     }
 
-    public void setCreationDate(LocalDateTime creationDate) {
+    public void setCreationDate(Instant creationDate) {
         this.creationDate = creationDate;
     }
 
-    public LocalDateTime getStartDate() {
+    public Instant getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(LocalDateTime startDate) {
+    public void setStartDate(Instant startDate) {
         this.startDate = startDate;
     }
 
-    public LocalDateTime getEndDate() {
+    public Instant getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(LocalDateTime endDate) {
+    public void setEndDate(Instant endDate) {
         this.endDate = endDate;
     }
 
