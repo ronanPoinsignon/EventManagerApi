@@ -49,12 +49,22 @@ public class DiscordBridgeFilter extends OncePerRequestFilter {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication == null) {
-            filterChain.doFilter(request, response);
+            resolver.resolveException(
+                    request,
+                    response,
+                    null,
+                    new UnauthorizedException("Utilisateur non reconnu.")
+            );
             return;
         }
 
         if (!(authentication instanceof JwtAuthenticationToken jwtAuth)) {
-            filterChain.doFilter(request, response);
+            resolver.resolveException(
+                    request,
+                    response,
+                    null,
+                    new UnauthorizedException("Utilisateur non reconnu.")
+            );
             return;
         }
 
@@ -68,9 +78,11 @@ public class DiscordBridgeFilter extends OncePerRequestFilter {
 
         var discordUserId = request.getHeader(DISCORD_HEADER);
         if (discordUserId == null || discordUserId.isBlank()) {
-            response.sendError(
-                    HttpServletResponse.SC_BAD_REQUEST,
-                    "Missing X-Discord-User-Id header"
+            resolver.resolveException(
+                    request,
+                    response,
+                    null,
+                    new UnauthorizedException("Header X-Discord-User-Id manquant")
             );
             return;
         }

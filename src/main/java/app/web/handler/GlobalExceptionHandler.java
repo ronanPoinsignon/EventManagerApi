@@ -7,6 +7,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
+import org.springframework.security.authentication.InsufficientAuthenticationException;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
+import org.springframework.security.oauth2.server.resource.InvalidBearerTokenException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.ServletWebRequest;
@@ -34,6 +38,28 @@ public class GlobalExceptionHandler {
 
         Map<String, Object> error = Map.of(
                 "message", "Une erreur est survenue."
+        );
+        problem.setProperty("error", error);
+
+        return problem;
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ProblemDetail handleException(AuthenticationException ex, HttpServletRequest request) {
+       ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.UNAUTHORIZED);
+
+        problem.setTitle(HttpStatus.UNAUTHORIZED.getReasonPhrase());
+        problem.setInstance(URI.create(request.getRequestURI()));
+
+        String message = switch (ex) {
+            case InvalidBearerTokenException _ -> "Token invalide ou expiré";
+            case InsufficientAuthenticationException _ -> "Token manquant";
+            case OAuth2AuthenticationException _ -> "Bearer malformé";
+            default -> "Accès non autorisé";
+        };
+
+        Map<String, Object> error = Map.of(
+                "message", message
         );
         problem.setProperty("error", error);
 
