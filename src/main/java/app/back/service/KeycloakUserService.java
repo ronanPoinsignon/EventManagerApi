@@ -103,7 +103,6 @@ public class KeycloakUserService implements KeycloakUserServiceApi {
     }
 
     private String getBaseURL() {
-        System.out.println("BASE URL : " + keycloakInternalBaseUrl);
         return keycloakInternalBaseUrl;
     }
 
