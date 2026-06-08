@@ -2,16 +2,21 @@ package app.back.service;
 
 import app.back.api.DtoEventServiceApi;
 import app.back.dto.Event;
+import app.back.dto.notification.EntityType;
+import app.back.dto.notification.ScheduleNotification;
 import app.back.entityname.EntityTable;
 import app.back.exception.BackBadRequestException;
 import app.back.exception.duplicate.event.BackDuplicateEventNameException;
 import app.back.repository.EventRepository;
 import app.back.security.UserServiceApi;
 import org.jspecify.annotations.NonNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.stereotype.Service;
 
 import java.time.*;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -19,11 +24,15 @@ import java.util.Optional;
 @Service
 public class DtoEventService extends DtoAbstractEntityService<Event, @NonNull EventRepository> implements DtoEventServiceApi {
 
-    private final UserServiceApi userService;
+    Logger logger = LoggerFactory.getLogger(DtoEventService.class);
 
-    protected DtoEventService(@NonNull EventRepository repository, UserServiceApi userService) {
+    private final UserServiceApi userService;
+    private final DtoScheduleNotificationService dtoScheduleNotificationService;
+
+    protected DtoEventService(@NonNull EventRepository repository, UserServiceApi userService, DtoScheduleNotificationService dtoScheduleNotificationService) {
         super(repository);
         this.userService = userService;
+        this.dtoScheduleNotificationService = dtoScheduleNotificationService;
     }
 
     @Override
@@ -61,7 +70,39 @@ public class DtoEventService extends DtoAbstractEntityService<Event, @NonNull Ev
             entity.setOwnerUserId(user.getUserId());
         }
 
-        return super.save(entity);
+        var result = super.save(entity);
+        createNotifications(result);
+        return result;
+    }
+
+    private void createNotifications(Event event) {
+        if(event == null) {
+            return;
+        }
+        if(event.getId() == null) {
+            logger.warn("Impossible de supprimer les notifications pour un événement d'id null.");
+            return;
+        }
+
+        // suppression des possibles précédentes notifications
+        var eventNotificationNumber = dtoScheduleNotificationService.deleteNotificationByRelatedId(EntityType.EVENT_TYPE, event.getId());
+        logger.info("{} notification(s) sont supprimées après la modification de l'événement {}", eventNotificationNumber, event.getId());
+
+        var now = Instant.now();
+        var startDate = event.getStartDate();
+        var duration = Duration.between(now, startDate);
+        var seconds = duration.get(ChronoUnit.SECONDS);
+        var secondsByDay = 86400;
+
+        if(seconds > 60 * secondsByDay) {
+            dtoScheduleNotificationService.save(new ScheduleNotification(startDate.minus(30, ChronoUnit.DAYS), event));
+        }
+        if(seconds > 20 * secondsByDay) {
+            dtoScheduleNotificationService.save(new ScheduleNotification(startDate.minus(7, ChronoUnit.DAYS), event));
+        }
+        if(seconds > 6 * secondsByDay) {
+            dtoScheduleNotificationService.save(new ScheduleNotification(startDate.minus(1, ChronoUnit.DAYS), event));
+        }
     }
 
     @Override

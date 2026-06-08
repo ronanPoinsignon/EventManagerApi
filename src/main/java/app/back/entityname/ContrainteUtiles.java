@@ -33,9 +33,14 @@ public class ContrainteUtiles {
         Map<String, Supplier<? extends BackConstraintException>> userAttributesMap = new HashMap<>();
         Contrainte.USER_ATTRIBUTES_UNIQUE_ATTRIBUTES.forEach(uniqueContrainte -> userAttributesMap.put(uniqueContrainte, () -> new BackUniqueEntityAttribute(uniqueContrainte)));
 
+        Map<String, Supplier<? extends BackConstraintException>> notificationMap = new HashMap<>();
+        notificationMap.put(Contrainte.NOTIFICATION_ENTITY_TYPE, () -> new BackConstraintException("Le type de l'entité ne peut pas être null."));
+        notificationMap.put(Contrainte.NOTIFICATION_EXECUTION_DATE, () -> new BackConstraintException("La date d'exécution ne peut pas être null."));
+
         CONTRAINTE_EXCEPTION_MAP.put(EntityTable.EVENT, Collections.unmodifiableMap(eventMap));
         CONTRAINTE_EXCEPTION_MAP.put(EntityTable.USER_ATTRIBUTES, Collections.unmodifiableMap(userAttributesMap));
         CONTRAINTE_EXCEPTION_MAP.put(EntityTable.TODO_ENTRY, Collections.unmodifiableMap(todoMap));
+        CONTRAINTE_EXCEPTION_MAP.put(EntityTable.SCHEDULE_NOTIFICATION, Collections.unmodifiableMap(notificationMap));
     }
 
 }

@@ -22,4 +22,7 @@ public interface Contrainte {
     String USER_ATTRIBUTE_KEYCLOAK_USER_ID = "keycloak_user_id";
     List<String> USER_ATTRIBUTES_UNIQUE_ATTRIBUTES = List.of(USER_ATTRIBUTES_DISCORD_ID, USER_ATTRIBUTE_KEYCLOAK_USER_ID);
 
+    String NOTIFICATION_EXECUTION_DATE = "execution_date";
+    String NOTIFICATION_ENTITY_TYPE = "entity_type";
+
 }
