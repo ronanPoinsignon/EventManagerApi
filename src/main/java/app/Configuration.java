@@ -1,5 +1,6 @@
 package app;
 
+import app.configuration.*;
 import app.web.converter.StringToInstantConverter;
 import app.web.converter.StringToLocalDateTimeConverter;
 import app.web.deserializer.InstantDeserializer;
@@ -23,7 +24,7 @@ import java.time.LocalDateTime;
 @org.springframework.context.annotation.Configuration
 @ComponentScan
 @EnableJpaRepositories
-@Import({ CacheConfiguration.class, RestTemplateConfiguration.class, KeycloakConfiguration.class, ScheduleNotificationConfiguration.class })
+@Import({ CacheConfiguration.class, RestTemplateConfiguration.class, KeycloakConfiguration.class, ScheduleNotificationConfiguration.class, RabbitConfiguration.class})
 public class Configuration implements WebMvcConfigurer {
 
     @Bean

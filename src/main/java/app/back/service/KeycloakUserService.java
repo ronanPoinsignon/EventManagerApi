@@ -1,6 +1,6 @@
 package app.back.service;
 
-import app.RestTemplateConfiguration;
+import app.configuration.RestTemplateConfiguration;
 import app.back.api.KeycloakUserServiceApi;
 import app.back.dto.KeycloakUser;
 import org.springframework.beans.factory.annotation.Value;

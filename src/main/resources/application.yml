@@ -22,9 +22,21 @@ spring:
         format_sql: true
       naming:
         strategy: org.hibernate.cfg.ImprovedNamingStrategy
+  rabbitmq:
+    host: ${rabbit.host}
+    port: ${RABBITMQ_PORT}
+    username: ${RABBITMQ_DEFAULT_USER}
+    password: ${RABBITMQ_DEFAULT_PASS}
+    dynamic: true
   security:
     oauth2:
       resourceserver:
         jwt:
           issuer-uri: ${keycloak.external-server-url}/realms/${KEYCLOAK_REALM}
           jwk-set-uri: ${keycloak.internal-server-url}/realms/${KEYCLOAK_REALM}/protocol/openid-connect/certs
+  logging:
+    level:
+      org:
+        springframework:
+          amqp: DEBUG
+          rabbit: DEBUG

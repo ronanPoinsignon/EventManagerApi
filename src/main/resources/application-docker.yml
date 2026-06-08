@@ -1,5 +1,7 @@
 keycloak:
   external-server-url: http://localhost:${KEYCLOAK_PORT}
   internal-server-url: http://keycloak:${KEYCLOAK_PORT}
+rabbit:
+  host: rabbit
 storage:
   path: /var/lib/data

@@ -1,4 +1,4 @@
-package app;
+package app.configuration;
 
 import app.back.api.KeycloakUserServiceApi;
 import com.github.benmanes.caffeine.cache.Caffeine;

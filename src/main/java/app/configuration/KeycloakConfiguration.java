@@ -1,4 +1,4 @@
-package app;
+package app.configuration;
 
 import app.web.filter.DiscordBridgeFilter;
 import app.web.handler.GlobalExceptionHandler;
