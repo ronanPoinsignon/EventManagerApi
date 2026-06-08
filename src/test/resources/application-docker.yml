@@ -1,2 +1,5 @@
 keycloak:
-  server-url: http://keycloak:${KEYCLOAK_PORT}
+  external-server-url: http://localhost:${KEYCLOAK_PORT}
+  internal-server-url: http://keycloak:${KEYCLOAK_PORT}
+storage:
+  path: /var/lib/data
