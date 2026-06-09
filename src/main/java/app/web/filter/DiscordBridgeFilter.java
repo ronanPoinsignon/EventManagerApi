@@ -78,12 +78,7 @@ public class DiscordBridgeFilter extends OncePerRequestFilter {
 
         var discordUserId = request.getHeader(DISCORD_HEADER);
         if (discordUserId == null || discordUserId.isBlank()) {
-            resolver.resolveException(
-                    request,
-                    response,
-                    null,
-                    new UnauthorizedException("Header X-Discord-User-Id manquant")
-            );
+            filterChain.doFilter(request, response);
             return;
         }
 
