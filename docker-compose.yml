@@ -23,6 +23,8 @@ services:
       - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
       - KEYCLOAK_CLIENT_SECRET=${KEYCLOAK_CLIENT_SECRET}
       - RABBITMQ_PORT=${RABBITMQ_PORT}
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
     networks:
       - pladonf_api
       - pladonf_auth
@@ -86,9 +88,10 @@ services:
     networks:
       - pladonf_api
       - pladonf_auth
-  rabbitmq:
+      - pladonf_rabbitmq
+  rabbit:
     image: rabbitmq:3-management
-    container_name: rabbitmq
+    container_name: rabbit
     ports:
       - ${RABBITMQ_PORT}:5672
       - "15672:15672"
