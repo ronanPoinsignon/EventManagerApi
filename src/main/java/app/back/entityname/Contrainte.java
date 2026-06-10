@@ -25,4 +25,6 @@ public interface Contrainte {
     String NOTIFICATION_EXECUTION_DATE = "execution_date";
     String NOTIFICATION_ENTITY_TYPE = "entity_type";
 
+    String DISCORD_GUILD_ID = "discord_guild_id";
+
 }

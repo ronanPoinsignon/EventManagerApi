@@ -14,6 +14,9 @@ import org.hibernate.annotations.AnyDiscriminatorValues;
 import org.hibernate.annotations.AnyKeyJavaClass;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.UUID;
 
 @Entity
 @Table(name = EntityTable.SCHEDULE_NOTIFICATION)
@@ -34,14 +37,17 @@ public class ScheduleNotification extends AbstractEntity {
     @Column(name = "notified")
     private boolean notified;
 
+    private Collection<UUID> notifiedUsers = new ArrayList<>();
+
     // constructeur vide pour hibernate
     public ScheduleNotification() {
 
     }
 
-    public ScheduleNotification(Instant executionDate, AbstractEntity entity) {
+    public ScheduleNotification(Instant executionDate, AbstractEntity entity, Collection<UUID> notifiedUsers) {
         this.executionDate = executionDate;
         this.entity = entity;
+        this.notifiedUsers = notifiedUsers;
     }
 
     public Instant getExecutionDate() {
@@ -68,4 +74,11 @@ public class ScheduleNotification extends AbstractEntity {
         this.notified = notified;
     }
 
+    public Collection<UUID> getNotifiedUsers() {
+        return notifiedUsers;
+    }
+
+    public void setNotifiedUsers(Collection<UUID> notifiedUsers) {
+        this.notifiedUsers = notifiedUsers;
+    }
 }

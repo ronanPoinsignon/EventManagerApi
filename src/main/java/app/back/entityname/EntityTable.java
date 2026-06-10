@@ -6,5 +6,6 @@ public interface EntityTable {
     String USER_ATTRIBUTES = "user_attributes";
     String TODO_ENTRY = "todos";
     String SCHEDULE_NOTIFICATION = "schedule_notification";
+    String DISCORD_GUILD = "discord_guild";
 
 }

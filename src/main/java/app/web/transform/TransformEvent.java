@@ -71,6 +71,9 @@ public class TransformEvent extends AbstractTransform<Event, PojoEvent> {
                 return todo;
             }).toList());
         }
+        if(pojo.getGuildIds() != null) {
+            event.setGuildIds(pojo.getGuildIds());
+        }
         event.setTricountUrl(pojo.getTricountUrl());
 
         return event;
@@ -123,6 +126,7 @@ public class TransformEvent extends AbstractTransform<Event, PojoEvent> {
 
             return pojo;
         }).toList());
+        pojoEvent.setGuildIds(dto.getGuildIds());
         pojoEvent.setTricountUrl(dto.getTricountUrl());
 
         return pojoEvent;

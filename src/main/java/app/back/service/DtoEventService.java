@@ -71,7 +71,9 @@ public class DtoEventService extends DtoAbstractEntityService<Event, @NonNull Ev
         }
 
         var result = super.save(entity);
-        createNotifications(result);
+        if(result.getParentEvent() == null) {
+            createNotifications(result);
+        }
         return result;
     }
 
@@ -95,13 +97,13 @@ public class DtoEventService extends DtoAbstractEntityService<Event, @NonNull Ev
         var secondsByDay = 86400;
 
         if(seconds > 60 * secondsByDay) {
-            dtoScheduleNotificationService.save(new ScheduleNotification(startDate.minus(30, ChronoUnit.DAYS), event));
+            dtoScheduleNotificationService.save(new ScheduleNotification(startDate.minus(30, ChronoUnit.DAYS), event, event.getParticipants()));
         }
         if(seconds > 20 * secondsByDay) {
-            dtoScheduleNotificationService.save(new ScheduleNotification(startDate.minus(7, ChronoUnit.DAYS), event));
+            dtoScheduleNotificationService.save(new ScheduleNotification(startDate.minus(7, ChronoUnit.DAYS), event, event.getParticipants()));
         }
         if(seconds > 6 * secondsByDay) {
-            dtoScheduleNotificationService.save(new ScheduleNotification(startDate.minus(1, ChronoUnit.DAYS), event));
+            dtoScheduleNotificationService.save(new ScheduleNotification(startDate.minus(1, ChronoUnit.DAYS), event, event.getParticipants()));
         }
     }
 
@@ -120,6 +122,9 @@ public class DtoEventService extends DtoAbstractEntityService<Event, @NonNull Ev
         }
         if(entityToSave.isShouldUpdateTodos()) {
             dbEntity.setTodoList(entityToSave.getTodoList());
+        }
+        if(entityToSave.shouldUpdateGuildIds()) {
+            dbEntity.setGuildIds(entityToSave.getGuildIds());
         }
     }
 
@@ -176,11 +181,13 @@ public class DtoEventService extends DtoAbstractEntityService<Event, @NonNull Ev
         var parentEvent = event.getParentEvent();
         if(parentEvent == null) {
             this.delete(event);
+            dtoScheduleNotificationService.deleteNotificationByRelatedId(EntityType.EVENT_TYPE, id);
             return Optional.of(event);
         }
 
         parentEvent.removeSubEvent(event);
         this.save(parentEvent);
+        dtoScheduleNotificationService.deleteNotificationByRelatedId(EntityType.EVENT_TYPE, id);
         return Optional.of(event);
     }
 }

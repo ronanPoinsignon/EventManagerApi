@@ -47,12 +47,18 @@ public class Event extends AbstractEntity {
 
     private transient boolean shouldUpdateParticipants;
 
+    @Column(name = "participants")
     private final Set<UUID> participants = new HashSet<>();
 
     private transient boolean shouldUpdateTodos;
 
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<TodoEntry> todoListEntries = new ArrayList<>();
+
+    @Column(name = "guild_ids")
+    private final Set<String> guildIds = new HashSet<>();
+
+    private transient boolean shouldUpdateGuildIds;
 
     @Column(name = "tricount")
     private String tricountUrl;
@@ -215,6 +221,61 @@ public class Event extends AbstractEntity {
         this.participants.clear();
         this.participants.addAll(temp);
         shouldUpdateParticipants = true;
+        return true;
+    }
+
+    public boolean shouldUpdateGuildIds() {
+        return shouldUpdateGuildIds;
+    }
+
+    public Set<String> getGuildIds() {
+        return Collections.unmodifiableSet(this.guildIds);
+    }
+
+    public boolean addGuildId(String id) {
+        var result = this.guildIds.add(id);
+        shouldUpdateGuildIds |= result;
+        return result;
+    }
+
+    public boolean addGuildId(Collection<String> idCollection) {
+        if(idCollection == null || idCollection.isEmpty()) {
+            return false;
+        }
+
+        var result = this.guildIds.addAll(idCollection);
+        shouldUpdateGuildIds |= result;
+        return result;
+    }
+
+    public boolean removeGuildIds(String id) {
+        return removeGuildIds(List.of(id));
+    }
+
+    public boolean removeGuildIds(Collection<String> idCollection) {
+        if(idCollection == null || idCollection.isEmpty()) {
+            return false;
+        }
+
+        var temp = new ArrayList<>(idCollection);
+        var result = this.guildIds.removeIf(temp::contains);
+        shouldUpdateGuildIds |= result;
+        return result;
+    }
+
+    public boolean setGuildIds(Collection<String> ids) {
+        var shouldChange = false;
+        if(ids == null || ids.isEmpty()) {
+            shouldChange = !this.guildIds.isEmpty();
+            shouldUpdateGuildIds = shouldChange;
+            this.guildIds.clear();
+            return shouldChange;
+        }
+
+        var temp = new ArrayList<>(ids);
+        this.guildIds.clear();
+        this.guildIds.addAll(temp);
+        shouldUpdateGuildIds = true;
         return true;
     }
 

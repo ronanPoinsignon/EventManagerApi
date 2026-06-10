@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.ArrayList;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -22,7 +23,7 @@ public class ScheduleNotificationTest extends BasicDtoTestService<ScheduleNotifi
 
     @Override
     protected ScheduleNotification createBasicObject() {
-        return new ScheduleNotification(Instant.now(), new Event());
+        return new ScheduleNotification(Instant.now(), new Event(), new ArrayList<>());
     }
 
 }

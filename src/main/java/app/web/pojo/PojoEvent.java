@@ -6,6 +6,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 public class PojoEvent extends PojoEntity {
 
@@ -20,6 +21,7 @@ public class PojoEvent extends PojoEntity {
     private PojoEvent parentEvent;
     private List<PojoUser> participants;
     private List<PojoTodoEntry> todoList;
+    private Set<String> guildIds;
     private String tricountUrl;
 
     public String getEventName() {
@@ -100,6 +102,14 @@ public class PojoEvent extends PojoEntity {
 
     public void setTodoList(List<PojoTodoEntry> todoList) {
         this.todoList = new ArrayList<>(todoList);
+    }
+
+    public Set<String> getGuildIds() {
+        return guildIds;
+    }
+
+    public void setGuildIds(Set<String> guildIds) {
+        this.guildIds = guildIds;
     }
 
     public String getTricountUrl() {
