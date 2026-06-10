@@ -1,12 +1,14 @@
 package app.web.pojo;
 
 import java.time.Instant;
+import java.util.List;
 
 public class PojoScheduleNotification extends PojoEntity {
 
     private Instant executionDate;
     private String entityType;
     private PojoEntity entity;
+    private List<PojoKeycloakUserAttributes> users;
 
     public Instant getExecutionDate() {
         return executionDate;
@@ -32,4 +34,11 @@ public class PojoScheduleNotification extends PojoEntity {
         this.entity = entity;
     }
 
+    public List<PojoKeycloakUserAttributes> getUsers() {
+        return users;
+    }
+
+    public void setUsers(List<PojoKeycloakUserAttributes> users) {
+        this.users = users;
+    }
 }

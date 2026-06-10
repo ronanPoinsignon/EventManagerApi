@@ -4,6 +4,7 @@ import app.back.dto.Event;
 import app.back.dto.notification.ScheduleNotification;
 import app.web.pojo.PojoEntity;
 import app.web.pojo.PojoScheduleNotification;
+import app.web.service.KeycloakUserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -12,11 +13,14 @@ import org.springframework.stereotype.Service;
 public class TransformScheduleNotification implements Transform<ScheduleNotification, PojoScheduleNotification> {
 
     private final TransformEvent transformEvent;
+    private final KeycloakUserService keycloakUserService;
 
-    private Logger logger = LoggerFactory.getLogger(TransformScheduleNotification.class);
 
-    public TransformScheduleNotification(TransformEvent transformEvent) {
+    private final Logger logger = LoggerFactory.getLogger(TransformScheduleNotification.class);
+
+    public TransformScheduleNotification(TransformEvent transformEvent, KeycloakUserService keycloakUserService) {
         this.transformEvent = transformEvent;
+        this.keycloakUserService = keycloakUserService;
     }
 
     @Override
@@ -36,6 +40,7 @@ public class TransformScheduleNotification implements Transform<ScheduleNotifica
             }
         };
         pojoNotif.setEntity(pojoRelatedEntity);
+        pojoNotif.setUsers(keycloakUserService.findByIds(dto.getNotifiedUsers()));
         return pojoNotif;
     }
 }
