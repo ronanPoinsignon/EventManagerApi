@@ -2,7 +2,6 @@ package app.web.transform;
 
 import app.back.dto.Event;
 import app.back.dto.notification.ScheduleNotification;
-import app.back.service.DtoScheduleNotificationService;
 import app.web.pojo.PojoEntity;
 import app.web.pojo.PojoScheduleNotification;
 import org.slf4j.Logger;
@@ -12,13 +11,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class TransformScheduleNotification implements Transform<ScheduleNotification, PojoScheduleNotification> {
 
-    private final DtoScheduleNotificationService dtoScheduleNotificationService;
     private final TransformEvent transformEvent;
 
     private Logger logger = LoggerFactory.getLogger(TransformScheduleNotification.class);
 
-    public TransformScheduleNotification(DtoScheduleNotificationService dtoScheduleNotificationService, TransformEvent transformEvent) {
-        this.dtoScheduleNotificationService = dtoScheduleNotificationService;
+    public TransformScheduleNotification(TransformEvent transformEvent) {
         this.transformEvent = transformEvent;
     }
 
