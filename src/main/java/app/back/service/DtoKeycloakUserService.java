@@ -17,7 +17,7 @@ import org.springframework.util.MultiValueMap;
 import java.util.*;
 
 @Service
-public class KeycloakUserService implements KeycloakUserServiceApi {
+public class DtoKeycloakUserService implements KeycloakUserServiceApi {
 
     @Value("${KEYCLOAK_REALM}")
     private String keycloakRealmValue;
@@ -32,7 +32,7 @@ public class KeycloakUserService implements KeycloakUserServiceApi {
 
     private final RestTemplateConfiguration.WebRequester webRequester;
 
-    public KeycloakUserService(RestTemplateConfiguration.WebRequester webRequester) {
+    public DtoKeycloakUserService(RestTemplateConfiguration.WebRequester webRequester) {
         this.webRequester = webRequester;
     }
 
