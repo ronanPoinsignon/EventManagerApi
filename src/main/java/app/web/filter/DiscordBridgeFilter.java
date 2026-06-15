@@ -3,6 +3,7 @@ package app.web.filter;
 import app.back.api.KeycloakUserServiceApi;
 import app.back.repository.UserAttributesRepository;
 import app.web.exception.UnauthorizedException;
+import com.nimbusds.jose.shaded.gson.internal.LinkedTreeMap;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -10,6 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
@@ -19,6 +21,8 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class DiscordBridgeFilter extends OncePerRequestFilter {
@@ -99,7 +103,11 @@ public class DiscordBridgeFilter extends OncePerRequestFilter {
         var keycloakUserId = userAttributes.getKeycloakUserId();
         var userTokenInformations = keycloakUserService.impersonate(keycloakUserId);
         var userJwt = jwtDecoder.decode(userTokenInformations.get("access_token"));
-        UsernamePasswordAuthenticationToken userAuthentication = new UsernamePasswordAuthenticationToken(userJwt, null, new ArrayList<>());
+        
+        var realmAccess = (LinkedTreeMap<String, List<String>>) userJwt.getClaims().getOrDefault("realm_access", new LinkedTreeMap<String, List<String>>());
+        var roles = realmAccess.getOrDefault("roles", new ArrayList<>()).stream().map(SimpleGrantedAuthority::new).collect(Collectors.toSet());
+
+        UsernamePasswordAuthenticationToken userAuthentication = new UsernamePasswordAuthenticationToken(userJwt, null, roles);
         SecurityContextHolder.getContext().setAuthentication(userAuthentication);
 
         filterChain.doFilter(request, response);
