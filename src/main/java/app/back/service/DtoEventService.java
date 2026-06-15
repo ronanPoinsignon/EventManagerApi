@@ -178,15 +178,7 @@ public class DtoEventService extends DtoAbstractEntityService<Event, @NonNull Ev
         }
 
         var event = resultOptional.get();
-        var parentEvent = event.getParentEvent();
-        if(parentEvent == null) {
-            this.delete(event);
-            dtoScheduleNotificationService.deleteNotificationByRelatedId(EntityType.EVENT_TYPE, id);
-            return Optional.of(event);
-        }
-
-        parentEvent.removeSubEvent(event);
-        this.save(parentEvent);
+        this.delete(event);
         dtoScheduleNotificationService.deleteNotificationByRelatedId(EntityType.EVENT_TYPE, id);
         return Optional.of(event);
     }
