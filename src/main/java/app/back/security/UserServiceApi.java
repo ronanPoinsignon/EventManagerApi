@@ -1,7 +1,9 @@
 package app.back.security;
 
+import org.jspecify.annotations.NonNull;
+
 public interface UserServiceApi {
 
-    User getUser();
+    @NonNull User getUser();
 
 }

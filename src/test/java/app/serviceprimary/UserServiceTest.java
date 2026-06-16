@@ -2,6 +2,7 @@ package app.serviceprimary;
 
 import app.back.security.User;
 import app.back.security.UserServiceApi;
+import org.jspecify.annotations.NonNull;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +23,7 @@ public class UserServiceTest implements UserServiceApi {
     }
 
     @Override
-    public User getUser() {
+    public @NonNull User getUser() {
         return testUser;
     }
 

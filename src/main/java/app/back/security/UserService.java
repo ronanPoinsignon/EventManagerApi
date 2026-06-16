@@ -1,6 +1,7 @@
 package app.back.security;
 
 import app.back.exception.BackForbiddenException;
+import org.jspecify.annotations.NonNull;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
@@ -11,7 +12,7 @@ import java.util.*;
 public class UserService implements UserServiceApi {
 
     @Override
-    public User getUser() {
+    public @NonNull User getUser() {
         var jwt = (Jwt) Objects.requireNonNull(SecurityContextHolder.getContext()
                         .getAuthentication())
                 .getPrincipal();
@@ -28,6 +29,7 @@ public class UserService implements UserServiceApi {
         if(claims.containsKey("realm_access")) {
             user.setRoles(((Map<String, List<String>>) claims.get("realm_access")).getOrDefault("roles", new ArrayList<>()));
         }
+
         return user;
     }
 }
