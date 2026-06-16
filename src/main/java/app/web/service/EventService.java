@@ -3,6 +3,7 @@ package app.web.service;
 import app.back.api.DtoEventServiceApi;
 import app.back.dto.Event;
 import app.back.dto.TodoEntry;
+import app.back.security.UserServiceApi;
 import app.utils.FileService;
 import app.web.api.EventServiceApi;
 import app.web.exception.BadRequestException;
@@ -30,11 +31,13 @@ public class EventService extends AbstractService<Event, PojoEvent, DtoEventServ
 
     private final UserAttributesService userAttributesService;
     private final FileService fileService;
+    private final UserServiceApi userServiceApi;
 
-    public EventService(DtoEventServiceApi eventService, TransformEvent transformEvent, UserAttributesService userAttributesService, FileService fileService) {
+    public EventService(DtoEventServiceApi eventService, TransformEvent transformEvent, UserAttributesService userAttributesService, FileService fileService, UserServiceApi userServiceApi) {
         super(eventService, transformEvent);
         this.userAttributesService = userAttributesService;
         this.fileService = fileService;
+        this.userServiceApi = userServiceApi;
     }
 
     @Transactional
@@ -306,6 +309,15 @@ public class EventService extends AbstractService<Event, PojoEvent, DtoEventServ
         }
 
         return new InputStreamResource(fileInputStream);
+    }
+
+    @Override
+    public List<PojoEvent> getMyEvents() {
+        var user = userServiceApi.getUser();
+
+        return getService().getEventsByUserId(user.getUserId()).stream()
+                .map(getTransform()::toPojo)
+                .toList();
     }
 
     @Transactional

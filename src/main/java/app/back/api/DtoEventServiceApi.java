@@ -5,6 +5,7 @@ import app.back.dto.Event;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface DtoEventServiceApi extends AbstractDtoServiceApi<Event> {
 
@@ -21,4 +22,6 @@ public interface DtoEventServiceApi extends AbstractDtoServiceApi<Event> {
     Optional<Event> getLast();
 
     Optional<Event> findEventFromTodoId(long todoId);
+
+    List<Event> getEventsByUserId(UUID userId);
 }

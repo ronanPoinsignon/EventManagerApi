@@ -54,4 +54,7 @@ public interface EventServiceApi extends AbstractServiceApi<PojoEvent> {
     InputStreamResource uploadEventImageFile(long eventId, MultipartFile eventFile);
 
     InputStreamResource downloadEventImageFile(long eventId);
+
+    List<PojoEvent> getMyEvents();
+
 }

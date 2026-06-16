@@ -71,4 +71,9 @@ public class EventController {
         return eventService.downloadEventImageFile(eventId);
     }
 
+    @GetMapping("/myEvents")
+    public List<PojoEvent> getMyEvents() {
+        return eventService.getMyEvents();
+    }
+
 }

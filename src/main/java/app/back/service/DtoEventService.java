@@ -20,6 +20,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class DtoEventService extends DtoAbstractEntityService<Event, @NonNull EventRepository> implements DtoEventServiceApi {
@@ -164,6 +165,11 @@ public class DtoEventService extends DtoAbstractEntityService<Event, @NonNull Ev
     @Override
     public Optional<Event> findEventFromTodoId(long todoId) {
         return repository.findEventFromTodoId(todoId);
+    }
+
+    @Override
+    public List<Event> getEventsByUserId(UUID userId) {
+        return repository.getEventsByUserId(userId.toString());
     }
 
     @Override
