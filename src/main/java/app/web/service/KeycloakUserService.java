@@ -14,10 +14,11 @@ import java.util.UUID;
 public class KeycloakUserService {
 
     private final TransformKeycloakUser transformKeycloakUser;
-    private KeycloakUserServiceApi keycloakUserServiceApi;
+    private final KeycloakUserServiceApi keycloakUserServiceApi;
 
-    public KeycloakUserService(TransformKeycloakUser transformKeycloakUser) {
+    public KeycloakUserService(TransformKeycloakUser transformKeycloakUser, KeycloakUserServiceApi keycloakUserServiceApi) {
         this.transformKeycloakUser = transformKeycloakUser;
+        this.keycloakUserServiceApi = keycloakUserServiceApi;
     }
 
     public PojoKeycloakUserAttributes findById(UUID id) {
